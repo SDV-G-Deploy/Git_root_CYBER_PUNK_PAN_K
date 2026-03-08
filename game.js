@@ -117,6 +117,7 @@ const ChainLabGame = (() => {
       score: 0,
       shotsRemaining: CONFIG.LEVEL.SHOTS,
       phase: 'aim',
+      lastShotHit: false,
       projectile: null,
       nodes: createNodes(),
       aim: {
@@ -141,7 +142,8 @@ const ChainLabGame = (() => {
     return {
       score: state.score,
       shotsRemaining: state.shotsRemaining,
-      phase: state.phase
+      phase: state.phase,
+      lastShotHit: state.lastShotHit
     };
   }
 
@@ -225,6 +227,7 @@ const ChainLabGame = (() => {
     };
 
     state.shotsRemaining -= 1;
+    state.lastShotHit = false;
     state.phase = 'simulate';
     return true;
   }
@@ -260,6 +263,7 @@ const ChainLabGame = (() => {
       speed <= CONFIG.PROJECTILE.MIN_SPEED
     ) {
       projectile.alive = false;
+      state.lastShotHit = false;
       state.phase = 'end';
       return;
     }
@@ -269,6 +273,7 @@ const ChainLabGame = (() => {
       hitNode.resolved = true;
       state.score += CONFIG.NODES.HIT_SCORE;
       projectile.alive = false;
+      state.lastShotHit = true;
       state.phase = 'end';
     }
   }
@@ -420,12 +425,10 @@ const ChainLabGame = (() => {
       return;
     }
 
-    const allResolved = state.nodes.every((node) => node.resolved);
-
     ctx.font = CONFIG.END_HINT.FONT;
-    ctx.fillStyle = allResolved ? CONFIG.END_HINT.WIN_COLOR : CONFIG.END_HINT.LOSE_COLOR;
+    ctx.fillStyle = state.lastShotHit ? CONFIG.END_HINT.WIN_COLOR : CONFIG.END_HINT.LOSE_COLOR;
     ctx.fillText(
-      allResolved ? CONFIG.END_HINT.WIN_TEXT : CONFIG.END_HINT.LOSE_TEXT,
+      state.lastShotHit ? CONFIG.END_HINT.WIN_TEXT : CONFIG.END_HINT.LOSE_TEXT,
       CONFIG.END_HINT.X,
       CONFIG.END_HINT.Y
     );
@@ -466,3 +469,5 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ChainLabGame;
 }
+
+
