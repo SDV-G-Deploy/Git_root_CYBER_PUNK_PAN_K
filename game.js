@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const ChainLabGame = (() => {
   const CONFIG = Object.freeze({
@@ -74,8 +74,8 @@ const ChainLabGame = (() => {
       START_MULTIPLIER: 1
     },
     RUN: {
-      WIN_TEXT: 'Run complete. Loading next level...',
-      LOSE_TEXT: 'Run failed. Retry current level.',
+      WIN_TEXT: 'Target reached. Continue to next level.',
+      LOSE_TEXT: 'Shots depleted. Retry current level.',
       WIN_COLOR: '#8dffba',
       LOSE_COLOR: '#ff9fa9',
       LABEL_X: 245,
@@ -386,6 +386,23 @@ const ChainLabGame = (() => {
 
   function getCurrentLevelIndex() {
     return runtime.levelIndex;
+  }
+
+  function evaluateRunOutcome() {
+    const state = getState();
+
+    if (state.score >= state.targetScore) {
+      finalizeRun('win');
+      return;
+    }
+
+    if (state.shotsRemaining <= 0) {
+      finalizeRun('lose');
+      return;
+    }
+
+    state.projectile = null;
+    state.phase = 'aim';
   }
 
   function finalizeRun(result) {
@@ -776,7 +793,7 @@ const ChainLabGame = (() => {
         capped: state.chain.capped
       });
 
-      finalizeRun(state.lastShotHit ? 'win' : 'lose');
+      evaluateRunOutcome();
     }
   }
 
@@ -786,7 +803,7 @@ const ChainLabGame = (() => {
 
     if (!projectile || !projectile.alive) {
       state.lastShotHit = false;
-      finalizeRun('lose');
+      evaluateRunOutcome();
       return;
     }
 
@@ -813,7 +830,7 @@ const ChainLabGame = (() => {
     ) {
       projectile.alive = false;
       state.lastShotHit = false;
-      finalizeRun('lose');
+      evaluateRunOutcome();
       return;
     }
 

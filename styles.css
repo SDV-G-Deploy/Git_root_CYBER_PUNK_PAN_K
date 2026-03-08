@@ -89,3 +89,44 @@ body {
   color: #8cb2c7;
   font-size: 13px;
 }
+.outcome {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #35556d;
+  background: rgba(16, 34, 49, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.outcome.win {
+  border-color: #3e8f62;
+  color: #b7ffd4;
+}
+
+.outcome.lose {
+  border-color: #92565e;
+  color: #ffc2cb;
+}
+
+.outcome-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.outcome-actions button {
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.outcome-actions button:hover {
+  background: #163248;
+}
+
+.hidden {
+  display: none;
+}

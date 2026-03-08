@@ -12,8 +12,6 @@ function getCanvasPoint(canvas, event) {
 }
 
 function bootstrap() {
-  const AUTO_NEXT_DELAY_MS = 900;
-
   const canvas = document.getElementById('chainlab-canvas');
   const scoreLabel = document.getElementById('scoreLabel');
   const shotsLabel = document.getElementById('shotsLabel');
@@ -21,6 +19,10 @@ function bootstrap() {
   const levelLabel = document.getElementById('levelLabel');
   const levelSelect = document.getElementById('levelSelect');
   const retryButton = document.getElementById('retryButton');
+  const outcomePanel = document.getElementById('outcomePanel');
+  const outcomeText = document.getElementById('outcomeText');
+  const summaryRetryButton = document.getElementById('summaryRetryButton');
+  const nextButton = document.getElementById('nextButton');
 
   const summaryResult = document.getElementById('summaryResult');
   const summaryScore = document.getElementById('summaryScore');
@@ -34,15 +36,6 @@ function bootstrap() {
   const ctx = canvas.getContext('2d');
   if (!ctx) {
     throw new Error('Unable to get 2D context from canvas.');
-  }
-
-  let pendingAutoNext = null;
-
-  function clearAutoNext() {
-    if (pendingAutoNext !== null) {
-      clearTimeout(pendingAutoNext);
-      pendingAutoNext = null;
-    }
   }
 
   function renderLevelSelect() {
@@ -91,32 +84,51 @@ function bootstrap() {
     summaryAccuracy.textContent = `Accuracy: ${summary.accuracy}%`;
   }
 
+  function syncOutcomePanel() {
+    if (!outcomePanel || !outcomeText || !nextButton) {
+      return;
+    }
+
+    const summary = ChainLabGame.getRunSummary();
+    if (!summary || summary.phase !== 'end') {
+      outcomePanel.classList.add('hidden');
+      outcomePanel.classList.remove('win');
+      outcomePanel.classList.remove('lose');
+      nextButton.disabled = false;
+      return;
+    }
+
+    const hasNextLevel = summary.levelIndex < summary.levelCount - 1;
+    outcomePanel.classList.remove('hidden');
+
+    if (summary.result === 'win') {
+      outcomePanel.classList.add('win');
+      outcomePanel.classList.remove('lose');
+      outcomeText.textContent = hasNextLevel
+        ? 'Victory: target reached. Proceed to next level.'
+        : 'Victory: campaign complete.';
+    } else {
+      outcomePanel.classList.add('lose');
+      outcomePanel.classList.remove('win');
+      outcomeText.textContent = 'Defeat: shots exhausted before target score.';
+    }
+
+    nextButton.disabled = !hasNextLevel || summary.result !== 'win';
+  }
+
   function hardSync() {
     syncHud();
     syncSummary();
+    syncOutcomePanel();
   }
 
   function restartCurrentLevel() {
-    clearAutoNext();
     ChainLabGame.resetLevel();
     hardSync();
   }
 
-  function handleRunEnd(result) {
+  function handleRunEnd() {
     hardSync();
-
-    if (result !== 'win') {
-      return;
-    }
-
-    clearAutoNext();
-    pendingAutoNext = setTimeout(() => {
-      pendingAutoNext = null;
-      const moved = ChainLabGame.nextLevel();
-      if (moved) {
-        hardSync();
-      }
-    }, AUTO_NEXT_DELAY_MS);
   }
 
   ChainLabGame.initGame(canvas, { onRunEnd: handleRunEnd });
@@ -139,7 +151,6 @@ function bootstrap() {
 
   if (levelSelect) {
     levelSelect.addEventListener('change', (event) => {
-      clearAutoNext();
       const nextIndex = Number(event.target.value);
       ChainLabGame.setLevel(nextIndex);
       hardSync();
@@ -149,6 +160,21 @@ function bootstrap() {
   retryButton.addEventListener('click', () => {
     restartCurrentLevel();
   });
+
+  if (summaryRetryButton) {
+    summaryRetryButton.addEventListener('click', () => {
+      restartCurrentLevel();
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      const moved = ChainLabGame.nextLevel();
+      if (moved) {
+        hardSync();
+      }
+    });
+  }
 
   window.addEventListener('keydown', (event) => {
     if (event.key.toLowerCase() === 'r') {
