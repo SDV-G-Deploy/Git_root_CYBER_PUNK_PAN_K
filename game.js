@@ -95,10 +95,26 @@ const ChainLabGame = (() => {
       CHAIN_LINK_TTL: 0.7,
       CHAIN_LINK_WIDTH: 2,
       CHAIN_LINK_COLOR: '#ffe082',
-      TRAJECTORY_UNDERLAY_WIDTH: 4,
-      TRAJECTORY_UNDERLAY_COLOR: 'rgba(181, 243, 255, 0.22)',
+      HIT_FLASH_TTL: 0.22,
+      HIT_FLASH_MAX_ALPHA: 0.42,
+      SCREEN_SHAKE_TTL: 0.18,
+      SCREEN_SHAKE_POWER: 7,
+      PARTICLE_TTL: 0.55,
+      PARTICLE_DRAG_PER_SECOND: 1.7,
+      PARTICLE_SPEED_MIN: 65,
+      PARTICLE_SPEED_MAX: 210,
+      PARTICLE_RADIUS: 2.5,
+      PARTICLE_COUNT_MIN: 8,
+      PARTICLE_COUNT_MAX: 14,
+      CHAIN_CUE_TTL: 0.75,
+      CHAIN_CUE_FONT: 'bold 14px monospace',
+      CHAIN_CUE_COLOR: '#fff4bc',
+      TRAJECTORY_UNDERLAY_WIDTH: 5,
+      TRAJECTORY_UNDERLAY_COLOR: 'rgba(181, 243, 255, 0.26)',
       TRAJECTORY_DOT_RADIUS: 2,
-      TRAJECTORY_DOT_STEP: 4
+      TRAJECTORY_DOT_STEP: 4,
+      AIM_END_RADIUS: 8,
+      AIM_END_COLOR: '#d8f6ff'
     },
     LABEL: {
       FONT: 'bold 12px monospace',
@@ -129,6 +145,10 @@ const ChainLabGame = (() => {
 
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
+  }
+
+  function randomRange(min, max) {
+    return min + Math.random() * (max - min);
   }
 
   function distance(ax, ay, bx, by) {
@@ -249,6 +269,10 @@ const ChainLabGame = (() => {
       rewardPacket: null,
       telemetry: [],
       visualLinks: [],
+      particles: [],
+      chainCues: [],
+      hitFlashTtl: 0,
+      screenShakeTtl: 0,
       accumulator: 0
     };
   }
@@ -580,6 +604,79 @@ const ChainLabGame = (() => {
     }
   }
 
+  function spawnHitParticles(x, y) {
+    const state = getState();
+    const rawCount = randomRange(CONFIG.VISUAL.PARTICLE_COUNT_MIN, CONFIG.VISUAL.PARTICLE_COUNT_MAX + 1);
+    const count = Math.floor(rawCount);
+
+    for (let i = 0; i < count; i += 1) {
+      const angle = randomRange(0, Math.PI * 2);
+      const speed = randomRange(CONFIG.VISUAL.PARTICLE_SPEED_MIN, CONFIG.VISUAL.PARTICLE_SPEED_MAX);
+      state.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        ttl: CONFIG.VISUAL.PARTICLE_TTL
+      });
+    }
+  }
+
+  function createHitFeedback(node, stepIndex) {
+    const state = getState();
+
+    state.hitFlashTtl = CONFIG.VISUAL.HIT_FLASH_TTL;
+    state.screenShakeTtl = CONFIG.VISUAL.SCREEN_SHAKE_TTL;
+
+    state.chainCues.push({
+      x: node.x,
+      y: node.y - node.radius - 14,
+      ttl: CONFIG.VISUAL.CHAIN_CUE_TTL,
+      step: stepIndex
+    });
+
+    spawnHitParticles(node.x, node.y);
+  }
+
+  function updateParticles(dt) {
+    const state = getState();
+
+    for (let i = state.particles.length - 1; i >= 0; i -= 1) {
+      const particle = state.particles[i];
+      const drag = Math.max(0, 1 - CONFIG.VISUAL.PARTICLE_DRAG_PER_SECOND * dt);
+      particle.vx *= drag;
+      particle.vy *= drag;
+      particle.x += particle.vx * dt;
+      particle.y += particle.vy * dt;
+      particle.ttl -= dt;
+
+      if (particle.ttl <= 0) {
+        state.particles.splice(i, 1);
+      }
+    }
+  }
+
+  function updateChainCues(dt) {
+    const state = getState();
+
+    for (let i = state.chainCues.length - 1; i >= 0; i -= 1) {
+      const cue = state.chainCues[i];
+      cue.ttl -= dt;
+      cue.y -= dt * 20;
+
+      if (cue.ttl <= 0) {
+        state.chainCues.splice(i, 1);
+      }
+    }
+  }
+
+  function updateFeedbackTimers(dt) {
+    const state = getState();
+
+    state.hitFlashTtl = Math.max(0, state.hitFlashTtl - dt);
+    state.screenShakeTtl = Math.max(0, state.screenShakeTtl - dt);
+  }
+
   function enqueueChainNode(nodeId, depth, reason, sourceId) {
     const state = getState();
     if (state.chain.queue.length >= CONFIG.CHAIN.MAX_QUEUE_SIZE) {
@@ -737,6 +834,7 @@ const ChainLabGame = (() => {
     const points = applyNodeScore(node.type, event.depth);
 
     addVisualLink(event.sourceId, node);
+    createHitFeedback(node, state.chain.steps);
 
     emitTelemetry('chain_step', {
       levelId: state.levelId,
@@ -898,6 +996,9 @@ const ChainLabGame = (() => {
 
     delta = clamp(delta, 0, CONFIG.SIMULATION.MAX_DT);
     updateVisualLinks(delta);
+    updateParticles(delta);
+    updateChainCues(delta);
+    updateFeedbackTimers(delta);
 
     if (state.phase === 'end') {
       return;
@@ -1011,6 +1112,14 @@ const ChainLabGame = (() => {
       ctx.fill();
     }
 
+    const endPoint = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(endPoint.x, endPoint.y, CONFIG.VISUAL.AIM_END_RADIUS, 0, Math.PI * 2);
+    ctx.strokeStyle = CONFIG.VISUAL.AIM_END_COLOR;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
     ctx.restore();
   }
 
@@ -1036,6 +1145,59 @@ const ChainLabGame = (() => {
     ctx.restore();
   }
 
+  function drawParticles(ctx) {
+    const state = getState();
+    if (state.particles.length === 0) {
+      return;
+    }
+
+    ctx.save();
+    for (let i = 0; i < state.particles.length; i += 1) {
+      const particle = state.particles[i];
+      const alpha = clamp(particle.ttl / CONFIG.VISUAL.PARTICLE_TTL, 0, 1);
+      ctx.fillStyle = `rgba(255, 226, 150, ${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, CONFIG.VISUAL.PARTICLE_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawChainCues(ctx) {
+    const state = getState();
+    if (state.chainCues.length === 0) {
+      return;
+    }
+
+    ctx.save();
+    ctx.font = CONFIG.VISUAL.CHAIN_CUE_FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let i = 0; i < state.chainCues.length; i += 1) {
+      const cue = state.chainCues[i];
+      const alpha = clamp(cue.ttl / CONFIG.VISUAL.CHAIN_CUE_TTL, 0, 1);
+      ctx.fillStyle = `rgba(255, 244, 188, ${alpha.toFixed(3)})`;
+      ctx.fillText(`#${cue.step}`, cue.x, cue.y);
+    }
+
+    ctx.restore();
+  }
+
+  function drawHitFlash(ctx) {
+    const state = getState();
+    if (state.hitFlashTtl <= 0) {
+      return;
+    }
+
+    const alphaBase = clamp(state.hitFlashTtl / CONFIG.VISUAL.HIT_FLASH_TTL, 0, 1);
+    const alpha = alphaBase * CONFIG.VISUAL.HIT_FLASH_MAX_ALPHA;
+    ctx.save();
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(3)})`;
+    ctx.fillRect(0, 0, CONFIG.ARENA.WIDTH, CONFIG.ARENA.HEIGHT);
+    ctx.restore();
+  }
+
   function drawEndHint(ctx) {
     const state = getState();
     if (state.phase !== 'end') {
@@ -1057,14 +1219,26 @@ const ChainLabGame = (() => {
       return;
     }
 
+    const shakeIntensity = clamp(state.screenShakeTtl / CONFIG.VISUAL.SCREEN_SHAKE_TTL, 0, 1);
+    const shakePower = CONFIG.VISUAL.SCREEN_SHAKE_POWER * shakeIntensity;
+    const offsetX = (Math.random() * 2 - 1) * shakePower;
+    const offsetY = (Math.random() * 2 - 1) * shakePower;
+
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
     drawArena(ctx);
     drawAimPreview(ctx);
     drawChainLinks(ctx);
+    drawParticles(ctx);
     drawShooter(ctx);
     drawNodes(ctx);
     drawProjectile(ctx);
+    drawChainCues(ctx);
+    ctx.restore();
+
+    drawHitFlash(ctx);
     drawEndHint(ctx);
   }
 

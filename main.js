@@ -38,6 +38,10 @@ function bootstrap() {
     throw new Error('Unable to get 2D context from canvas.');
   }
 
+  function getSummary() {
+    return ChainLabGame.getRunSummary();
+  }
+
   function renderLevelSelect() {
     if (!levelSelect) {
       return;
@@ -73,7 +77,7 @@ function bootstrap() {
   }
 
   function syncSummary() {
-    const summary = ChainLabGame.getRunSummary();
+    const summary = getSummary();
     if (!summary) {
       return;
     }
@@ -89,7 +93,7 @@ function bootstrap() {
       return;
     }
 
-    const summary = ChainLabGame.getRunSummary();
+    const summary = getSummary();
     if (!summary || summary.phase !== 'end') {
       outcomePanel.classList.add('hidden');
       outcomePanel.classList.remove('win');
@@ -105,12 +109,12 @@ function bootstrap() {
       outcomePanel.classList.add('win');
       outcomePanel.classList.remove('lose');
       outcomeText.textContent = hasNextLevel
-        ? 'Victory: target reached. Proceed to next level.'
-        : 'Victory: campaign complete.';
+        ? 'Victory: target reached. Press Enter or click arena for next level.'
+        : 'Victory: campaign complete. Press R to replay level.';
     } else {
       outcomePanel.classList.add('lose');
       outcomePanel.classList.remove('win');
-      outcomeText.textContent = 'Defeat: shots exhausted before target score.';
+      outcomeText.textContent = 'Defeat: shots exhausted. Press Space or click arena to retry.';
     }
 
     nextButton.disabled = !hasNextLevel || summary.result !== 'win';
@@ -125,6 +129,25 @@ function bootstrap() {
   function restartCurrentLevel() {
     ChainLabGame.resetLevel();
     hardSync();
+  }
+
+  function tryOutcomeQuickAction() {
+    const summary = getSummary();
+    if (!summary || summary.phase !== 'end') {
+      return false;
+    }
+
+    if (summary.result === 'win') {
+      const moved = ChainLabGame.nextLevel();
+      if (moved) {
+        hardSync();
+        return true;
+      }
+      return false;
+    }
+
+    restartCurrentLevel();
+    return true;
   }
 
   function handleRunEnd() {
@@ -144,6 +167,10 @@ function bootstrap() {
   });
 
   canvas.addEventListener('click', (event) => {
+    if (tryOutcomeQuickAction()) {
+      return;
+    }
+
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.fireShot(point.x, point.y);
     hardSync();
@@ -177,8 +204,27 @@ function bootstrap() {
   }
 
   window.addEventListener('keydown', (event) => {
-    if (event.key.toLowerCase() === 'r') {
+    const key = event.key.toLowerCase();
+
+    if (key === 'r') {
       restartCurrentLevel();
+      return;
+    }
+
+    if (key === ' ' || key === 'spacebar') {
+      event.preventDefault();
+      tryOutcomeQuickAction();
+      return;
+    }
+
+    if (key === 'enter') {
+      const summary = getSummary();
+      if (summary && summary.phase === 'end' && summary.result === 'win') {
+        const moved = ChainLabGame.nextLevel();
+        if (moved) {
+          hardSync();
+        }
+      }
     }
   });
 
