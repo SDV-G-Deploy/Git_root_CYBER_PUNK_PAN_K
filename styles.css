@@ -336,6 +336,10 @@ body {
   z-index: 20;
 }
 
+.tutorial-overlay.hidden {
+  display: none;
+}
+
 .tutorial-card {
   width: min(100%, 680px);
   border: 1px solid #35556d;
