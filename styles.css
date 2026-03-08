@@ -130,3 +130,54 @@ body {
 .hidden {
   display: none;
 }
+.meta-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #35556d;
+  background: rgba(11, 24, 36, 0.9);
+}
+
+.meta-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.meta-tech {
+  margin: 0;
+  color: #b7ffd4;
+  font-size: 14px;
+}
+
+.meta-status {
+  margin: 6px 0 10px;
+  color: #9cc1d4;
+  font-size: 12px;
+}
+
+.meta-upgrades {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upgrade-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.upgrade-row button {
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.upgrade-row button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

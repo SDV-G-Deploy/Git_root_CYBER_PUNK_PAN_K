@@ -90,6 +90,12 @@ const ChainLabGame = (() => {
       DEPTH_MODULE_STEP: 0.05,
       MAX_MODULE_CHANCE: 0.8
     },
+    MODIFIERS: {
+      SCORE_BONUS_MIN: 0,
+      SCORE_BONUS_MAX: 0.5,
+      CHAIN_GROWTH_MIN: 0,
+      CHAIN_GROWTH_MAX: 0.25
+    },
     VISUAL: {
       MAX_CHAIN_LINKS: 16,
       CHAIN_LINK_TTL: 0.7,
@@ -134,6 +140,10 @@ const ChainLabGame = (() => {
     state: null,
     levels: [],
     levelIndex: 0,
+    modifiers: {
+      scoreBonus: 0,
+      chainGrowthBonus: 0
+    },
     callbacks: {
       onRunEnd: onRunEndStub
     }
@@ -162,6 +172,23 @@ const ChainLabGame = (() => {
     }
 
     return { x: x / length, y: y / length };
+  }
+
+  function normalizeModifiers(modifiers) {
+    const source = modifiers || {};
+
+    return {
+      scoreBonus: clamp(
+        Number(source.scoreBonus) || 0,
+        CONFIG.MODIFIERS.SCORE_BONUS_MIN,
+        CONFIG.MODIFIERS.SCORE_BONUS_MAX
+      ),
+      chainGrowthBonus: clamp(
+        Number(source.chainGrowthBonus) || 0,
+        CONFIG.MODIFIERS.CHAIN_GROWTH_MIN,
+        CONFIG.MODIFIERS.CHAIN_GROWTH_MAX
+      )
+    };
   }
 
   function createRunId() {
@@ -498,6 +525,7 @@ const ChainLabGame = (() => {
     }
 
     setLevels(config.levels);
+    runtime.modifiers = normalizeModifiers(config.modifiers);
 
     const startIndex = Number.isInteger(config.startLevelIndex) ? config.startLevelIndex : 0;
     return startLevel(startIndex);
@@ -530,6 +558,15 @@ const ChainLabGame = (() => {
 
     startLevel(runtime.levelIndex + 1);
     return true;
+  }
+
+  function setModifiers(modifiers) {
+    runtime.modifiers = normalizeModifiers(modifiers);
+    return { ...runtime.modifiers };
+  }
+
+  function getModifiers() {
+    return { ...runtime.modifiers };
   }
 
   function setAim(x, y, active) {
@@ -806,7 +843,8 @@ const ChainLabGame = (() => {
     const typeConfig = CONFIG.NODES.TYPES[nodeType];
     const depthBonus = depth * CONFIG.CHAIN.DEPTH_BONUS;
     const basePoints = typeConfig.score + depthBonus;
-    const points = Math.round(basePoints * state.chain.multiplier);
+    const scoreFactor = 1 + runtime.modifiers.scoreBonus;
+    const points = Math.round(basePoints * state.chain.multiplier * scoreFactor);
 
     state.score += points;
     return points;
@@ -824,8 +862,9 @@ const ChainLabGame = (() => {
     state.chain.maxDepth = Math.max(state.chain.maxDepth, event.depth);
 
     if (node.type === 'multiplier') {
+      const growthStep = CONFIG.CHAIN.MULTIPLIER_STEP * (1 + runtime.modifiers.chainGrowthBonus);
       state.chain.multiplier = clamp(
-        state.chain.multiplier + CONFIG.CHAIN.MULTIPLIER_STEP,
+        state.chain.multiplier + growthStep,
         CONFIG.CHAIN.START_MULTIPLIER,
         CONFIG.CHAIN.MAX_MULTIPLIER
       );
@@ -1248,6 +1287,8 @@ const ChainLabGame = (() => {
     resetLevel,
     setLevel,
     nextLevel,
+    setModifiers,
+    getModifiers,
     setAim,
     fireShot,
     update,
