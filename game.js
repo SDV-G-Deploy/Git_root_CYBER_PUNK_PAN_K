@@ -72,32 +72,47 @@ const ChainLabGame = (() => {
       DEPTH_BONUS: 12,
       START_MULTIPLIER: 1
     },
+    RUN: {
+      WIN_TEXT: 'Run complete. Retry for next run.',
+      LOSE_TEXT: 'No hit detected. Retry.',
+      WIN_COLOR: '#8dffba',
+      LOSE_COLOR: '#ff9fa9',
+      LABEL_X: 280,
+      LABEL_Y: 40,
+      LABEL_FONT: 'bold 20px monospace'
+    },
+    REWARD: {
+      CREDIT_PER_SCORE: 0.12,
+      WIN_BONUS_CREDITS: 25,
+      SCORE_PER_PART: 140,
+      BASE_MODULE_CHANCE: 0.05,
+      DEPTH_MODULE_STEP: 0.05,
+      MAX_MODULE_CHANCE: 0.8
+    },
+    LABEL: {
+      FONT: 'bold 12px monospace',
+      COLOR: '#0c1f2b'
+    },
     SIMULATION: {
       FIXED_DT: 1 / 120,
       MAX_DT: 0.25,
       MAX_STEPS: 12,
       MS_THRESHOLD: 10
     },
-    END_HINT: {
-      X: 280,
-      Y: 40,
-      FONT: 'bold 20px monospace',
-      WIN_COLOR: '#8dffba',
-      LOSE_COLOR: '#ff9fa9',
-      WIN_TEXT: 'Chain resolved. Retry for next run.',
-      LOSE_TEXT: 'No hit detected. Retry.'
-    },
-    LABEL: {
-      FONT: 'bold 12px monospace',
-      COLOR: '#0c1f2b'
-    },
     EPSILON: 0.0001
   });
 
   const runtime = {
     canvas: null,
-    state: null
+    state: null,
+    callbacks: {
+      onRunEnd: onRunEndStub
+    }
   };
+
+  function onRunEndStub() {
+    return null;
+  }
 
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -114,6 +129,12 @@ const ChainLabGame = (() => {
     }
 
     return { x: x / length, y: y / length };
+  }
+
+  function createRunId() {
+    const now = Date.now().toString(36);
+    const random = Math.floor(Math.random() * 0xffffff).toString(36);
+    return `run_${now}_${random}`;
   }
 
   function createNodes() {
@@ -141,9 +162,14 @@ const ChainLabGame = (() => {
 
   function createState() {
     return {
+      runId: createRunId(),
       score: 0,
       shotsRemaining: CONFIG.LEVEL.SHOTS,
+      shotsFired: 0,
+      shotsHit: 0,
       phase: 'aim',
+      result: 'in_progress',
+      ended: false,
       lastShotHit: false,
       projectile: null,
       nodes: createNodes(),
@@ -153,12 +179,74 @@ const ChainLabGame = (() => {
         active: false
       },
       chain: createChainState(),
+      rewardPacket: null,
       accumulator: 0
     };
   }
 
   function getState() {
     return runtime.state;
+  }
+
+  function getAccuracy(state) {
+    const runState = state || getState();
+    if (!runState || runState.shotsFired <= 0) {
+      return 0;
+    }
+
+    return runState.shotsHit / runState.shotsFired;
+  }
+
+  function buildRewardPacket(sourceState) {
+    const state = sourceState || getState();
+
+    const creditsBase = Math.floor(state.score * CONFIG.REWARD.CREDIT_PER_SCORE);
+    const credits = creditsBase + (state.result === 'win' ? CONFIG.REWARD.WIN_BONUS_CREDITS : 0);
+
+    const techParts = Math.max(0, Math.floor(state.score / CONFIG.REWARD.SCORE_PER_PART));
+
+    const moduleChanceRaw =
+      CONFIG.REWARD.BASE_MODULE_CHANCE + state.chain.maxDepth * CONFIG.REWARD.DEPTH_MODULE_STEP;
+    const moduleChance = clamp(moduleChanceRaw, 0, CONFIG.REWARD.MAX_MODULE_CHANCE);
+
+    const tags = [];
+    if (state.result === 'win') {
+      tags.push('run_complete');
+    }
+    if (state.chain.maxDepth >= 2) {
+      tags.push('deep_chain');
+    }
+    if (getAccuracy(state) >= 1) {
+      tags.push('accurate');
+    }
+
+    return {
+      credits,
+      tech_parts: techParts,
+      tech_module_chance: Number(moduleChance.toFixed(3)),
+      performance_tags: tags
+    };
+  }
+
+  function getRunSummary() {
+    const state = getState();
+    if (!state) {
+      return null;
+    }
+
+    return {
+      runId: state.runId,
+      result: state.result,
+      phase: state.phase,
+      score: state.score,
+      shotsRemaining: state.shotsRemaining,
+      shotsFired: state.shotsFired,
+      shotsHit: state.shotsHit,
+      chainDepth: state.chain.maxDepth,
+      chainSteps: state.chain.steps,
+      accuracy: Number((getAccuracy(state) * 100).toFixed(1)),
+      rewardPacket: state.rewardPacket
+    };
   }
 
   function getSnapshot() {
@@ -173,14 +261,38 @@ const ChainLabGame = (() => {
       phase: state.phase,
       lastShotHit: state.lastShotHit,
       chainDepth: state.chain.maxDepth,
-      chainSteps: state.chain.steps
+      chainSteps: state.chain.steps,
+      result: state.result
     };
   }
 
-  function initGame(canvas) {
+  function finalizeRun(result) {
+    const state = getState();
+
+    if (state.ended) {
+      return;
+    }
+
+    state.ended = true;
+    state.result = result;
+    state.phase = 'end';
+    state.rewardPacket = buildRewardPacket(state);
+
+    try {
+      runtime.callbacks.onRunEnd(result, state.rewardPacket, getRunSummary());
+    } catch (error) {
+      // No-op in MVP: callback failures must not break local run.
+    }
+  }
+
+  function initGame(canvas, options) {
     if (!canvas || typeof canvas.getContext !== 'function') {
       throw new Error('initGame requires a valid canvas element.');
     }
+
+    const config = options || {};
+    runtime.callbacks.onRunEnd =
+      typeof config.onRunEnd === 'function' ? config.onRunEnd : onRunEndStub;
 
     runtime.canvas = canvas;
 
@@ -290,6 +402,7 @@ const ChainLabGame = (() => {
     };
 
     state.shotsRemaining -= 1;
+    state.shotsFired += 1;
     state.lastShotHit = false;
     state.phase = 'simulate';
     return true;
@@ -409,7 +522,7 @@ const ChainLabGame = (() => {
     }
 
     if (state.chain.queue.length === 0) {
-      state.phase = 'end';
+      finalizeRun(state.lastShotHit ? 'win' : 'lose');
     }
   }
 
@@ -419,7 +532,7 @@ const ChainLabGame = (() => {
 
     if (!projectile || !projectile.alive) {
       state.lastShotHit = false;
-      state.phase = 'end';
+      finalizeRun('lose');
       return;
     }
 
@@ -446,13 +559,14 @@ const ChainLabGame = (() => {
     ) {
       projectile.alive = false;
       state.lastShotHit = false;
-      state.phase = 'end';
+      finalizeRun('lose');
       return;
     }
 
     const hitNode = findHitNode(projectile);
     if (hitNode) {
       projectile.alive = false;
+      state.shotsHit += 1;
       startChainFrom(hitNode.id);
     }
   }
@@ -502,7 +616,7 @@ const ChainLabGame = (() => {
 
   function update(dt) {
     const state = getState();
-    if (!state) {
+    if (!state || state.phase === 'end') {
       return;
     }
 
@@ -613,12 +727,12 @@ const ChainLabGame = (() => {
       return;
     }
 
-    ctx.font = CONFIG.END_HINT.FONT;
-    ctx.fillStyle = state.lastShotHit ? CONFIG.END_HINT.WIN_COLOR : CONFIG.END_HINT.LOSE_COLOR;
+    ctx.font = CONFIG.RUN.LABEL_FONT;
+    ctx.fillStyle = state.result === 'win' ? CONFIG.RUN.WIN_COLOR : CONFIG.RUN.LOSE_COLOR;
     ctx.fillText(
-      state.lastShotHit ? CONFIG.END_HINT.WIN_TEXT : CONFIG.END_HINT.LOSE_TEXT,
-      CONFIG.END_HINT.X,
-      CONFIG.END_HINT.Y
+      state.result === 'win' ? CONFIG.RUN.WIN_TEXT : CONFIG.RUN.LOSE_TEXT,
+      CONFIG.RUN.LABEL_X,
+      CONFIG.RUN.LABEL_Y
     );
   }
 
@@ -646,7 +760,9 @@ const ChainLabGame = (() => {
     fireShot,
     update,
     render,
-    getSnapshot
+    getSnapshot,
+    getRunSummary,
+    buildRewardPacket
   };
 })();
 

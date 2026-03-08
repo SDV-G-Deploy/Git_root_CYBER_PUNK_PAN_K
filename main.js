@@ -17,6 +17,11 @@ function bootstrap() {
   const shotsLabel = document.getElementById('shotsLabel');
   const retryButton = document.getElementById('retryButton');
 
+  const summaryResult = document.getElementById('summaryResult');
+  const summaryScore = document.getElementById('summaryScore');
+  const summaryDepth = document.getElementById('summaryDepth');
+  const summaryAccuracy = document.getElementById('summaryAccuracy');
+
   if (!canvas) {
     throw new Error('Canvas #chainlab-canvas not found.');
   }
@@ -38,6 +43,18 @@ function bootstrap() {
     shotsLabel.textContent = `Shots: ${snapshot.shotsRemaining}`;
   }
 
+  function syncSummary() {
+    const summary = ChainLabGame.getRunSummary();
+    if (!summary) {
+      return;
+    }
+
+    summaryResult.textContent = `Result: ${summary.result}`;
+    summaryScore.textContent = `Final Score: ${summary.score}`;
+    summaryDepth.textContent = `Chain Depth: ${summary.chainDepth}`;
+    summaryAccuracy.textContent = `Accuracy: ${summary.accuracy}%`;
+  }
+
   canvas.addEventListener('mousemove', (event) => {
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.setAim(point.x, point.y, true);
@@ -51,11 +68,13 @@ function bootstrap() {
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.fireShot(point.x, point.y);
     syncHud();
+    syncSummary();
   });
 
   retryButton.addEventListener('click', () => {
     ChainLabGame.resetLevel();
     syncHud();
+    syncSummary();
   });
 
   let previous = 0;
@@ -70,11 +89,13 @@ function bootstrap() {
     ChainLabGame.update(dt);
     ChainLabGame.render(ctx);
     syncHud();
+    syncSummary();
 
     requestAnimationFrame(frame);
   }
 
   syncHud();
+  syncSummary();
   requestAnimationFrame(frame);
 }
 

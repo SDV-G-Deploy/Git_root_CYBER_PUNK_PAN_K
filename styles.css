@@ -61,6 +61,15 @@ body {
   display: block;
 }
 
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #9cc1d4;
+}
+
 .hint {
   margin-top: 8px;
   color: #8cb2c7;
