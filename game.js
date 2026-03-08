@@ -180,12 +180,42 @@ const ChainLabGame = (() => {
       },
       chain: createChainState(),
       rewardPacket: null,
+      telemetry: [],
       accumulator: 0
     };
   }
 
   function getState() {
     return runtime.state;
+  }
+
+  function emitTelemetry(eventType, payload) {
+    const state = getState();
+    if (!state) {
+      return;
+    }
+
+    state.telemetry.push({
+      timestamp: Date.now(),
+      runId: state.runId,
+      eventType,
+      payload: payload || {}
+    });
+  }
+
+  function exportTelemetry(format) {
+    const state = getState();
+    const mode = format || 'json';
+
+    if (!state) {
+      return mode === 'jsonl' ? '' : '[]';
+    }
+
+    if (mode === 'jsonl') {
+      return state.telemetry.map((entry) => JSON.stringify(entry)).join('\n');
+    }
+
+    return JSON.stringify(state.telemetry, null, 2);
   }
 
   function getAccuracy(state) {
@@ -278,6 +308,17 @@ const ChainLabGame = (() => {
     state.phase = 'end';
     state.rewardPacket = buildRewardPacket(state);
 
+    emitTelemetry('run_end', {
+      result,
+      score: state.score,
+      chainDepth: state.chain.maxDepth,
+      accuracy: Number((getAccuracy(state) * 100).toFixed(1))
+    });
+
+    emitTelemetry('reward_generated', {
+      rewardPacket: state.rewardPacket
+    });
+
     try {
       runtime.callbacks.onRunEnd(result, state.rewardPacket, getRunSummary());
     } catch (error) {
@@ -305,6 +346,11 @@ const ChainLabGame = (() => {
     }
 
     runtime.state = createState();
+
+    emitTelemetry('run_start', {
+      shotsRemaining: runtime.state.shotsRemaining
+    });
+
     return getSnapshot();
   }
 
@@ -314,6 +360,11 @@ const ChainLabGame = (() => {
     }
 
     runtime.state = createState();
+
+    emitTelemetry('run_start', {
+      shotsRemaining: runtime.state.shotsRemaining
+    });
+
     return getSnapshot();
   }
 
@@ -405,6 +456,14 @@ const ChainLabGame = (() => {
     state.shotsFired += 1;
     state.lastShotHit = false;
     state.phase = 'simulate';
+
+    emitTelemetry('shot_fired', {
+      shotsRemaining: state.shotsRemaining,
+      targetX,
+      targetY,
+      speed: CONFIG.PROJECTILE.SPEED
+    });
+
     return true;
   }
 
@@ -462,6 +521,7 @@ const ChainLabGame = (() => {
     const points = Math.round(basePoints * state.chain.multiplier);
 
     state.score += points;
+    return points;
   }
 
   function resolveNode(event) {
@@ -483,7 +543,17 @@ const ChainLabGame = (() => {
       );
     }
 
-    applyNodeScore(node.type, event.depth);
+    const points = applyNodeScore(node.type, event.depth);
+
+    emitTelemetry('chain_step', {
+      nodeId: node.id,
+      nodeType: node.type,
+      sourceId: event.sourceId,
+      reason: event.reason,
+      depth: event.depth,
+      points,
+      chainMultiplier: state.chain.multiplier
+    });
 
     if (node.type === 'bomb') {
       resolveBomb(node, event.depth);
@@ -522,6 +592,12 @@ const ChainLabGame = (() => {
     }
 
     if (state.chain.queue.length === 0) {
+      emitTelemetry('chain_resolved', {
+        steps: state.chain.steps,
+        maxDepth: state.chain.maxDepth,
+        capped: state.chain.capped
+      });
+
       finalizeRun(state.lastShotHit ? 'win' : 'lose');
     }
   }
@@ -762,7 +838,8 @@ const ChainLabGame = (() => {
     render,
     getSnapshot,
     getRunSummary,
-    buildRewardPacket
+    buildRewardPacket,
+    exportTelemetry
   };
 })();
 
