@@ -24,22 +24,24 @@ const ChainLabGame = (() => {
     },
     NODES: {
       RADIUS: 20,
-      HIT_SCORE: 100,
+      RESOLVED_COLOR: '#3a4751',
       TYPES: {
         bomb: {
           color: '#ff5d73',
-          label: 'B'
+          label: 'B',
+          score: 110
         },
         pusher: {
           color: '#5cc8ff',
-          label: 'P'
+          label: 'P',
+          score: 100
         },
         multiplier: {
           color: '#9bff8a',
-          label: 'M'
+          label: 'M',
+          score: 95
         }
-      },
-      RESOLVED_COLOR: '#3a4751'
+      }
     },
     LEVEL: {
       SHOTS: 1,
@@ -47,7 +49,8 @@ const ChainLabGame = (() => {
         { id: 'n1', type: 'bomb', x: 560, y: 160 },
         { id: 'n2', type: 'pusher', x: 710, y: 230 },
         { id: 'n3', type: 'multiplier', x: 640, y: 330 },
-        { id: 'n4', type: 'bomb', x: 810, y: 320 }
+        { id: 'n4', type: 'bomb', x: 810, y: 320 },
+        { id: 'n5', type: 'multiplier', x: 470, y: 250 }
       ]
     },
     TRAJECTORY: {
@@ -56,6 +59,18 @@ const ChainLabGame = (() => {
       WIDTH: 2,
       DASH_PATTERN: [7, 7],
       COLOR: '#b5f3ff'
+    },
+    CHAIN: {
+      MAX_QUEUE_SIZE: 256,
+      MAX_STEPS: 96,
+      RESOLVE_BATCH_SIZE: 10,
+      BOMB_RADIUS: 150,
+      PUSHER_RADIUS: 130,
+      PUSHER_FORCE: 42,
+      MULTIPLIER_STEP: 1,
+      MAX_MULTIPLIER: 6,
+      DEPTH_BONUS: 12,
+      START_MULTIPLIER: 1
     },
     SIMULATION: {
       FIXED_DT: 1 / 120,
@@ -69,8 +84,8 @@ const ChainLabGame = (() => {
       FONT: 'bold 20px monospace',
       WIN_COLOR: '#8dffba',
       LOSE_COLOR: '#ff9fa9',
-      WIN_TEXT: 'Hit confirmed. Retry for next run.',
-      LOSE_TEXT: 'No more shots. Retry.'
+      WIN_TEXT: 'Chain resolved. Retry for next run.',
+      LOSE_TEXT: 'No hit detected. Retry.'
     },
     LABEL: {
       FONT: 'bold 12px monospace',
@@ -112,6 +127,18 @@ const ChainLabGame = (() => {
     }));
   }
 
+  function createChainState() {
+    return {
+      queue: [],
+      queuedIds: new Set(),
+      visitedIds: new Set(),
+      steps: 0,
+      maxDepth: 0,
+      multiplier: CONFIG.CHAIN.START_MULTIPLIER,
+      capped: false
+    };
+  }
+
   function createState() {
     return {
       score: 0,
@@ -125,6 +152,7 @@ const ChainLabGame = (() => {
         y: CONFIG.SHOOTER.Y,
         active: false
       },
+      chain: createChainState(),
       accumulator: 0
     };
   }
@@ -143,7 +171,9 @@ const ChainLabGame = (() => {
       score: state.score,
       shotsRemaining: state.shotsRemaining,
       phase: state.phase,
-      lastShotHit: state.lastShotHit
+      lastShotHit: state.lastShotHit,
+      chainDepth: state.chain.maxDepth,
+      chainSteps: state.chain.steps
     };
   }
 
@@ -184,6 +214,39 @@ const ChainLabGame = (() => {
     state.aim.x = clamp(x, 0, CONFIG.ARENA.WIDTH);
     state.aim.y = clamp(y, 0, CONFIG.ARENA.HEIGHT);
     state.aim.active = Boolean(active);
+  }
+
+  function getNodeById(nodeId) {
+    const state = getState();
+    for (let i = 0; i < state.nodes.length; i += 1) {
+      if (state.nodes[i].id === nodeId) {
+        return state.nodes[i];
+      }
+    }
+
+    return null;
+  }
+
+  function enqueueChainNode(nodeId, depth, reason, sourceId) {
+    const state = getState();
+    if (state.chain.queue.length >= CONFIG.CHAIN.MAX_QUEUE_SIZE) {
+      return false;
+    }
+
+    if (state.chain.queuedIds.has(nodeId) || state.chain.visitedIds.has(nodeId)) {
+      return false;
+    }
+
+    state.chain.queue.push({ nodeId, depth, reason, sourceId });
+    state.chain.queuedIds.add(nodeId);
+    return true;
+  }
+
+  function startChainFrom(nodeId) {
+    const state = getState();
+    state.chain = createChainState();
+    enqueueChainNode(nodeId, 0, 'direct_hit', 'projectile');
+    state.phase = 'resolve';
   }
 
   function findHitNode(projectile) {
@@ -232,11 +295,130 @@ const ChainLabGame = (() => {
     return true;
   }
 
+  function pushNode(origin, target) {
+    const direction = normalize(target.x - origin.x, target.y - origin.y) || { x: 1, y: 0 };
+
+    target.x = clamp(
+      target.x + direction.x * CONFIG.CHAIN.PUSHER_FORCE,
+      target.radius,
+      CONFIG.ARENA.WIDTH - target.radius
+    );
+    target.y = clamp(
+      target.y + direction.y * CONFIG.CHAIN.PUSHER_FORCE,
+      target.radius,
+      CONFIG.ARENA.HEIGHT - target.radius
+    );
+  }
+
+  function resolveBomb(node, depth) {
+    const state = getState();
+
+    for (let i = 0; i < state.nodes.length; i += 1) {
+      const target = state.nodes[i];
+      if (target.id === node.id || target.resolved) {
+        continue;
+      }
+
+      if (distance(node.x, node.y, target.x, target.y) <= CONFIG.CHAIN.BOMB_RADIUS) {
+        enqueueChainNode(target.id, depth + 1, 'bomb_aoe', node.id);
+      }
+    }
+  }
+
+  function resolvePusher(node, depth) {
+    const state = getState();
+
+    for (let i = 0; i < state.nodes.length; i += 1) {
+      const target = state.nodes[i];
+      if (target.id === node.id || target.resolved) {
+        continue;
+      }
+
+      if (distance(node.x, node.y, target.x, target.y) <= CONFIG.CHAIN.PUSHER_RADIUS) {
+        pushNode(node, target);
+        enqueueChainNode(target.id, depth + 1, 'pusher_impulse', node.id);
+      }
+    }
+  }
+
+  function applyNodeScore(nodeType, depth) {
+    const state = getState();
+    const typeConfig = CONFIG.NODES.TYPES[nodeType];
+    const depthBonus = depth * CONFIG.CHAIN.DEPTH_BONUS;
+    const basePoints = typeConfig.score + depthBonus;
+    const points = Math.round(basePoints * state.chain.multiplier);
+
+    state.score += points;
+  }
+
+  function resolveNode(event) {
+    const state = getState();
+    const node = getNodeById(event.nodeId);
+    if (!node || node.resolved) {
+      return;
+    }
+
+    node.resolved = true;
+    state.lastShotHit = true;
+    state.chain.maxDepth = Math.max(state.chain.maxDepth, event.depth);
+
+    if (node.type === 'multiplier') {
+      state.chain.multiplier = clamp(
+        state.chain.multiplier + CONFIG.CHAIN.MULTIPLIER_STEP,
+        CONFIG.CHAIN.START_MULTIPLIER,
+        CONFIG.CHAIN.MAX_MULTIPLIER
+      );
+    }
+
+    applyNodeScore(node.type, event.depth);
+
+    if (node.type === 'bomb') {
+      resolveBomb(node, event.depth);
+      return;
+    }
+
+    if (node.type === 'pusher') {
+      resolvePusher(node, event.depth);
+    }
+  }
+
+  function resolveChain() {
+    const state = getState();
+
+    let processed = 0;
+    while (state.chain.queue.length > 0 && processed < CONFIG.CHAIN.RESOLVE_BATCH_SIZE) {
+      if (state.chain.steps >= CONFIG.CHAIN.MAX_STEPS) {
+        state.chain.capped = true;
+        state.chain.queue.length = 0;
+        break;
+      }
+
+      const event = state.chain.queue.shift();
+      state.chain.queuedIds.delete(event.nodeId);
+
+      if (state.chain.visitedIds.has(event.nodeId)) {
+        processed += 1;
+        continue;
+      }
+
+      state.chain.visitedIds.add(event.nodeId);
+      state.chain.steps += 1;
+
+      resolveNode(event);
+      processed += 1;
+    }
+
+    if (state.chain.queue.length === 0) {
+      state.phase = 'end';
+    }
+  }
+
   function simulateProjectile(dt) {
     const state = getState();
     const projectile = state.projectile;
 
     if (!projectile || !projectile.alive) {
+      state.lastShotHit = false;
       state.phase = 'end';
       return;
     }
@@ -270,11 +452,8 @@ const ChainLabGame = (() => {
 
     const hitNode = findHitNode(projectile);
     if (hitNode) {
-      hitNode.resolved = true;
-      state.score += CONFIG.NODES.HIT_SCORE;
       projectile.alive = false;
-      state.lastShotHit = true;
-      state.phase = 'end';
+      startChainFrom(hitNode.id);
     }
   }
 
@@ -323,7 +502,16 @@ const ChainLabGame = (() => {
 
   function update(dt) {
     const state = getState();
-    if (!state || state.phase !== 'simulate') {
+    if (!state) {
+      return;
+    }
+
+    if (state.phase === 'resolve') {
+      resolveChain();
+      return;
+    }
+
+    if (state.phase !== 'simulate') {
       return;
     }
 
@@ -469,5 +657,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ChainLabGame;
 }
-
-
