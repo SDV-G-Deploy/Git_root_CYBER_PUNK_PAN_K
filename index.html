@@ -15,13 +15,24 @@
         <span id="shotsLabel">Shots: 1</span>
         <span id="targetLabel">Target: 0</span>
         <span id="levelLabel">Level: L01</span>
+        <span id="chainStatusLabel">Chain: idle</span>
       </div>
       <label class="level-select-wrap" for="levelSelect">Level</label>
       <select id="levelSelect" aria-label="Select level"></select>
+      <button id="helpButton" type="button">How to play</button>
       <button id="retryButton" type="button">Retry</button>
     </header>
 
     <canvas id="chainlab-canvas" width="960" height="540" aria-label="Chain Lab Arena"></canvas>
+
+    <section class="legend" aria-label="Node legend">
+      <h2 class="legend-title">Node Rules</h2>
+      <div class="legend-items">
+        <span class="legend-item bomb"><strong>B</strong> Bomb: triggers nearby nodes in AOE.</span>
+        <span class="legend-item pusher"><strong>P</strong> Pusher: pushes and triggers nearby nodes.</span>
+        <span class="legend-item multiplier"><strong>M</strong> Multiplier: increases chain score factor.</span>
+      </div>
+    </section>
 
     <section class="summary" aria-live="polite">
       <span id="summaryResult">Result: in_progress</span>
@@ -31,11 +42,22 @@
     </section>
 
     <section id="outcomePanel" class="outcome hidden" aria-live="polite">
-      <strong id="outcomeText">Run status</strong>
+      <div class="outcome-copy">
+        <strong id="outcomeText">Run status</strong>
+        <p id="outcomeReason" class="outcome-reason">Reach target score before shots run out.</p>
+      </div>
       <div class="outcome-actions">
         <button id="summaryRetryButton" type="button">Retry</button>
         <button id="nextButton" type="button">Next</button>
       </div>
+    </section>
+
+    <section id="chainPanel" class="chain-panel" aria-live="polite">
+      <h2 class="chain-title">Chain Feed</h2>
+      <p id="chainFeedStatus" class="chain-feed-status">Waiting for shot...</p>
+      <ul id="chainLogList" class="chain-log-list">
+        <li class="chain-log-empty">Hit a node to see causal chain events.</li>
+      </ul>
     </section>
 
     <section id="metaPanel" class="meta-panel" aria-live="polite">
@@ -69,6 +91,22 @@
 
     <p class="hint">Move mouse to aim. Click to fire one shot.</p>
   </main>
+
+  <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+    <div class="tutorial-card">
+      <h2 id="tutorialTitle">How to Play Chain Lab</h2>
+      <ol class="tutorial-list">
+        <li>Aim with mouse. Dashed line shows your shot trajectory.</li>
+        <li>You have limited shots. Reach Target score before shots hit zero.</li>
+        <li>Hit nodes to start chain reactions and build depth.</li>
+        <li>Use legend: Bomb (AOE), Pusher (impulse), Multiplier (score growth).</li>
+      </ol>
+      <p class="tutorial-tip">Tip: One precise hit can trigger several nodes. Watch Chain Feed to learn why it happened.</p>
+      <div class="tutorial-actions">
+        <button id="tutorialStartButton" type="button">Start</button>
+      </div>
+    </div>
+  </div>
 
   <script src="levels.js" defer></script>
   <script src="game.js" defer></script>

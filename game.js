@@ -71,7 +71,8 @@ const ChainLabGame = (() => {
       MULTIPLIER_STEP: 1,
       MAX_MULTIPLIER: 6,
       DEPTH_BONUS: 12,
-      START_MULTIPLIER: 1
+      START_MULTIPLIER: 1,
+      TRACE_MAX: 12
     },
     RUN: {
       WIN_TEXT: 'Target reached. Continue to next level.',
@@ -294,6 +295,7 @@ const ChainLabGame = (() => {
         active: false
       },
       chain: createChainState(),
+      chainTrace: [],
       rewardPacket: null,
       telemetry: [],
       visualLinks: [],
@@ -426,6 +428,15 @@ const ChainLabGame = (() => {
       chainSteps: state.chain.steps,
       result: state.result
     };
+  }
+
+  function getChainTrace() {
+    const state = getState();
+    if (!state) {
+      return [];
+    }
+
+    return state.chainTrace.map((entry) => ({ ...entry }));
   }
 
   function getLevelList() {
@@ -889,6 +900,19 @@ const ChainLabGame = (() => {
       chainMultiplier: state.chain.multiplier
     });
 
+    state.chainTrace.push({
+      step: state.chain.steps,
+      depth: event.depth,
+      sourceId: event.sourceId,
+      targetId: node.id,
+      nodeType: node.type,
+      reason: event.reason,
+      points
+    });
+    if (state.chainTrace.length > CONFIG.CHAIN.TRACE_MAX) {
+      state.chainTrace.splice(0, state.chainTrace.length - CONFIG.CHAIN.TRACE_MAX);
+    }
+
     if (node.type === 'bomb') {
       resolveBomb(node, event.depth);
       return;
@@ -1297,6 +1321,7 @@ const ChainLabGame = (() => {
     update,
     render,
     getSnapshot,
+    getChainTrace,
     getRunSummary,
     getLevelList,
     getCurrentLevelIndex,

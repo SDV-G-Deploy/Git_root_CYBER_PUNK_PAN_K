@@ -3,6 +3,7 @@
 const META_SAVE_KEY = 'signal_district_chainlab_meta_v1';
 const META_SAVE_VERSION = 1;
 const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';
+const TUTORIAL_SEEN_KEY = 'signal_district_chainlab_tutorial_seen';
 
 const UPGRADE_DEFS = Object.freeze({
   score_bonus: {
@@ -17,6 +18,18 @@ const UPGRADE_DEFS = Object.freeze({
     scoreBonus: 0,
     chainGrowthBonus: 0.01
   }
+});
+
+const NODE_TYPE_LABELS = Object.freeze({
+  bomb: 'Bomb',
+  pusher: 'Pusher',
+  multiplier: 'Multiplier'
+});
+
+const CHAIN_REASON_LABELS = Object.freeze({
+  direct_hit: 'direct hit',
+  bomb_aoe: 'bomb AOE',
+  pusher_impulse: 'pusher impulse'
 });
 
 function getCanvasPoint(canvas, event) {
@@ -115,6 +128,22 @@ function loadPlaytestMode() {
 function savePlaytestMode(isEnabled) {
   try {
     localStorage.setItem(PLAYTEST_MODE_KEY, isEnabled ? '1' : '0');
+  } catch (error) {
+    // Ignore persistence errors.
+  }
+}
+
+function loadTutorialSeen() {
+  try {
+    return localStorage.getItem(TUTORIAL_SEEN_KEY) === '1';
+  } catch (error) {
+    return false;
+  }
+}
+
+function saveTutorialSeen() {
+  try {
+    localStorage.setItem(TUTORIAL_SEEN_KEY, '1');
   } catch (error) {
     // Ignore persistence errors.
   }
@@ -312,16 +341,27 @@ function buildTelemetryReport(records, levelList) {
   return lines.join('\n');
 }
 
+function formatChainReason(reason) {
+  return CHAIN_REASON_LABELS[reason] || String(reason || 'trigger');
+}
+
+function formatNodeType(type) {
+  return NODE_TYPE_LABELS[type] || String(type || 'node');
+}
+
 function bootstrap() {
   const canvas = document.getElementById('chainlab-canvas');
   const scoreLabel = document.getElementById('scoreLabel');
   const shotsLabel = document.getElementById('shotsLabel');
   const targetLabel = document.getElementById('targetLabel');
   const levelLabel = document.getElementById('levelLabel');
+  const chainStatusLabel = document.getElementById('chainStatusLabel');
   const levelSelect = document.getElementById('levelSelect');
+  const helpButton = document.getElementById('helpButton');
   const retryButton = document.getElementById('retryButton');
   const outcomePanel = document.getElementById('outcomePanel');
   const outcomeText = document.getElementById('outcomeText');
+  const outcomeReason = document.getElementById('outcomeReason');
   const summaryRetryButton = document.getElementById('summaryRetryButton');
   const nextButton = document.getElementById('nextButton');
 
@@ -329,6 +369,12 @@ function bootstrap() {
   const summaryScore = document.getElementById('summaryScore');
   const summaryDepth = document.getElementById('summaryDepth');
   const summaryAccuracy = document.getElementById('summaryAccuracy');
+
+  const chainFeedStatus = document.getElementById('chainFeedStatus');
+  const chainLogList = document.getElementById('chainLogList');
+
+  const tutorialOverlay = document.getElementById('tutorialOverlay');
+  const tutorialStartButton = document.getElementById('tutorialStartButton');
 
   const techPartsLabel = document.getElementById('techPartsLabel');
   const metaStatus = document.getElementById('metaStatus');
@@ -352,6 +398,7 @@ function bootstrap() {
 
   let metaState = loadMetaState();
   let playtestMode = loadPlaytestMode();
+  let tutorialVisible = !loadTutorialSeen();
 
   function setMetaStatus(message) {
     metaState.lastStatus = message;
@@ -360,6 +407,20 @@ function bootstrap() {
 
   function getSummary() {
     return ChainLabGame.getRunSummary();
+  }
+
+  function setTutorialVisible(visible, markSeen) {
+    tutorialVisible = Boolean(visible);
+
+    if (tutorialOverlay) {
+      tutorialOverlay.classList.toggle('hidden', !tutorialVisible);
+    }
+
+    document.body.classList.toggle('tutorial-open', tutorialVisible);
+
+    if (markSeen) {
+      saveTutorialSeen();
+    }
   }
 
   function renderLevelSelect() {
@@ -453,6 +514,18 @@ function bootstrap() {
     targetLabel.textContent = `Target: ${snapshot.targetScore}`;
     levelLabel.textContent = `Level: ${snapshot.levelId}`;
 
+    if (chainStatusLabel) {
+      let status = 'Chain: idle';
+      if (snapshot.phase === 'simulate') {
+        status = 'Chain: projectile in flight';
+      } else if (snapshot.phase === 'resolve') {
+        status = `Chain: resolving (step ${snapshot.chainSteps})`;
+      } else if (snapshot.phase === 'end') {
+        status = `Chain: resolved depth ${snapshot.chainDepth}`;
+      }
+      chainStatusLabel.textContent = status;
+    }
+
     if (levelSelect) {
       levelSelect.value = String(snapshot.levelIndex);
     }
@@ -481,6 +554,9 @@ function bootstrap() {
       outcomePanel.classList.remove('win');
       outcomePanel.classList.remove('lose');
       nextButton.disabled = false;
+      if (outcomeReason) {
+        outcomeReason.textContent = 'Reach target score before shots run out.';
+      }
       return;
     }
 
@@ -493,19 +569,71 @@ function bootstrap() {
       outcomeText.textContent = hasNextLevel
         ? 'Victory: target reached. Press Enter or click arena for next level.'
         : 'Victory: campaign complete. Press R to replay level.';
+      if (outcomeReason) {
+        outcomeReason.textContent = `Target ${summary.targetScore} reached with ${summary.score} score.`;
+      }
     } else {
       outcomePanel.classList.add('lose');
       outcomePanel.classList.remove('win');
       outcomeText.textContent = 'Defeat: shots exhausted. Press Space or click arena to retry.';
+      if (outcomeReason) {
+        outcomeReason.textContent = `Score ${summary.score}/${summary.targetScore}. No shots left.`;
+      }
     }
 
     nextButton.disabled = !hasNextLevel || summary.result !== 'win';
+  }
+
+  function syncChainFeed() {
+    if (!chainFeedStatus || !chainLogList) {
+      return;
+    }
+
+    const summary = getSummary();
+    if (!summary) {
+      return;
+    }
+
+    if (summary.phase === 'resolve') {
+      chainFeedStatus.textContent = `Chain resolving... step ${summary.chainSteps}, depth ${summary.chainDepth}.`;
+    } else if (summary.phase === 'simulate') {
+      chainFeedStatus.textContent = 'Projectile in flight...';
+    } else if (summary.phase === 'end') {
+      chainFeedStatus.textContent =
+        summary.chainSteps > 0
+          ? `Chain ended at depth ${summary.chainDepth}.`
+          : 'No chain triggered this run.';
+    } else {
+      chainFeedStatus.textContent = 'Waiting for shot...';
+    }
+
+    const trace = typeof ChainLabGame.getChainTrace === 'function' ? ChainLabGame.getChainTrace() : [];
+    chainLogList.innerHTML = '';
+
+    if (!Array.isArray(trace) || trace.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'chain-log-empty';
+      empty.textContent = 'Hit a node to see causal chain events.';
+      chainLogList.appendChild(empty);
+      return;
+    }
+
+    for (let i = trace.length - 1; i >= 0; i -= 1) {
+      const item = trace[i];
+      const source = item.sourceId === 'projectile' ? 'shot' : item.sourceId;
+      const reason = formatChainReason(item.reason);
+      const nodeType = formatNodeType(item.nodeType);
+      const row = document.createElement('li');
+      row.textContent = `#${item.step} ${source} -> ${item.targetId} (${nodeType}) via ${reason}, +${item.points}`;
+      chainLogList.appendChild(row);
+    }
   }
 
   function hardSync() {
     syncHud();
     syncSummary();
     syncOutcomePanel();
+    syncChainFeed();
     syncMetaPanel();
   }
 
@@ -636,17 +764,30 @@ function bootstrap() {
   renderLevelSelect();
   applyModifiersFromMeta();
   applyPlaytestMode();
+  setTutorialVisible(tutorialVisible, false);
 
   canvas.addEventListener('mousemove', (event) => {
+    if (tutorialVisible) {
+      return;
+    }
+
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.setAim(point.x, point.y, true);
   });
 
   canvas.addEventListener('mouseleave', () => {
+    if (tutorialVisible) {
+      return;
+    }
+
     ChainLabGame.setAim(0, 0, false);
   });
 
   canvas.addEventListener('click', (event) => {
+    if (tutorialVisible) {
+      return;
+    }
+
     if (tryOutcomeQuickAction()) {
       return;
     }
@@ -661,6 +802,26 @@ function bootstrap() {
       const nextIndex = Number(event.target.value);
       ChainLabGame.setLevel(nextIndex);
       hardSync();
+    });
+  }
+
+  if (helpButton) {
+    helpButton.addEventListener('click', () => {
+      setTutorialVisible(true, false);
+    });
+  }
+
+  if (tutorialStartButton) {
+    tutorialStartButton.addEventListener('click', () => {
+      setTutorialVisible(false, true);
+    });
+  }
+
+  if (tutorialOverlay) {
+    tutorialOverlay.addEventListener('click', (event) => {
+      if (event.target === tutorialOverlay) {
+        setTutorialVisible(false, true);
+      }
     });
   }
 
@@ -723,6 +884,14 @@ function bootstrap() {
 
   window.addEventListener('keydown', (event) => {
     const key = event.key.toLowerCase();
+
+    if (tutorialVisible) {
+      if (key === 'escape' || key === 'enter' || key === ' ') {
+        event.preventDefault();
+        setTutorialVisible(false, true);
+      }
+      return;
+    }
 
     if (key === 'r') {
       restartCurrentLevel('hotkey_retry', true);

@@ -53,8 +53,8 @@ body {
   min-width: 138px;
 }
 
+#helpButton,
 #retryButton {
-  margin-left: auto;
   border: 1px solid #35556d;
   background: #102231;
   color: #d7ecff;
@@ -62,6 +62,11 @@ body {
   cursor: pointer;
 }
 
+#helpButton {
+  margin-left: auto;
+}
+
+#helpButton:hover,
 #retryButton:hover {
   background: #163248;
 }
@@ -229,6 +234,149 @@ body {
 .playtest-mode .meta-panel,
 .playtest-mode .level-select-wrap,
 .playtest-mode #levelSelect,
-.playtest-mode .hint {
+.playtest-mode .hint,
+.playtest-mode .legend,
+.playtest-mode .chain-panel {
   display: none;
+}
+.legend {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #35556d;
+  background: rgba(10, 20, 29, 0.88);
+}
+
+.legend-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legend-item {
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid #35556d;
+  border-radius: 4px;
+  background: rgba(9, 16, 25, 0.84);
+}
+
+.legend-item strong {
+  margin-right: 6px;
+}
+
+.legend-item.bomb strong {
+  color: #ff5d73;
+}
+
+.legend-item.pusher strong {
+  color: #5cc8ff;
+}
+
+.legend-item.multiplier strong {
+  color: #9bff8a;
+}
+
+.outcome-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.outcome-reason {
+  margin: 0;
+  color: #c1d9e8;
+  font-size: 12px;
+}
+
+.chain-panel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #35556d;
+  background: rgba(7, 16, 24, 0.9);
+}
+
+.chain-title {
+  margin: 0;
+  font-size: 14px;
+}
+
+.chain-feed-status {
+  margin: 6px 0 8px;
+  color: #9cc1d4;
+  font-size: 12px;
+}
+
+.chain-log-list {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #d1e7f7;
+}
+
+.chain-log-empty {
+  color: #8da8ba;
+}
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 12, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 20;
+}
+
+.tutorial-card {
+  width: min(100%, 680px);
+  border: 1px solid #35556d;
+  background: #09151f;
+  padding: 16px;
+}
+
+.tutorial-card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.tutorial-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.tutorial-tip {
+  margin: 10px 0 0;
+  color: #9cc1d4;
+  font-size: 13px;
+}
+
+.tutorial-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#tutorialStartButton {
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+#tutorialStartButton:hover {
+  background: #163248;
 }
