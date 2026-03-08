@@ -89,6 +89,16 @@ const ChainLabGame = (() => {
       DEPTH_MODULE_STEP: 0.05,
       MAX_MODULE_CHANCE: 0.8
     },
+    VISUAL: {
+      MAX_CHAIN_LINKS: 16,
+      CHAIN_LINK_TTL: 0.7,
+      CHAIN_LINK_WIDTH: 2,
+      CHAIN_LINK_COLOR: '#ffe082',
+      TRAJECTORY_UNDERLAY_WIDTH: 4,
+      TRAJECTORY_UNDERLAY_COLOR: 'rgba(181, 243, 255, 0.22)',
+      TRAJECTORY_DOT_RADIUS: 2,
+      TRAJECTORY_DOT_STEP: 4
+    },
     LABEL: {
       FONT: 'bold 12px monospace',
       COLOR: '#0c1f2b'
@@ -181,6 +191,7 @@ const ChainLabGame = (() => {
       chain: createChainState(),
       rewardPacket: null,
       telemetry: [],
+      visualLinks: [],
       accumulator: 0
     };
   }
@@ -390,6 +401,56 @@ const ChainLabGame = (() => {
     return null;
   }
 
+  function findSourcePosition(sourceId) {
+    if (sourceId === 'projectile') {
+      return {
+        x: CONFIG.SHOOTER.X,
+        y: CONFIG.SHOOTER.Y
+      };
+    }
+
+    const sourceNode = getNodeById(sourceId);
+    if (!sourceNode) {
+      return null;
+    }
+
+    return {
+      x: sourceNode.x,
+      y: sourceNode.y
+    };
+  }
+
+  function addVisualLink(sourceId, targetNode) {
+    const state = getState();
+    const source = findSourcePosition(sourceId);
+    if (!source || !targetNode) {
+      return;
+    }
+
+    state.visualLinks.push({
+      x1: source.x,
+      y1: source.y,
+      x2: targetNode.x,
+      y2: targetNode.y,
+      ttl: CONFIG.VISUAL.CHAIN_LINK_TTL
+    });
+
+    if (state.visualLinks.length > CONFIG.VISUAL.MAX_CHAIN_LINKS) {
+      state.visualLinks.splice(0, state.visualLinks.length - CONFIG.VISUAL.MAX_CHAIN_LINKS);
+    }
+  }
+
+  function updateVisualLinks(dt) {
+    const state = getState();
+
+    for (let i = state.visualLinks.length - 1; i >= 0; i -= 1) {
+      state.visualLinks[i].ttl -= dt;
+      if (state.visualLinks[i].ttl <= 0) {
+        state.visualLinks.splice(i, 1);
+      }
+    }
+  }
+
   function enqueueChainNode(nodeId, depth, reason, sourceId) {
     const state = getState();
     if (state.chain.queue.length >= CONFIG.CHAIN.MAX_QUEUE_SIZE) {
@@ -545,6 +606,8 @@ const ChainLabGame = (() => {
 
     const points = applyNodeScore(node.type, event.depth);
 
+    addVisualLink(event.sourceId, node);
+
     emitTelemetry('chain_step', {
       nodeId: node.id,
       nodeType: node.type,
@@ -692,7 +755,19 @@ const ChainLabGame = (() => {
 
   function update(dt) {
     const state = getState();
-    if (!state || state.phase === 'end') {
+    if (!state) {
+      return;
+    }
+
+    let delta = Number(dt) || 0;
+    if (delta > CONFIG.SIMULATION.MS_THRESHOLD) {
+      delta /= 1000;
+    }
+
+    delta = clamp(delta, 0, CONFIG.SIMULATION.MAX_DT);
+    updateVisualLinks(delta);
+
+    if (state.phase === 'end') {
       return;
     }
 
@@ -705,12 +780,6 @@ const ChainLabGame = (() => {
       return;
     }
 
-    let delta = Number(dt) || 0;
-    if (delta > CONFIG.SIMULATION.MS_THRESHOLD) {
-      delta /= 1000;
-    }
-
-    delta = clamp(delta, 0, CONFIG.SIMULATION.MAX_DT);
     state.accumulator += delta;
 
     let steps = 0;
@@ -782,18 +851,56 @@ const ChainLabGame = (() => {
     }
 
     ctx.save();
-    ctx.strokeStyle = CONFIG.TRAJECTORY.COLOR;
-    ctx.lineWidth = CONFIG.TRAJECTORY.WIDTH;
-    ctx.setLineDash(CONFIG.TRAJECTORY.DASH_PATTERN);
 
+    ctx.strokeStyle = CONFIG.VISUAL.TRAJECTORY_UNDERLAY_COLOR;
+    ctx.lineWidth = CONFIG.VISUAL.TRAJECTORY_UNDERLAY_WIDTH;
+    ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
-
     for (let i = 1; i < points.length; i += 1) {
       ctx.lineTo(points[i].x, points[i].y);
     }
-
     ctx.stroke();
+
+    ctx.strokeStyle = CONFIG.TRAJECTORY.COLOR;
+    ctx.lineWidth = CONFIG.TRAJECTORY.WIDTH;
+    ctx.setLineDash(CONFIG.TRAJECTORY.DASH_PATTERN);
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = CONFIG.TRAJECTORY.COLOR;
+    for (let i = 0; i < points.length; i += CONFIG.VISUAL.TRAJECTORY_DOT_STEP) {
+      ctx.beginPath();
+      ctx.arc(points[i].x, points[i].y, CONFIG.VISUAL.TRAJECTORY_DOT_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawChainLinks(ctx) {
+    const state = getState();
+    if (state.visualLinks.length === 0) {
+      return;
+    }
+
+    ctx.save();
+    ctx.lineWidth = CONFIG.VISUAL.CHAIN_LINK_WIDTH;
+
+    for (let i = 0; i < state.visualLinks.length; i += 1) {
+      const link = state.visualLinks[i];
+      const alpha = clamp(link.ttl / CONFIG.VISUAL.CHAIN_LINK_TTL, 0, 1);
+      ctx.strokeStyle = `rgba(255, 224, 130, ${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(link.x1, link.y1);
+      ctx.lineTo(link.x2, link.y2);
+      ctx.stroke();
+    }
+
     ctx.restore();
   }
 
@@ -822,6 +929,7 @@ const ChainLabGame = (() => {
 
     drawArena(ctx);
     drawAimPreview(ctx);
+    drawChainLinks(ctx);
     drawShooter(ctx);
     drawNodes(ctx);
     drawProjectile(ctx);

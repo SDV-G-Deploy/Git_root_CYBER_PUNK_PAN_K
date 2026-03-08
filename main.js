@@ -55,6 +55,12 @@ function bootstrap() {
     summaryAccuracy.textContent = `Accuracy: ${summary.accuracy}%`;
   }
 
+  function doRetry() {
+    ChainLabGame.resetLevel();
+    syncHud();
+    syncSummary();
+  }
+
   canvas.addEventListener('mousemove', (event) => {
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.setAim(point.x, point.y, true);
@@ -72,9 +78,13 @@ function bootstrap() {
   });
 
   retryButton.addEventListener('click', () => {
-    ChainLabGame.resetLevel();
-    syncHud();
-    syncSummary();
+    doRetry();
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key.toLowerCase() === 'r') {
+      doRetry();
+    }
   });
 
   let previous = 0;
