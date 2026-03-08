@@ -1,0 +1,13 @@
+{"timestamp":1710000000000,"runId":"run_a","eventType":"run_start","payload":{"levelId":"L01"}}
+{"timestamp":1710000001000,"runId":"run_a","eventType":"shot_fired","payload":{"levelId":"L01"}}
+{"timestamp":1710000002000,"runId":"run_a","eventType":"chain_resolved","payload":{"levelId":"L01"}}
+{"timestamp":1710000002600,"runId":"run_a","eventType":"run_end","payload":{"levelId":"L01","result":"win"}}
+{"timestamp":1710000002700,"runId":"run_a","eventType":"reward_generated","payload":{"levelId":"L01"}}
+{"timestamp":1710000010000,"runId":"run_b","eventType":"run_start","payload":{"levelId":"L02"}}
+{"timestamp":1710000010500,"runId":"run_b","eventType":"shot_fired","payload":{"levelId":"L02"}}
+{"timestamp":1710000010900,"runId":"run_b","eventType":"run_end","payload":{"levelId":"L02","result":"lose"}}
+{"timestamp":1710000011000,"runId":"run_b","eventType":"retry","payload":{"levelId":"L02","reason":"quick_retry"}}
+{"timestamp":1710000020000,"runId":"run_c","eventType":"run_start","payload":{"levelId":"L02"}}
+{"timestamp":1710000021200,"runId":"run_c","eventType":"run_end","payload":{"levelId":"L02","result":"win"}}
+{"timestamp":1710000030000,"runId":"run_d","eventType":"run_start","payload":{"levelId":"L03"}}
+{"timestamp":1710000030600,"runId":"run_d","eventType":"run_end","payload":{"levelId":"L03","result":"lose"}}

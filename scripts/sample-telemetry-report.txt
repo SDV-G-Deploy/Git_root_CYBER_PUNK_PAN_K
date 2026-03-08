@@ -1,0 +1,28 @@
+Telemetry Report (v0.1-playtest)
+
+Runs observed: 4
+Avg session length: 1.5s
+Retry rate: 25% (1 retries)
+
+Level completion funnel (L1-L12):
+- L01: attempts=1, wins=1, completion=100%
+- L02: attempts=2, wins=1, completion=50%
+- L03: attempts=1, wins=0, completion=0%
+- L04: attempts=0, wins=0, completion=0.0%
+- L05: attempts=0, wins=0, completion=0.0%
+- L06: attempts=0, wins=0, completion=0.0%
+- L07: attempts=0, wins=0, completion=0.0%
+- L08: attempts=0, wins=0, completion=0.0%
+- L09: attempts=0, wins=0, completion=0.0%
+- L10: attempts=0, wins=0, completion=0.0%
+- L11: attempts=0, wins=0, completion=0.0%
+- L12: attempts=0, wins=0, completion=0.0%
+
+Top fail levels:
+- L02: fails=1/2
+- L03: fails=1/1
+
+Known issues:
+- Screen shake can feel strong on dense chains.
+- Telemetry is local-only and resets if storage is cleared.
+- Funnel quality improves after enough external sessions.

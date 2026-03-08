@@ -54,6 +54,19 @@
       </div>
     </section>
 
+    <section id="playtestPanel" class="playtest-panel" aria-live="polite">
+      <label class="playtest-toggle" for="playtestModeToggle">
+        <input id="playtestModeToggle" type="checkbox">
+        Playtest mode (clean UI)
+      </label>
+      <div class="playtest-actions">
+        <button id="exportTelemetryJsonButton" type="button">Export telemetry JSON</button>
+        <button id="exportTelemetryJsonlButton" type="button">Export telemetry JSONL</button>
+        <button id="buildReportButton" type="button">Build telemetry report</button>
+      </div>
+      <pre id="telemetryReportOutput" class="telemetry-report hidden"></pre>
+    </section>
+
     <p class="hint">Move mouse to aim. Click to fire one shot.</p>
   </main>
 

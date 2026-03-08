@@ -2,6 +2,7 @@
 
 const META_SAVE_KEY = 'signal_district_chainlab_meta_v1';
 const META_SAVE_VERSION = 1;
+const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';
 
 const UPGRADE_DEFS = Object.freeze({
   score_bonus: {
@@ -103,6 +104,22 @@ function saveMetaState(metaState) {
   }
 }
 
+function loadPlaytestMode() {
+  try {
+    return localStorage.getItem(PLAYTEST_MODE_KEY) === '1';
+  } catch (error) {
+    return false;
+  }
+}
+
+function savePlaytestMode(isEnabled) {
+  try {
+    localStorage.setItem(PLAYTEST_MODE_KEY, isEnabled ? '1' : '0');
+  } catch (error) {
+    // Ignore persistence errors.
+  }
+}
+
 function buildMetaModifiers(metaState) {
   let scoreBonus = 0;
   let chainGrowthBonus = 0;
@@ -116,6 +133,183 @@ function buildMetaModifiers(metaState) {
   }
 
   return { scoreBonus, chainGrowthBonus };
+}
+
+function downloadTextFile(fileName, text, mimeType) {
+  const blob = new Blob([text], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function parseTelemetryRecords(raw) {
+  if (!raw || typeof raw !== 'string') {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    return [];
+  } catch (error) {
+    const lines = raw
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    const records = [];
+    for (let i = 0; i < lines.length; i += 1) {
+      try {
+        records.push(JSON.parse(lines[i]));
+      } catch (lineError) {
+        // Skip malformed lines in MVP report mode.
+      }
+    }
+
+    return records;
+  }
+}
+
+function formatSeconds(value) {
+  return `${value.toFixed(2)}s`;
+}
+
+function buildTelemetryReport(records, levelList) {
+  const runs = new Map();
+  const levelStats = new Map();
+
+  for (let i = 0; i < levelList.length; i += 1) {
+    levelStats.set(levelList[i].id, { attempts: 0, wins: 0, fails: 0 });
+  }
+
+  let retryEvents = 0;
+
+  for (let i = 0; i < records.length; i += 1) {
+    const entry = records[i];
+    if (!entry || typeof entry !== 'object') {
+      continue;
+    }
+
+    const runId = entry.runId || `unknown_${i}`;
+    const payload = entry.payload || {};
+    if (!runs.has(runId)) {
+      runs.set(runId, {
+        startAt: null,
+        endAt: null,
+        levelId: payload.levelId || null,
+        result: null
+      });
+    }
+
+    const run = runs.get(runId);
+    const eventType = entry.eventType;
+
+    if (eventType === 'run_start') {
+      run.startAt = entry.timestamp;
+      run.levelId = payload.levelId || run.levelId;
+    }
+
+    if (eventType === 'run_end') {
+      run.endAt = entry.timestamp;
+      run.result = payload.result || run.result;
+      run.levelId = payload.levelId || run.levelId;
+
+      if (run.levelId) {
+        if (!levelStats.has(run.levelId)) {
+          levelStats.set(run.levelId, { attempts: 0, wins: 0, fails: 0 });
+        }
+
+        const stats = levelStats.get(run.levelId);
+        stats.attempts += 1;
+        if (run.result === 'win') {
+          stats.wins += 1;
+        } else {
+          stats.fails += 1;
+        }
+      }
+    }
+
+    if (eventType === 'retry') {
+      retryEvents += 1;
+    }
+  }
+
+  const runEntries = Array.from(runs.values());
+  const completedRuns = runEntries.filter((run) => Number.isFinite(run.startAt) && Number.isFinite(run.endAt));
+
+  let totalDurationSec = 0;
+  for (let i = 0; i < completedRuns.length; i += 1) {
+    totalDurationSec += Math.max(0, (completedRuns[i].endAt - completedRuns[i].startAt) / 1000);
+  }
+
+  const avgSessionSec = completedRuns.length > 0 ? totalDurationSec / completedRuns.length : 0;
+  const retryRate = runEntries.length > 0 ? retryEvents / runEntries.length : 0;
+
+  const levelIds = levelList.map((level) => level.id);
+  const funnelLines = [];
+  for (let i = 0; i < levelIds.length; i += 1) {
+    const id = levelIds[i];
+    const stats = levelStats.get(id) || { attempts: 0, wins: 0, fails: 0 };
+    const completionRate = stats.attempts > 0 ? (stats.wins / stats.attempts) * 100 : 0;
+    funnelLines.push(
+      `${id}: attempts=${stats.attempts}, wins=${stats.wins}, completion=${completionRate.toFixed(1)}%`
+    );
+  }
+
+  const failRanking = [];
+  levelStats.forEach((stats, levelId) => {
+    if (stats.fails > 0) {
+      failRanking.push({ levelId, fails: stats.fails, attempts: stats.attempts });
+    }
+  });
+
+  failRanking.sort((a, b) => {
+    if (b.fails !== a.fails) {
+      return b.fails - a.fails;
+    }
+    return a.levelId.localeCompare(b.levelId);
+  });
+
+  const topFailLines = failRanking.slice(0, 5).map((row) => `${row.levelId}: fails=${row.fails}/${row.attempts}`);
+
+  const lines = [];
+  lines.push('Telemetry Report (v0.1-playtest)');
+  lines.push('');
+  lines.push(`Runs observed: ${runEntries.length}`);
+  lines.push(`Avg session length: ${formatSeconds(avgSessionSec)}`);
+  lines.push(`Retry rate: ${(retryRate * 100).toFixed(1)}% (${retryEvents} retries)`);
+  lines.push('');
+  lines.push('Level completion funnel (L1-L12):');
+  if (funnelLines.length === 0) {
+    lines.push('- no level data');
+  } else {
+    for (let i = 0; i < funnelLines.length; i += 1) {
+      lines.push(`- ${funnelLines[i]}`);
+    }
+  }
+  lines.push('');
+  lines.push('Top fail levels:');
+  if (topFailLines.length === 0) {
+    lines.push('- no fails captured');
+  } else {
+    for (let i = 0; i < topFailLines.length; i += 1) {
+      lines.push(`- ${topFailLines[i]}`);
+    }
+  }
+  lines.push('');
+  lines.push('Known issues:');
+  lines.push('- Screen shake can feel strong on dense chains.');
+  lines.push('- Telemetry is local-only and resets if storage is cleared.');
+  lines.push('- Completion funnel stabilizes only after enough external sessions.');
+
+  return lines.join('\n');
 }
 
 function bootstrap() {
@@ -141,6 +335,12 @@ function bootstrap() {
   const buyScoreBonusButton = document.getElementById('buyScoreBonusButton');
   const buyChainGrowthButton = document.getElementById('buyChainGrowthButton');
 
+  const playtestModeToggle = document.getElementById('playtestModeToggle');
+  const exportTelemetryJsonButton = document.getElementById('exportTelemetryJsonButton');
+  const exportTelemetryJsonlButton = document.getElementById('exportTelemetryJsonlButton');
+  const buildReportButton = document.getElementById('buildReportButton');
+  const telemetryReportOutput = document.getElementById('telemetryReportOutput');
+
   if (!canvas) {
     throw new Error('Canvas #chainlab-canvas not found.');
   }
@@ -151,6 +351,7 @@ function bootstrap() {
   }
 
   let metaState = loadMetaState();
+  let playtestMode = loadPlaytestMode();
 
   function setMetaStatus(message) {
     metaState.lastStatus = message;
@@ -184,6 +385,26 @@ function bootstrap() {
     if (typeof ChainLabGame.setModifiers === 'function') {
       ChainLabGame.setModifiers(modifiers);
     }
+  }
+
+  function applyPlaytestMode() {
+    document.body.classList.toggle('playtest-mode', playtestMode);
+    if (playtestModeToggle) {
+      playtestModeToggle.checked = playtestMode;
+    }
+  }
+
+  function trackRetry(reason) {
+    if (typeof ChainLabGame.trackEvent !== 'function') {
+      return;
+    }
+
+    const summary = getSummary();
+    ChainLabGame.trackEvent('retry', {
+      reason,
+      levelId: summary ? summary.levelId : null,
+      result: summary ? summary.result : null
+    });
   }
 
   function syncMetaPanel() {
@@ -288,7 +509,11 @@ function bootstrap() {
     syncMetaPanel();
   }
 
-  function restartCurrentLevel() {
+  function restartCurrentLevel(reason, trackAsRetry) {
+    if (trackAsRetry) {
+      trackRetry(reason || 'manual_retry');
+    }
+
     ChainLabGame.resetLevel();
     hardSync();
   }
@@ -308,7 +533,7 @@ function bootstrap() {
       return false;
     }
 
-    restartCurrentLevel();
+    restartCurrentLevel('quick_retry', true);
     return true;
   }
 
@@ -335,7 +560,45 @@ function bootstrap() {
     setMetaStatus(`Unlocked ${def.label}. Applied on next run.`);
     saveMetaState(metaState);
     applyModifiersFromMeta();
-    restartCurrentLevel();
+    restartCurrentLevel('upgrade_refresh', false);
+  }
+
+  function exportTelemetry(format) {
+    const normalized = format === 'jsonl' ? 'jsonl' : 'json';
+    const raw = ChainLabGame.exportTelemetry(normalized);
+    if (!raw || raw.length === 0 || raw === '[]') {
+      setMetaStatus('No telemetry data yet. Play at least one run first.');
+      hardSync();
+      return;
+    }
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const ext = normalized === 'jsonl' ? 'jsonl' : 'json';
+    const mime = normalized === 'jsonl' ? 'application/jsonl' : 'application/json';
+    const fileName = `chainlab-telemetry-${stamp}.${ext}`;
+
+    downloadTextFile(fileName, raw, mime);
+    setMetaStatus(`Telemetry exported: ${fileName}`);
+    hardSync();
+  }
+
+  function buildAndShowTelemetryReport() {
+    const raw = ChainLabGame.exportTelemetry('json');
+    const records = parseTelemetryRecords(raw);
+    const levelList = ChainLabGame.getLevelList();
+    const reportText = buildTelemetryReport(records, levelList);
+
+    if (telemetryReportOutput) {
+      telemetryReportOutput.textContent = reportText;
+      telemetryReportOutput.classList.remove('hidden');
+    }
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const reportFileName = `chainlab-telemetry-report-${stamp}.txt`;
+    downloadTextFile(reportFileName, reportText, 'text/plain');
+
+    setMetaStatus(`Telemetry report generated: ${reportFileName}`);
+    hardSync();
   }
 
   function handleRunEnd(result, rewardPacket, summary) {
@@ -350,6 +613,13 @@ function bootstrap() {
       metaState.techParts += earnedTechParts;
       const levelId = summary && summary.levelId ? summary.levelId : 'level';
       setMetaStatus(`+${earnedTechParts} tech parts from ${levelId}.`);
+
+      if (typeof ChainLabGame.trackEvent === 'function') {
+        ChainLabGame.trackEvent('reward_claimed', {
+          levelId,
+          tech_parts: earnedTechParts
+        });
+      }
     } else {
       setMetaStatus('Run failed. Retry to earn tech parts.');
     }
@@ -365,6 +635,7 @@ function bootstrap() {
 
   renderLevelSelect();
   applyModifiersFromMeta();
+  applyPlaytestMode();
 
   canvas.addEventListener('mousemove', (event) => {
     const point = getCanvasPoint(canvas, event);
@@ -394,12 +665,12 @@ function bootstrap() {
   }
 
   retryButton.addEventListener('click', () => {
-    restartCurrentLevel();
+    restartCurrentLevel('hud_retry', true);
   });
 
   if (summaryRetryButton) {
     summaryRetryButton.addEventListener('click', () => {
-      restartCurrentLevel();
+      restartCurrentLevel('summary_retry', true);
     });
   }
 
@@ -424,11 +695,37 @@ function bootstrap() {
     });
   }
 
+  if (playtestModeToggle) {
+    playtestModeToggle.addEventListener('change', (event) => {
+      playtestMode = Boolean(event.target.checked);
+      savePlaytestMode(playtestMode);
+      applyPlaytestMode();
+    });
+  }
+
+  if (exportTelemetryJsonButton) {
+    exportTelemetryJsonButton.addEventListener('click', () => {
+      exportTelemetry('json');
+    });
+  }
+
+  if (exportTelemetryJsonlButton) {
+    exportTelemetryJsonlButton.addEventListener('click', () => {
+      exportTelemetry('jsonl');
+    });
+  }
+
+  if (buildReportButton) {
+    buildReportButton.addEventListener('click', () => {
+      buildAndShowTelemetryReport();
+    });
+  }
+
   window.addEventListener('keydown', (event) => {
     const key = event.key.toLowerCase();
 
     if (key === 'r') {
-      restartCurrentLevel();
+      restartCurrentLevel('hotkey_retry', true);
       return;
     }
 

@@ -181,3 +181,54 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.playtest-panel {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #35556d;
+  background: rgba(10, 21, 31, 0.92);
+}
+
+.playtest-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.playtest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.playtest-actions button {
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.playtest-actions button:hover {
+  background: #163248;
+}
+
+.telemetry-report {
+  margin: 10px 0 0;
+  padding: 10px;
+  border: 1px solid #35556d;
+  background: rgba(6, 15, 23, 0.9);
+  color: #c9e6ff;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.playtest-mode .summary,
+.playtest-mode .meta-panel,
+.playtest-mode .level-select-wrap,
+.playtest-mode #levelSelect,
+.playtest-mode .hint {
+  display: none;
+}

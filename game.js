@@ -140,6 +140,7 @@ const ChainLabGame = (() => {
     state: null,
     levels: [],
     levelIndex: 0,
+    telemetryLog: [],
     modifiers: {
       scoreBonus: 0,
       chainGrowthBonus: 0
@@ -314,27 +315,29 @@ const ChainLabGame = (() => {
       return;
     }
 
-    state.telemetry.push({
+    const entry = {
       timestamp: Date.now(),
       runId: state.runId,
       eventType,
       payload: payload || {}
-    });
+    };
+
+    state.telemetry.push(entry);
+    runtime.telemetryLog.push(entry);
+  }
+
+  function trackEvent(eventType, payload) {
+    emitTelemetry(eventType, payload);
   }
 
   function exportTelemetry(format) {
-    const state = getState();
     const mode = format || 'json';
 
-    if (!state) {
-      return mode === 'jsonl' ? '' : '[]';
-    }
-
     if (mode === 'jsonl') {
-      return state.telemetry.map((entry) => JSON.stringify(entry)).join('\n');
+      return runtime.telemetryLog.map((entry) => JSON.stringify(entry)).join('\n');
     }
 
-    return JSON.stringify(state.telemetry, null, 2);
+    return JSON.stringify(runtime.telemetryLog, null, 2);
   }
 
   function getAccuracy(state) {
@@ -1298,6 +1301,7 @@ const ChainLabGame = (() => {
     getLevelList,
     getCurrentLevelIndex,
     buildRewardPacket,
+    trackEvent,
     exportTelemetry
   };
 })();
