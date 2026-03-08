@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -13,7 +13,11 @@
       <div class="stats">
         <span id="scoreLabel">Score: 0</span>
         <span id="shotsLabel">Shots: 1</span>
+        <span id="targetLabel">Target: 0</span>
+        <span id="levelLabel">Level: L01</span>
       </div>
+      <label class="level-select-wrap" for="levelSelect">Level</label>
+      <select id="levelSelect" aria-label="Select level"></select>
       <button id="retryButton" type="button">Retry</button>
     </header>
 
@@ -29,6 +33,7 @@
     <p class="hint">Move mouse to aim. Click to fire one shot.</p>
   </main>
 
+  <script src="levels.js" defer></script>
   <script src="game.js" defer></script>
   <script src="main.js" defer></script>
 </body>

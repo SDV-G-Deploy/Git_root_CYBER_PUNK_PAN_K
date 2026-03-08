@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   color-scheme: dark;
 }
 
@@ -35,8 +35,22 @@ body {
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   font-size: 14px;
+}
+
+.level-select-wrap {
+  font-size: 13px;
+  color: #9cc1d4;
+}
+
+#levelSelect {
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 6px 8px;
+  min-width: 138px;
 }
 
 #retryButton {

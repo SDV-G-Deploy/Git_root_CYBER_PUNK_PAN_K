@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 function getCanvasPoint(canvas, event) {
   const rect = canvas.getBoundingClientRect();
@@ -12,9 +12,14 @@ function getCanvasPoint(canvas, event) {
 }
 
 function bootstrap() {
+  const AUTO_NEXT_DELAY_MS = 900;
+
   const canvas = document.getElementById('chainlab-canvas');
   const scoreLabel = document.getElementById('scoreLabel');
   const shotsLabel = document.getElementById('shotsLabel');
+  const targetLabel = document.getElementById('targetLabel');
+  const levelLabel = document.getElementById('levelLabel');
+  const levelSelect = document.getElementById('levelSelect');
   const retryButton = document.getElementById('retryButton');
 
   const summaryResult = document.getElementById('summaryResult');
@@ -31,7 +36,32 @@ function bootstrap() {
     throw new Error('Unable to get 2D context from canvas.');
   }
 
-  ChainLabGame.initGame(canvas);
+  let pendingAutoNext = null;
+
+  function clearAutoNext() {
+    if (pendingAutoNext !== null) {
+      clearTimeout(pendingAutoNext);
+      pendingAutoNext = null;
+    }
+  }
+
+  function renderLevelSelect() {
+    if (!levelSelect) {
+      return;
+    }
+
+    const levels = ChainLabGame.getLevelList();
+    levelSelect.innerHTML = '';
+
+    levels.forEach((level) => {
+      const option = document.createElement('option');
+      option.value = String(level.index);
+      option.textContent = `${level.id} (${level.difficultyTag})`;
+      levelSelect.appendChild(option);
+    });
+
+    levelSelect.value = String(ChainLabGame.getCurrentLevelIndex());
+  }
 
   function syncHud() {
     const snapshot = ChainLabGame.getSnapshot();
@@ -41,6 +71,12 @@ function bootstrap() {
 
     scoreLabel.textContent = `Score: ${snapshot.score}`;
     shotsLabel.textContent = `Shots: ${snapshot.shotsRemaining}`;
+    targetLabel.textContent = `Target: ${snapshot.targetScore}`;
+    levelLabel.textContent = `Level: ${snapshot.levelId}`;
+
+    if (levelSelect) {
+      levelSelect.value = String(snapshot.levelIndex);
+    }
   }
 
   function syncSummary() {
@@ -55,11 +91,36 @@ function bootstrap() {
     summaryAccuracy.textContent = `Accuracy: ${summary.accuracy}%`;
   }
 
-  function doRetry() {
-    ChainLabGame.resetLevel();
+  function hardSync() {
     syncHud();
     syncSummary();
   }
+
+  function restartCurrentLevel() {
+    clearAutoNext();
+    ChainLabGame.resetLevel();
+    hardSync();
+  }
+
+  function handleRunEnd(result) {
+    hardSync();
+
+    if (result !== 'win') {
+      return;
+    }
+
+    clearAutoNext();
+    pendingAutoNext = setTimeout(() => {
+      pendingAutoNext = null;
+      const moved = ChainLabGame.nextLevel();
+      if (moved) {
+        hardSync();
+      }
+    }, AUTO_NEXT_DELAY_MS);
+  }
+
+  ChainLabGame.initGame(canvas, { onRunEnd: handleRunEnd });
+  renderLevelSelect();
 
   canvas.addEventListener('mousemove', (event) => {
     const point = getCanvasPoint(canvas, event);
@@ -73,17 +134,25 @@ function bootstrap() {
   canvas.addEventListener('click', (event) => {
     const point = getCanvasPoint(canvas, event);
     ChainLabGame.fireShot(point.x, point.y);
-    syncHud();
-    syncSummary();
+    hardSync();
   });
 
+  if (levelSelect) {
+    levelSelect.addEventListener('change', (event) => {
+      clearAutoNext();
+      const nextIndex = Number(event.target.value);
+      ChainLabGame.setLevel(nextIndex);
+      hardSync();
+    });
+  }
+
   retryButton.addEventListener('click', () => {
-    doRetry();
+    restartCurrentLevel();
   });
 
   window.addEventListener('keydown', (event) => {
     if (event.key.toLowerCase() === 'r') {
-      doRetry();
+      restartCurrentLevel();
     }
   });
 
@@ -98,14 +167,12 @@ function bootstrap() {
 
     ChainLabGame.update(dt);
     ChainLabGame.render(ctx);
-    syncHud();
-    syncSummary();
+    hardSync();
 
     requestAnimationFrame(frame);
   }
 
-  syncHud();
-  syncSummary();
+  hardSync();
   requestAnimationFrame(frame);
 }
 

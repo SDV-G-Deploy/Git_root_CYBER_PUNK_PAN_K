@@ -43,14 +43,15 @@ const ChainLabGame = (() => {
         }
       }
     },
-    LEVEL: {
-      SHOTS: 1,
-      LAYOUT: [
-        { id: 'n1', type: 'bomb', x: 560, y: 160 },
-        { id: 'n2', type: 'pusher', x: 710, y: 230 },
-        { id: 'n3', type: 'multiplier', x: 640, y: 330 },
-        { id: 'n4', type: 'bomb', x: 810, y: 320 },
-        { id: 'n5', type: 'multiplier', x: 470, y: 250 }
+    DEFAULT_LEVEL: {
+      id: 'L01',
+      shotsLimit: 1,
+      targetScore: 120,
+      difficultyTag: 'light',
+      nodes: [
+        { id: 'n1', type: 'bomb', x: 560, y: 180 },
+        { id: 'n2', type: 'multiplier', x: 680, y: 260 },
+        { id: 'n3', type: 'pusher', x: 760, y: 320 }
       ]
     },
     TRAJECTORY: {
@@ -73,11 +74,11 @@ const ChainLabGame = (() => {
       START_MULTIPLIER: 1
     },
     RUN: {
-      WIN_TEXT: 'Run complete. Retry for next run.',
-      LOSE_TEXT: 'No hit detected. Retry.',
+      WIN_TEXT: 'Run complete. Loading next level...',
+      LOSE_TEXT: 'Run failed. Retry current level.',
       WIN_COLOR: '#8dffba',
       LOSE_COLOR: '#ff9fa9',
-      LABEL_X: 280,
+      LABEL_X: 245,
       LABEL_Y: 40,
       LABEL_FONT: 'bold 20px monospace'
     },
@@ -115,6 +116,8 @@ const ChainLabGame = (() => {
   const runtime = {
     canvas: null,
     state: null,
+    levels: [],
+    levelIndex: 0,
     callbacks: {
       onRunEnd: onRunEndStub
     }
@@ -147,8 +150,57 @@ const ChainLabGame = (() => {
     return `run_${now}_${random}`;
   }
 
-  function createNodes() {
-    return CONFIG.LEVEL.LAYOUT.map((node) => ({
+  function normalizeLevelNode(node, idx) {
+    const type = Object.prototype.hasOwnProperty.call(CONFIG.NODES.TYPES, node.type)
+      ? node.type
+      : 'bomb';
+
+    return {
+      id: String(node.id || `n${idx + 1}`),
+      type,
+      x: Number(node.x) || 500,
+      y: Number(node.y) || 250
+    };
+  }
+
+  function normalizeLevel(level, idx) {
+    const fallbackId = `L${String(idx + 1).padStart(2, '0')}`;
+    const rawNodes = Array.isArray(level.nodes) ? level.nodes : [];
+
+    return {
+      id: String(level.id || fallbackId),
+      shotsLimit: Math.max(1, Number(level.shotsLimit) || 1),
+      targetScore: Math.max(0, Number(level.targetScore) || 0),
+      difficultyTag: String(level.difficultyTag || 'light'),
+      nodes: rawNodes.map((node, nodeIdx) => normalizeLevelNode(node, nodeIdx))
+    };
+  }
+
+  function getGlobalLevels() {
+    if (typeof window !== 'undefined' && Array.isArray(window.CHAIN_LAB_LEVELS)) {
+      return window.CHAIN_LAB_LEVELS;
+    }
+
+    return [CONFIG.DEFAULT_LEVEL];
+  }
+
+  function setLevels(levels) {
+    const source = Array.isArray(levels) && levels.length > 0 ? levels : getGlobalLevels();
+    runtime.levels = source.map((level, index) => normalizeLevel(level, index));
+
+    if (runtime.levels.length === 0) {
+      runtime.levels = [normalizeLevel(CONFIG.DEFAULT_LEVEL, 0)];
+    }
+
+    runtime.levelIndex = clamp(runtime.levelIndex, 0, runtime.levels.length - 1);
+  }
+
+  function getCurrentLevel() {
+    return runtime.levels[runtime.levelIndex] || runtime.levels[0] || normalizeLevel(CONFIG.DEFAULT_LEVEL, 0);
+  }
+
+  function createNodes(level) {
+    return level.nodes.map((node) => ({
       id: node.id,
       type: node.type,
       x: node.x,
@@ -170,11 +222,16 @@ const ChainLabGame = (() => {
     };
   }
 
-  function createState() {
+  function createState(level) {
     return {
       runId: createRunId(),
+      levelId: level.id,
+      levelIndex: runtime.levelIndex,
+      levelCount: runtime.levels.length,
+      targetScore: level.targetScore,
+      difficultyTag: level.difficultyTag,
       score: 0,
-      shotsRemaining: CONFIG.LEVEL.SHOTS,
+      shotsRemaining: level.shotsLimit,
       shotsFired: 0,
       shotsHit: 0,
       phase: 'aim',
@@ -182,7 +239,7 @@ const ChainLabGame = (() => {
       ended: false,
       lastShotHit: false,
       projectile: null,
-      nodes: createNodes(),
+      nodes: createNodes(level),
       aim: {
         x: CONFIG.SHOOTER.X + 120,
         y: CONFIG.SHOOTER.Y,
@@ -277,6 +334,11 @@ const ChainLabGame = (() => {
 
     return {
       runId: state.runId,
+      levelId: state.levelId,
+      levelIndex: state.levelIndex,
+      levelCount: state.levelCount,
+      targetScore: state.targetScore,
+      difficultyTag: state.difficultyTag,
       result: state.result,
       phase: state.phase,
       score: state.score,
@@ -297,6 +359,11 @@ const ChainLabGame = (() => {
     }
 
     return {
+      levelId: state.levelId,
+      levelIndex: state.levelIndex,
+      levelCount: state.levelCount,
+      targetScore: state.targetScore,
+      difficultyTag: state.difficultyTag,
       score: state.score,
       shotsRemaining: state.shotsRemaining,
       phase: state.phase,
@@ -305,6 +372,20 @@ const ChainLabGame = (() => {
       chainSteps: state.chain.steps,
       result: state.result
     };
+  }
+
+  function getLevelList() {
+    return runtime.levels.map((level, index) => ({
+      index,
+      id: level.id,
+      shotsLimit: level.shotsLimit,
+      targetScore: level.targetScore,
+      difficultyTag: level.difficultyTag
+    }));
+  }
+
+  function getCurrentLevelIndex() {
+    return runtime.levelIndex;
   }
 
   function finalizeRun(result) {
@@ -320,13 +401,16 @@ const ChainLabGame = (() => {
     state.rewardPacket = buildRewardPacket(state);
 
     emitTelemetry('run_end', {
+      levelId: state.levelId,
       result,
       score: state.score,
+      targetScore: state.targetScore,
       chainDepth: state.chain.maxDepth,
       accuracy: Number((getAccuracy(state) * 100).toFixed(1))
     });
 
     emitTelemetry('reward_generated', {
+      levelId: state.levelId,
       rewardPacket: state.rewardPacket
     });
 
@@ -335,6 +419,22 @@ const ChainLabGame = (() => {
     } catch (error) {
       // No-op in MVP: callback failures must not break local run.
     }
+  }
+
+  function startLevel(levelIndex) {
+    runtime.levelIndex = clamp(levelIndex, 0, runtime.levels.length - 1);
+    const level = getCurrentLevel();
+    runtime.state = createState(level);
+
+    emitTelemetry('run_start', {
+      levelId: level.id,
+      levelIndex: runtime.levelIndex,
+      shotsLimit: level.shotsLimit,
+      targetScore: level.targetScore,
+      difficultyTag: level.difficultyTag
+    });
+
+    return getSnapshot();
   }
 
   function initGame(canvas, options) {
@@ -356,13 +456,10 @@ const ChainLabGame = (() => {
       canvas.height = CONFIG.ARENA.HEIGHT;
     }
 
-    runtime.state = createState();
+    setLevels(config.levels);
 
-    emitTelemetry('run_start', {
-      shotsRemaining: runtime.state.shotsRemaining
-    });
-
-    return getSnapshot();
+    const startIndex = Number.isInteger(config.startLevelIndex) ? config.startLevelIndex : 0;
+    return startLevel(startIndex);
   }
 
   function resetLevel() {
@@ -370,13 +467,28 @@ const ChainLabGame = (() => {
       throw new Error('resetLevel called before initGame.');
     }
 
-    runtime.state = createState();
+    return startLevel(runtime.levelIndex);
+  }
 
-    emitTelemetry('run_start', {
-      shotsRemaining: runtime.state.shotsRemaining
-    });
+  function setLevel(levelIndex) {
+    if (!runtime.canvas) {
+      throw new Error('setLevel called before initGame.');
+    }
 
-    return getSnapshot();
+    return startLevel(levelIndex);
+  }
+
+  function nextLevel() {
+    if (!runtime.canvas) {
+      throw new Error('nextLevel called before initGame.');
+    }
+
+    if (runtime.levelIndex >= runtime.levels.length - 1) {
+      return false;
+    }
+
+    startLevel(runtime.levelIndex + 1);
+    return true;
   }
 
   function setAim(x, y, active) {
@@ -519,6 +631,7 @@ const ChainLabGame = (() => {
     state.phase = 'simulate';
 
     emitTelemetry('shot_fired', {
+      levelId: state.levelId,
       shotsRemaining: state.shotsRemaining,
       targetX,
       targetY,
@@ -609,6 +722,7 @@ const ChainLabGame = (() => {
     addVisualLink(event.sourceId, node);
 
     emitTelemetry('chain_step', {
+      levelId: state.levelId,
       nodeId: node.id,
       nodeType: node.type,
       sourceId: event.sourceId,
@@ -656,6 +770,7 @@ const ChainLabGame = (() => {
 
     if (state.chain.queue.length === 0) {
       emitTelemetry('chain_resolved', {
+        levelId: state.levelId,
         steps: state.chain.steps,
         maxDepth: state.chain.maxDepth,
         capped: state.chain.capped
@@ -940,12 +1055,16 @@ const ChainLabGame = (() => {
     CONFIG,
     initGame,
     resetLevel,
+    setLevel,
+    nextLevel,
     setAim,
     fireShot,
     update,
     render,
     getSnapshot,
     getRunSummary,
+    getLevelList,
+    getCurrentLevelIndex,
     buildRewardPacket,
     exportTelemetry
   };
