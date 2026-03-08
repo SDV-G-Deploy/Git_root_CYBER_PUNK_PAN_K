@@ -1,0 +1,67 @@
+﻿:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Consolas, 'Courier New', monospace;
+  background: radial-gradient(circle at top, #132435 0%, #070e15 70%);
+  color: #d7ecff;
+}
+
+.app {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+}
+
+#retryButton {
+  margin-left: auto;
+  border: 1px solid #35556d;
+  background: #102231;
+  color: #d7ecff;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#retryButton:hover {
+  background: #163248;
+}
+
+#chainlab-canvas {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  border: 2px solid #26465a;
+  background: #0c1f2b;
+  display: block;
+}
+
+.hint {
+  margin-top: 8px;
+  color: #8cb2c7;
+  font-size: 13px;
+}

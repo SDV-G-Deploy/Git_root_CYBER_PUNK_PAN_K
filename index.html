@@ -1,0 +1,27 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chain Lab P0</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hud">
+      <h1 class="title">Chain Lab - P0 Core Loop</h1>
+      <div class="stats">
+        <span id="scoreLabel">Score: 0</span>
+        <span id="shotsLabel">Shots: 1</span>
+      </div>
+      <button id="retryButton" type="button">Retry</button>
+    </header>
+
+    <canvas id="chainlab-canvas" width="960" height="540" aria-label="Chain Lab Arena"></canvas>
+
+    <p class="hint">Move mouse to aim. Click once to fire.</p>
+  </main>
+
+  <script src="game.js" defer></script>
+</body>
+</html>
