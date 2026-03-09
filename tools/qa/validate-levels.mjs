@@ -112,9 +112,11 @@ function buildValidationSystemDoc() {
 
 - \`tools/qa/rule-model.mjs\`: extracts the active gameplay rule model from runtime constants and node behavior contracts.
 - \`tools/qa/state-key.mjs\`: builds a canonical state hash so the solver can dedupe repeated turn-boundary states and detect loops.
+- \`tools/qa/difficulty-model.mjs\`: holds shared scoring, classification, and target-distribution helpers for actual puzzle difficulty.
 - \`tools/qa/topology-fingerprint.mjs\`: computes a stable topology hash from node types, graph connectivity, and layout coordinates.
 - \`tools/qa/solver.mjs\`: runs headless simulation using the real game modules from \`src/\`, explores player actions, computes solvability, extracts deterministic \`solutionPath\` proofs, and exposes hint-friendly helpers.
-- \`tools/qa/pack-builder.mjs\`: filters candidate puzzles by solvability, degeneracy heuristics, and topology uniqueness before they enter a generated pack.
+- \`tools/qa/telemetry-analysis.mjs\`: turns raw telemetry into per-level actual difficulty metrics such as \`avgSolveTime\`, \`retryRate\`, \`failRate\`, and \`avgMovesOverOptimal\`.
+- \`tools/qa/pack-builder.mjs\`: filters candidate puzzles by solvability, degeneracy heuristics, topology uniqueness, and target difficulty distribution before they enter a generated pack.
 - \`tools/qa/validate-levels.mjs\`: developer entry point that runs the solver across the full authored level pack and writes JSON + Markdown reports.
 - \`tools/qa/report-format.mjs\`: converts solver output into a readable QA report.
 
@@ -132,24 +134,25 @@ function buildValidationSystemDoc() {
 1. Keep runtime rules authoritative in \`src/\`; do not fork gameplay logic for validation.
 2. When rules change, update the solver only if the state model changes, not for cosmetic/UI changes.
 3. Treat \`src/levels.js\` as validated content and rerun the solver whenever authored data changes.
-4. Extend result metrics before adding procedural generation so generated content can be filtered by the same heuristics.
-5. Use \`buildValidatedPack()\` to reject degenerate or duplicate-topology candidates before they enter an authored pack.
+4. Feed exported telemetry through \`tools/qa/telemetry-analysis.mjs\` so actual player behavior calibrates difficulty labels.
+5. Use \`buildValidatedPack()\` to reject degenerate or duplicate-topology candidates and to bias accepted packs toward the target actual-difficulty distribution.
 
 ## Level Validation Workflow
 
 1. Edit \`src/levels.js\` or the core propagation rules in \`src/config.js\`, \`src/node.js\`, or \`src/energySystem.js\`.
 2. Run \`node tools/qa/validate-levels.mjs\` or \`powershell -ExecutionPolicy Bypass -File scripts/validate-levels.ps1\` for authored content.
-3. Run \`node tools/qa/build-pack.mjs <candidate-file.json>\` or \`powershell -ExecutionPolicy Bypass -File scripts/build-pack.ps1 <candidate-file.json>\` for generated candidate batches.
-4. Inspect \`qa/level-validation.json\`, \`qa_report.md\`, and generated pack reports for unsolved, degenerate, or duplicate-topology candidates.
-5. Fix content or generator parameters and rerun the pipeline until the pack is stable.
+3. Run \`node tools/qa/analyze-telemetry.mjs --input <telemetry.json|jsonl>\` or \`powershell -ExecutionPolicy Bypass -File scripts/telemetry-report.ps1 -InputPath <telemetry.json|jsonl>\` to compute actual difficulty from player runs.
+4. Run \`node tools/qa/build-pack.mjs <candidate-file.json> --telemetry <telemetry.json|jsonl>\` or \`powershell -ExecutionPolicy Bypass -File scripts/build-pack.ps1 <candidate-file.json> --telemetry <telemetry.json|jsonl>\` for generated candidate batches.
+5. Inspect \`qa/level-validation.json\`, \`qa_report.md\`, telemetry difficulty reports, and generated pack reports for unsolved, degenerate, duplicate-topology, or target-distribution violations.
+6. Fix content or generator parameters and rerun the pipeline until the pack is stable.
 
 ## Integration Instructions
 
-- Direct module use: import \`validateLevels\`, \`loadLevelsWithSolverProof\`, or \`getNextHint\` from \`tools/qa/solver.mjs\`, and \`buildValidatedPack\` from \`tools/qa/pack-builder.mjs\`.
-- CLI use: run \`node tools/qa/validate-levels.mjs\` for authored levels or \`node tools/qa/build-pack.mjs <candidate-file.json>\` for generated candidates.
-- Windows helpers: run \`scripts/validate-levels.ps1\` or \`scripts/build-pack.ps1 <candidate-file.json>\`.
-- Recommended triggers: after any level-authoring pass, after any propagation-rule change, and after any procedural candidate generation batch.
-- Future extension: procedural generation should emit candidate levels into the same pipeline and reject any layout marked unsolved, degenerate, duplicated by topology, unstable, or too chaotic.
+- Direct module use: import \`validateLevels\`, \`loadLevelsWithSolverProof\`, or \`getNextHint\` from \`tools/qa/solver.mjs\`, \`buildTelemetryDifficultyReportFromRaw\` from \`tools/qa/telemetry-analysis.mjs\`, and \`buildValidatedPack\` from \`tools/qa/pack-builder.mjs\`.
+- CLI use: run \`node tools/qa/validate-levels.mjs\` for authored levels, \`node tools/qa/analyze-telemetry.mjs --input <telemetry.json|jsonl>\` for actual-difficulty analysis, or \`node tools/qa/build-pack.mjs <candidate-file.json> --telemetry <telemetry.json|jsonl>\` for generated candidates.
+- Windows helpers: run \`scripts/validate-levels.ps1\`, \`scripts/telemetry-report.ps1\`, or \`scripts/build-pack.ps1\`.
+- Recommended triggers: after any level-authoring pass, after any propagation-rule change, after each telemetry review, and after any procedural candidate generation batch.
+- Future extension: procedural generation should emit candidate levels into the same pipeline and reject any layout marked unsolved, degenerate, duplicated by topology, over-target for the desired difficulty mix, unstable, or too chaotic.
 `;
 }
 const results = validateLevels();
