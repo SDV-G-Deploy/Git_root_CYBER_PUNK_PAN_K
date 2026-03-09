@@ -1,47 +1,52 @@
-import { CONFIG } from './config.js';
+import { CONFIG, NODE_TYPES } from './config.js';
 import {
   bumpRevision,
-  createLastShotReport,
   createState,
-  getChainTrace,
-  getLastShotReport,
+  getNodeById,
   getRunSummary,
   getSnapshot
 } from './gameState.js';
-import { loadLevels, clampLevelIndex } from './levels.js';
-import {
-  clamp,
-  distance,
-  integrateProjectile,
-  findHitNodeAt,
-  findHitNodeSwept,
-  randomRange
-} from './physicsLite.js';
-import { createProjectile } from './projectile.js';
+import { clampLevelIndex, loadLevels } from './levels.js';
 import { createTelemetryStore } from './telemetry.js';
-import { buildRewardPacket, finalizeLastShotReport, getAccuracy } from './scoring.js';
-import { enqueueChainNode, resolveChainStep, resetChainForShot, startChainFrom } from './energySystem.js';
-import { resolveNodeEvent } from './node.js';
+import { findClosestNode, updatePackets } from './physicsLite.js';
+import { applySwitchMode, isClickableNode, toggleSwitchMode, updateActiveState } from './node.js';
+import { evaluateLoseCondition, evaluateObjectives, makeOutcomeStatus } from './scoring.js';
+import { prepareTurn, resolvePropagation, seedActionPacket } from './energySystem.js';
 import { renderState } from './render.js';
 
 function onRunEndStub() {
   return null;
 }
 
-function normalizeModifiers(modifiers) {
-  const source = modifiers || {};
+function buildRewardPacket(state) {
+  const base = state.result === 'win' ? 40 : 10;
+  const efficiency = Math.max(0, state.movesLimit - state.movesUsed);
+  const controlBonus = Math.max(0, state.overloadLimit - state.overload);
 
   return {
-    scoreBonus: clamp(
-      Number(source.scoreBonus) || 0,
-      CONFIG.MODIFIERS.SCORE_BONUS_MIN,
-      CONFIG.MODIFIERS.SCORE_BONUS_MAX
-    ),
-    chainGrowthBonus: clamp(
-      Number(source.chainGrowthBonus) || 0,
-      CONFIG.MODIFIERS.CHAIN_GROWTH_MIN,
-      CONFIG.MODIFIERS.CHAIN_GROWTH_MAX
-    )
+    credits: base + efficiency * 4,
+    tech_parts: state.result === 'win' ? 2 + Math.floor(controlBonus / 2) : 1,
+    tech_module_chance: Number(Math.min(0.75, 0.1 + controlBonus * 0.03).toFixed(2)),
+    performance_tags: [
+      state.result === 'win' ? 'protocol_stable' : 'protocol_failed',
+      controlBonus >= 3 ? 'low_overload' : 'high_overload'
+    ]
+  };
+}
+
+function makeLastShotReport(state) {
+  return {
+    fired: state.lastAction.valid,
+    hit: state.lastAction.valid,
+    targetNodeId: state.lastAction.nodeId,
+    missReason: state.lastAction.valid ? null : state.lastAction.reason,
+    scoreBefore: 0,
+    scoreAfter: 0,
+    scoreGain: 0,
+    chainSteps: state.lastTurn.trace.length,
+    chainDepth: 0,
+    pointsMissing: Math.max(0, state.objectives.filter((o) => !o.done).length),
+    resolution: state.result
   };
 }
 
@@ -51,14 +56,14 @@ export function createChainLabEngine() {
     state: null,
     levels: [],
     levelIndex: 0,
-    modifiers: {
-      scoreBonus: 0,
-      chainGrowthBonus: 0
-    },
     callbacks: {
       onRunEnd: onRunEndStub
     },
-    telemetry: createTelemetryStore(CONFIG.TELEMETRY.MAX_LOG_ENTRIES)
+    telemetry: createTelemetryStore(CONFIG.TELEMETRY.MAX_LOG_ENTRIES),
+    modifiers: {
+      scoreBonus: 0,
+      chainGrowthBonus: 0
+    }
   };
 
   function getState() {
@@ -66,18 +71,33 @@ export function createChainLabEngine() {
   }
 
   function emitTelemetry(eventType, payload) {
-    return runtime.telemetry.emit(getState(), eventType, payload);
+    runtime.telemetry.emit(getState(), eventType, payload);
   }
 
-  function markDirty() {
+  function bump() {
     const state = getState();
     if (state) {
       bumpRevision(state);
     }
   }
 
-  function setLevels(levels) {
-    runtime.levels = loadLevels(levels);
+  function refreshAllNodeActivity(state) {
+    for (let i = 0; i < state.nodes.length; i += 1) {
+      updateActiveState(state.nodes[i]);
+    }
+  }
+
+  function initializeSwitches(state) {
+    for (let i = 0; i < state.nodes.length; i += 1) {
+      const node = state.nodes[i];
+      if (node.baseType === NODE_TYPES.SWITCH) {
+        applySwitchMode(state, node);
+      }
+    }
+  }
+
+  function setLevels(levelsOverride) {
+    runtime.levels = loadLevels(levelsOverride);
     runtime.levelIndex = clampLevelIndex(runtime.levelIndex, runtime.levels);
   }
 
@@ -85,173 +105,32 @@ export function createChainLabEngine() {
     return runtime.levels[runtime.levelIndex] || runtime.levels[0];
   }
 
-  function getNodeById(nodeId) {
-    const state = getState();
-    if (!state) {
-      return null;
-    }
-
-    for (let i = 0; i < state.nodes.length; i += 1) {
-      if (state.nodes[i].id === nodeId) {
-        return state.nodes[i];
-      }
-    }
-
-    return null;
+  function updateObjectiveState(state) {
+    const objectiveResult = evaluateObjectives(state);
+    state.lastTurn.objectiveProgress = objectiveResult.progress;
+    return objectiveResult;
   }
 
-  function findSourcePosition(sourceId) {
-    if (sourceId === 'projectile') {
-      return {
-        x: CONFIG.SHOOTER.X,
-        y: CONFIG.SHOOTER.Y
-      };
-    }
-
-    const sourceNode = getNodeById(sourceId);
-    if (!sourceNode) {
-      return null;
-    }
-
-    return {
-      x: sourceNode.x,
-      y: sourceNode.y
-    };
-  }
-
-  function addVisualLink(sourceId, targetNode) {
+  function finalizeRun(result, reason) {
     const state = getState();
-    const source = findSourcePosition(sourceId);
-    if (!source || !targetNode) {
-      return;
-    }
-
-    state.visualLinks.push({
-      x1: source.x,
-      y1: source.y,
-      x2: targetNode.x,
-      y2: targetNode.y,
-      ttl: CONFIG.VISUAL.CHAIN_LINK_TTL
-    });
-
-    if (state.visualLinks.length > CONFIG.VISUAL.MAX_CHAIN_LINKS) {
-      state.visualLinks.splice(0, state.visualLinks.length - CONFIG.VISUAL.MAX_CHAIN_LINKS);
-    }
-  }
-
-  function spawnHitParticles(x, y) {
-    const state = getState();
-    const rawCount = randomRange(CONFIG.VISUAL.PARTICLE_COUNT_MIN, CONFIG.VISUAL.PARTICLE_COUNT_MAX + 1);
-    const count = Math.floor(rawCount);
-
-    for (let i = 0; i < count; i += 1) {
-      const angle = randomRange(0, Math.PI * 2);
-      const speed = randomRange(CONFIG.VISUAL.PARTICLE_SPEED_MIN, CONFIG.VISUAL.PARTICLE_SPEED_MAX);
-      state.particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        ttl: CONFIG.VISUAL.PARTICLE_TTL
-      });
-    }
-  }
-
-  function createHitFeedback(node, stepIndex) {
-    const state = getState();
-
-    state.hitFlashTtl = CONFIG.VISUAL.HIT_FLASH_TTL;
-    state.screenShakeTtl = CONFIG.VISUAL.SCREEN_SHAKE_TTL;
-
-    state.chainCues.push({
-      x: node.x,
-      y: node.y - node.radius - 14,
-      ttl: CONFIG.VISUAL.CHAIN_CUE_TTL,
-      step: stepIndex
-    });
-
-    spawnHitParticles(node.x, node.y);
-  }
-
-  function updateVisualLinks(dt) {
-    const state = getState();
-
-    for (let i = state.visualLinks.length - 1; i >= 0; i -= 1) {
-      state.visualLinks[i].ttl -= dt;
-      if (state.visualLinks[i].ttl <= 0) {
-        state.visualLinks.splice(i, 1);
-      }
-    }
-  }
-
-  function updateParticles(dt) {
-    const state = getState();
-
-    for (let i = state.particles.length - 1; i >= 0; i -= 1) {
-      const particle = state.particles[i];
-      const drag = Math.max(0, 1 - CONFIG.VISUAL.PARTICLE_DRAG_PER_SECOND * dt);
-      particle.vx *= drag;
-      particle.vy *= drag;
-      particle.x += particle.vx * dt;
-      particle.y += particle.vy * dt;
-      particle.ttl -= dt;
-
-      if (particle.ttl <= 0) {
-        state.particles.splice(i, 1);
-      }
-    }
-  }
-
-  function updateChainCues(dt) {
-    const state = getState();
-
-    for (let i = state.chainCues.length - 1; i >= 0; i -= 1) {
-      const cue = state.chainCues[i];
-      cue.ttl -= dt;
-      cue.y -= dt * 20;
-
-      if (cue.ttl <= 0) {
-        state.chainCues.splice(i, 1);
-      }
-    }
-  }
-
-  function updateFeedbackTimers(dt) {
-    const state = getState();
-
-    state.hitFlashTtl = Math.max(0, state.hitFlashTtl - dt);
-    state.screenShakeTtl = Math.max(0, state.screenShakeTtl - dt);
-  }
-
-  function getSummaryInternal() {
-    const state = getState();
-    if (!state) {
-      return null;
-    }
-
-    return getRunSummary(state, Number((getAccuracy(state) * 100).toFixed(1)));
-  }
-
-  function finalizeRun(result) {
-    const state = getState();
-
-    if (state.ended) {
+    if (!state || state.ended) {
       return;
     }
 
     state.ended = true;
     state.result = result;
     state.phase = 'end';
+    state.lastTurn.status = makeOutcomeStatus(result, reason);
     state.rewardPacket = buildRewardPacket(state);
-    markDirty();
+    bump();
 
     emitTelemetry('run_end', {
       levelId: state.levelId,
       result,
-      score: state.score,
-      targetScore: state.targetScore,
-      chainDepth: state.chain.maxDepth,
-      accuracy: Number((getAccuracy(state) * 100).toFixed(1))
+      reason,
+      movesUsed: state.movesUsed,
+      overload: state.overload,
+      corruptedCount: state.nodes.filter((node) => node.corrupted).length
     });
 
     emitTelemetry('reward_generated', {
@@ -260,40 +139,175 @@ export function createChainLabEngine() {
     });
 
     try {
-      runtime.callbacks.onRunEnd(result, state.rewardPacket, getSummaryInternal());
+      runtime.callbacks.onRunEnd(result, state.rewardPacket, getRunSummary(state));
     } catch (error) {
-      // Callback failures must not break local run.
+      // callback errors should not break game
     }
   }
 
-  function evaluateRunOutcome() {
+  function checkWinLoseAfterTurn(state, overflow) {
+    if (overflow) {
+      finalizeRun('lose', 'simulation_overflow');
+      return;
+    }
+
+    const objectiveResult = updateObjectiveState(state);
+    if (objectiveResult.allDone) {
+      finalizeRun('win', 'objectives_complete');
+      return;
+    }
+
+    const lose = evaluateLoseCondition(state);
+    if (lose.lose) {
+      finalizeRun('lose', lose.reason);
+      return;
+    }
+
+    state.phase = 'await_input';
+    state.lastTurn.status = 'Awaiting next move.';
+    bump();
+  }
+
+  function pushPacketVisual(fromNodeId, toNodeId, energy) {
+    const state = getState();
+    state.effects.packets.push({
+      fromNodeId,
+      toNodeId,
+      energy,
+      t: 0,
+      ttl: CONFIG.FEEDBACK.PACKET_TTL
+    });
+
+    if (state.effects.packets.length > CONFIG.FEEDBACK.TRACE_MAX) {
+      state.effects.packets.splice(0, state.effects.packets.length - CONFIG.FEEDBACK.TRACE_MAX);
+    }
+  }
+
+  function activateNode(nodeId) {
     const state = getState();
 
-    if (state.score >= state.targetScore) {
-      finalizeLastShotReport(state, 'win');
-      finalizeRun('win');
-      return;
+    if (!state || state.phase === 'end') {
+      return false;
     }
 
-    if (state.shotsRemaining <= 0) {
-      finalizeLastShotReport(
-        state,
-        state.lastShotReport && state.lastShotReport.hit
-          ? 'lose_hit_not_enough_score'
-          : 'lose_miss'
-      );
-      finalizeRun('lose');
-      return;
+    const node = getNodeById(state, nodeId);
+    if (!node) {
+      state.lastAction = {
+        type: 'activate',
+        nodeId,
+        valid: false,
+        reason: 'node_not_found'
+      };
+      bump();
+      return false;
     }
 
-    finalizeLastShotReport(
-      state,
-      state.lastShotReport && state.lastShotReport.hit ? 'continue_hit' : 'continue_miss'
-    );
+    if (!isClickableNode(node)) {
+      state.lastAction = {
+        type: 'activate',
+        nodeId,
+        valid: false,
+        reason: 'node_not_clickable'
+      };
+      bump();
+      return false;
+    }
 
-    state.projectile = null;
-    state.phase = 'aim';
-    markDirty();
+    if (state.movesUsed >= state.movesLimit) {
+      state.lastAction = {
+        type: 'activate',
+        nodeId,
+        valid: false,
+        reason: 'out_of_moves'
+      };
+      bump();
+      return false;
+    }
+
+    state.turnIndex += 1;
+    state.movesUsed += 1;
+    state.movesRemaining = Math.max(0, state.movesLimit - state.movesUsed);
+    state.phase = 'resolving';
+
+    state.lastAction = {
+      type: 'activate',
+      nodeId,
+      valid: true,
+      reason: ''
+    };
+
+    prepareTurn(state);
+
+    let injectPower = 0;
+
+    if (node.baseType === NODE_TYPES.SOURCE) {
+      injectPower = node.injectPower;
+    }
+
+    if (node.baseType === NODE_TYPES.SWITCH) {
+      const toggled = toggleSwitchMode(state, node);
+      if (toggled) {
+        state.lastTurn.trace.push({
+          step: 0,
+          fromNodeId: 'player',
+          toNodeId: node.id,
+          edgeId: null,
+          energyIn: 0,
+          energyAccepted: 0,
+          detail: `switch_mode_${node.activeMode + 1}`
+        });
+      }
+
+      if (node.injectOnClick) {
+        injectPower = node.injectPower;
+      }
+    }
+
+    if (injectPower > 0) {
+      seedActionPacket(state, node, injectPower);
+    }
+
+    state.effects.flashTtl = CONFIG.FEEDBACK.FLASH_TTL;
+
+    emitTelemetry('move_committed', {
+      levelId: state.levelId,
+      turnIndex: state.turnIndex,
+      nodeId,
+      nodeType: node.baseType,
+      movesRemaining: state.movesRemaining
+    });
+
+    const propagation = resolvePropagation(state, {
+      onPacketResolved: (packet, accepted) => {
+        emitTelemetry('propagation_step', {
+          levelId: state.levelId,
+          turnIndex: state.turnIndex,
+          fromNodeId: packet.fromNodeId,
+          toNodeId: packet.nodeId,
+          edgeId: packet.edgeId,
+          energyAccepted: accepted
+        });
+      },
+      onPacketEmitted: (packet) => {
+        pushPacketVisual(packet.fromNodeId, packet.toNodeId, packet.energy);
+      }
+    });
+
+    refreshAllNodeActivity(state);
+
+    emitTelemetry('turn_resolved', {
+      levelId: state.levelId,
+      turnIndex: state.turnIndex,
+      overload: state.overload,
+      overflow: propagation.overflow,
+      corruptionNew: state.lastTurn.corruptionNew.slice(),
+      cleansedNodes: state.lastTurn.cleansedNodes.slice()
+    });
+
+    checkWinLoseAfterTurn(state, propagation.overflow);
+
+    bump();
+    return true;
   }
 
   function startLevel(levelIndex) {
@@ -301,14 +315,20 @@ export function createChainLabEngine() {
     const level = getCurrentLevel();
     runtime.state = createState(level, runtime.levelIndex, runtime.levels.length);
 
+    initializeSwitches(runtime.state);
+    refreshAllNodeActivity(runtime.state);
+    updateObjectiveState(runtime.state);
+
     emitTelemetry('run_start', {
-      levelId: level.id,
-      levelIndex: runtime.levelIndex,
-      shotsLimit: level.shotsLimit,
-      targetScore: level.targetScore,
-      difficultyTag: level.difficultyTag
+      levelId: runtime.state.levelId,
+      levelName: runtime.state.levelName,
+      levelIndex: runtime.state.levelIndex,
+      movesLimit: runtime.state.movesLimit,
+      overloadLimit: runtime.state.overloadLimit,
+      collapseLimit: runtime.state.collapseLimit
     });
 
+    bump();
     return getSnapshot(runtime.state);
   }
 
@@ -316,11 +336,6 @@ export function createChainLabEngine() {
     if (!canvas || typeof canvas.getContext !== 'function') {
       throw new Error('initGame requires a valid canvas element.');
     }
-
-    const config = options || {};
-
-    runtime.callbacks.onRunEnd =
-      typeof config.onRunEnd === 'function' ? config.onRunEnd : onRunEndStub;
 
     runtime.canvas = canvas;
 
@@ -332,191 +347,48 @@ export function createChainLabEngine() {
       canvas.height = CONFIG.ARENA.HEIGHT;
     }
 
-    setLevels(config.levels);
-    runtime.modifiers = normalizeModifiers(config.modifiers);
+    const cfg = options || {};
+    runtime.callbacks.onRunEnd = typeof cfg.onRunEnd === 'function' ? cfg.onRunEnd : onRunEndStub;
 
-    const startIndex = Number.isInteger(config.startLevelIndex) ? config.startLevelIndex : 0;
+    setLevels(cfg.levels);
+
+    const startIndex = Number.isFinite(cfg.startLevelIndex) ? cfg.startLevelIndex : 0;
     return startLevel(startIndex);
-  }
-
-  function resetLevel() {
-    if (!runtime.canvas) {
-      throw new Error('resetLevel called before initGame.');
-    }
-
-    return startLevel(runtime.levelIndex);
-  }
-
-  function setLevel(levelIndex) {
-    if (!runtime.canvas) {
-      throw new Error('setLevel called before initGame.');
-    }
-
-    return startLevel(levelIndex);
-  }
-
-  function nextLevel() {
-    if (!runtime.canvas) {
-      throw new Error('nextLevel called before initGame.');
-    }
-
-    if (runtime.levelIndex >= runtime.levels.length - 1) {
-      return false;
-    }
-
-    startLevel(runtime.levelIndex + 1);
-    return true;
-  }
-
-  function setModifiers(modifiers) {
-    runtime.modifiers = normalizeModifiers(modifiers);
-    return { ...runtime.modifiers };
-  }
-
-  function getModifiers() {
-    return { ...runtime.modifiers };
   }
 
   function setAim(x, y, active) {
     const state = getState();
-    if (!state || state.phase !== 'aim') {
+    if (!state || !active || state.phase === 'end') {
+      if (state) {
+        state.hoverNodeId = null;
+      }
       return;
     }
 
-    state.aim.x = clamp(x, 0, CONFIG.ARENA.WIDTH);
-    state.aim.y = clamp(y, 0, CONFIG.ARENA.HEIGHT);
-    state.aim.active = Boolean(active);
-    markDirty();
+    const hover = findClosestNode(state.nodes, x, y, CONFIG.NODES.CLICK_RADIUS + 8);
+    state.hoverNodeId = hover ? hover.id : null;
+    bump();
   }
 
   function fireShot(targetX, targetY) {
     const state = getState();
-
-    if (!state || state.phase !== 'aim' || state.shotsRemaining <= 0) {
+    if (!state || state.phase === 'end') {
       return false;
     }
 
-    const projectile = createProjectile(targetX, targetY);
-    if (!projectile) {
+    const node = findClosestNode(state.nodes, targetX, targetY, CONFIG.NODES.CLICK_RADIUS);
+    if (!node) {
+      state.lastAction = {
+        type: 'activate',
+        nodeId: null,
+        valid: false,
+        reason: 'no_target'
+      };
+      bump();
       return false;
     }
 
-    resetChainForShot(state);
-    state.lastShotReport = createLastShotReport(state.score);
-    state.lastShotReport.fired = true;
-    state.lastShotReport.resolution = 'in_flight';
-
-    state.projectile = projectile;
-    state.shotsRemaining -= 1;
-    state.shotsFired += 1;
-    state.lastShotHit = false;
-    state.phase = 'simulate';
-    markDirty();
-
-    emitTelemetry('shot_fired', {
-      levelId: state.levelId,
-      shotsRemaining: state.shotsRemaining,
-      targetX,
-      targetY,
-      speed: CONFIG.PROJECTILE.SPEED
-    });
-
-    return true;
-  }
-
-  function resolveNode(event) {
-    const state = getState();
-
-    return resolveNodeEvent({
-      state,
-      event,
-      modifiers: runtime.modifiers,
-      getNodeById,
-      enqueueChainNode: (nodeId, depth, reason, sourceId) =>
-        enqueueChainNode(state, nodeId, depth, reason, sourceId),
-      addVisualLink,
-      createHitFeedback,
-      emitTelemetry
-    });
-  }
-
-  function resolveChain() {
-    const state = getState();
-
-    const isResolved = resolveChainStep(
-      state,
-      (event) => {
-        const result = resolveNode(event);
-        if (result) {
-          markDirty();
-        }
-      },
-      emitTelemetry
-    );
-
-    if (isResolved) {
-      evaluateRunOutcome();
-    }
-  }
-
-  function simulateProjectile(dt) {
-    const state = getState();
-    const projectile = state.projectile;
-
-    if (!projectile || !projectile.alive) {
-      evaluateRunOutcome();
-      return;
-    }
-
-    const integration = integrateProjectile(projectile, dt);
-
-    const hitNode =
-      findHitNodeSwept(
-        state.nodes,
-        integration.previousX,
-        integration.previousY,
-        projectile.x,
-        projectile.y,
-        projectile.radius
-      ) || findHitNodeAt(state.nodes, projectile.x, projectile.y, projectile.radius);
-
-    if (hitNode) {
-      projectile.alive = false;
-      state.shotsHit += 1;
-
-      if (state.lastShotReport) {
-        state.lastShotReport.hit = true;
-        state.lastShotReport.missReason = null;
-        state.lastShotReport.targetNodeId = hitNode.id;
-      }
-
-      startChainFrom(state, hitNode.id);
-      markDirty();
-      return;
-    }
-
-    if (integration.outOfBounds || integration.lifetimeExpired || integration.speedDropped) {
-      projectile.alive = false;
-      state.lastShotHit = false;
-
-      if (state.lastShotReport && !state.lastShotReport.hit) {
-        if (integration.outOfBounds) {
-          state.lastShotReport.missReason = 'out_of_bounds';
-        } else if (integration.lifetimeExpired) {
-          state.lastShotReport.missReason = 'max_lifetime';
-        } else {
-          state.lastShotReport.missReason = 'speed_drop';
-        }
-      }
-
-      evaluateRunOutcome();
-      return;
-    }
-
-    const moved = distance(projectile.x, projectile.y, integration.previousX, integration.previousY) > CONFIG.EPSILON;
-    if (moved) {
-      markDirty();
-    }
+    return activateNode(node.id);
   }
 
   function executeCommand(command) {
@@ -531,14 +403,19 @@ export function createChainLabEngine() {
       case 'fire':
         fireShot(command.targetX, command.targetY);
         break;
+      case 'activate_node':
+        activateNode(command.nodeId);
+        break;
       case 'reset_level':
-        resetLevel();
+        startLevel(runtime.levelIndex);
         break;
       case 'set_level':
-        setLevel(command.levelIndex);
+        startLevel(command.levelIndex);
         break;
       case 'next_level':
-        nextLevel();
+        if (runtime.levelIndex < runtime.levels.length - 1) {
+          startLevel(runtime.levelIndex + 1);
+        }
         break;
       default:
         break;
@@ -546,7 +423,7 @@ export function createChainLabEngine() {
   }
 
   function tick(dt, commands) {
-    if (Array.isArray(commands) && commands.length > 0) {
+    if (Array.isArray(commands)) {
       for (let i = 0; i < commands.length; i += 1) {
         executeCommand(commands[i]);
       }
@@ -557,43 +434,11 @@ export function createChainLabEngine() {
       return;
     }
 
-    let delta = Number(dt) || 0;
-    if (delta > CONFIG.SIMULATION.MS_THRESHOLD) {
-      delta /= 1000;
-    }
+    const delta = Math.max(0, Number(dt) || 0);
+    updatePackets(state, delta);
 
-    delta = clamp(delta, 0, CONFIG.SIMULATION.MAX_DT);
-
-    updateVisualLinks(delta);
-    updateParticles(delta);
-    updateChainCues(delta);
-    updateFeedbackTimers(delta);
-
-    if (state.phase === 'end') {
-      return;
-    }
-
-    if (state.phase === 'resolve') {
-      resolveChain();
-      return;
-    }
-
-    if (state.phase !== 'simulate') {
-      return;
-    }
-
-    state.accumulator += delta;
-
-    let steps = 0;
-    while (state.accumulator >= CONFIG.SIMULATION.FIXED_DT && steps < CONFIG.SIMULATION.MAX_STEPS) {
-      simulateProjectile(CONFIG.SIMULATION.FIXED_DT);
-      state.accumulator -= CONFIG.SIMULATION.FIXED_DT;
-      steps += 1;
-
-      if (state.phase !== 'simulate') {
-        state.accumulator = 0;
-        break;
-      }
+    if (state.effects.packets.length > 0 || state.effects.flashTtl > 0) {
+      bump();
     }
   }
 
@@ -605,53 +450,69 @@ export function createChainLabEngine() {
     renderState(ctx, getState());
   }
 
-  function getRunSummaryPublic() {
-    return getSummaryInternal();
+  function resetLevel() {
+    return startLevel(runtime.levelIndex);
   }
 
-  function getSnapshotPublic() {
-    const state = getState();
-    if (!state) {
-      return null;
+  function setLevel(levelIndex) {
+    return startLevel(levelIndex);
+  }
+
+  function nextLevel() {
+    if (runtime.levelIndex >= runtime.levels.length - 1) {
+      return false;
     }
 
-    return getSnapshot(state);
-  }
-
-  function getChainTracePublic() {
-    const state = getState();
-    if (!state) {
-      return [];
-    }
-
-    return getChainTrace(state);
-  }
-
-  function getLastShotReportPublic() {
-    return getLastShotReport(getState());
+    startLevel(runtime.levelIndex + 1);
+    return true;
   }
 
   function getLevelList() {
     return runtime.levels.map((level, index) => ({
       index,
       id: level.id,
-      shotsLimit: level.shotsLimit,
-      targetScore: level.targetScore,
+      name: level.name,
+      movesLimit: level.movesLimit,
+      overloadLimit: level.overloadLimit,
       difficultyTag: level.difficultyTag
     }));
   }
 
-  function getCurrentLevelIndex() {
-    return runtime.levelIndex;
+  function getSnapshotPublic() {
+    const state = getState();
+    return state ? getSnapshot(state) : null;
   }
 
-  function buildRewardPacketPublic(sourceState) {
-    const state = sourceState || getState();
-    if (!state) {
-      return null;
-    }
+  function getRunSummaryPublic() {
+    const state = getState();
+    return state ? getRunSummary(state) : null;
+  }
 
-    return buildRewardPacket(state);
+  function getChainTrace() {
+    const state = getState();
+    return state ? state.lastTurn.trace.map((entry) => ({ ...entry })) : [];
+  }
+
+  function getLastShotReport() {
+    const state = getState();
+    return state ? makeLastShotReport(state) : makeLastShotReport({
+      lastAction: { valid: false, nodeId: null, reason: 'idle' },
+      lastTurn: { trace: [] },
+      result: 'in_progress',
+      objectives: []
+    });
+  }
+
+  function setModifiers(modifiers) {
+    runtime.modifiers = {
+      ...runtime.modifiers,
+      ...(modifiers || {})
+    };
+    return { ...runtime.modifiers };
+  }
+
+  function getModifiers() {
+    return { ...runtime.modifiers };
   }
 
   function trackEvent(eventType, payload) {
@@ -660,6 +521,15 @@ export function createChainLabEngine() {
 
   function exportTelemetry(format) {
     return runtime.telemetry.exportAs(format);
+  }
+
+  function getCurrentLevelIndex() {
+    return runtime.levelIndex;
+  }
+
+  function buildRewardPacketPublic(sourceState) {
+    const state = sourceState || getState();
+    return state ? buildRewardPacket(state) : null;
   }
 
   return {
@@ -676,11 +546,11 @@ export function createChainLabEngine() {
     update,
     render,
     getSnapshot: getSnapshotPublic,
-    getChainTrace: getChainTracePublic,
-    getLastShotReport: getLastShotReportPublic,
     getRunSummary: getRunSummaryPublic,
     getLevelList,
     getCurrentLevelIndex,
+    getChainTrace,
+    getLastShotReport,
     buildRewardPacket: buildRewardPacketPublic,
     trackEvent,
     exportTelemetry

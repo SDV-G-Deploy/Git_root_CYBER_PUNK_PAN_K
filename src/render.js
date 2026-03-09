@@ -1,5 +1,37 @@
-import { CONFIG } from './config.js';
-import { clamp, predictTrajectory } from './physicsLite.js';
+import { CONFIG, NODE_TYPES } from './config.js';
+import { clamp, lerp } from './physicsLite.js';
+
+function nodeColor(node) {
+  if (node.corrupted) {
+    return CONFIG.NODES.COLORS.corrupted;
+  }
+
+  if (!node.active && node.baseType !== NODE_TYPES.CORE) {
+    if (node.baseType === NODE_TYPES.SOURCE) {
+      return CONFIG.NODES.COLORS.source;
+    }
+
+    return CONFIG.NODES.COLORS.inactive;
+  }
+
+  if (node.baseType === NODE_TYPES.SOURCE) {
+    return CONFIG.NODES.COLORS.source;
+  }
+
+  if (node.baseType === NODE_TYPES.RELAY) {
+    return CONFIG.NODES.COLORS.relay;
+  }
+
+  if (node.baseType === NODE_TYPES.CORE) {
+    return CONFIG.NODES.COLORS.core;
+  }
+
+  if (node.baseType === NODE_TYPES.SWITCH) {
+    return CONFIG.NODES.COLORS.switch;
+  }
+
+  return CONFIG.NODES.COLORS.inactive;
+}
 
 function drawArena(ctx) {
   ctx.fillStyle = CONFIG.ARENA.BACKGROUND;
@@ -10,202 +42,155 @@ function drawArena(ctx) {
   ctx.strokeRect(0, 0, CONFIG.ARENA.WIDTH, CONFIG.ARENA.HEIGHT);
 }
 
-function drawShooter(ctx) {
-  ctx.beginPath();
-  ctx.arc(CONFIG.SHOOTER.X, CONFIG.SHOOTER.Y, CONFIG.SHOOTER.RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = CONFIG.SHOOTER.COLOR;
-  ctx.fill();
+function drawEdges(ctx, state) {
+  for (let i = 0; i < state.edges.length; i += 1) {
+    const edge = state.edges[i];
+    const from = state.nodes.find((node) => node.id === edge.from);
+    const to = state.nodes.find((node) => node.id === edge.to);
+
+    if (!from || !to) {
+      continue;
+    }
+
+    let color = CONFIG.EDGES.BASE_COLOR;
+    if (edge.enabled) {
+      color = CONFIG.EDGES.ENABLED_COLOR;
+    }
+    if (edge.overloadedThisTurn) {
+      color = CONFIG.EDGES.OVERLOAD_COLOR;
+    }
+
+    ctx.save();
+    if (!edge.enabled) {
+      ctx.globalAlpha = CONFIG.EDGES.DISABLED_ALPHA;
+    }
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = CONFIG.EDGES.WIDTH;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.hypot(dx, dy);
+    if (length > 0.001) {
+      const ux = dx / length;
+      const uy = dy / length;
+      const arrowX = to.x - ux * (to.radius + 8);
+      const arrowY = to.y - uy * (to.radius + 8);
+      const sideX = -uy;
+      const sideY = ux;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(arrowX, arrowY);
+      ctx.lineTo(arrowX - ux * 10 + sideX * 5, arrowY - uy * 10 + sideY * 5);
+      ctx.lineTo(arrowX - ux * 10 - sideX * 5, arrowY - uy * 10 - sideY * 5);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
 }
 
 function drawNodes(ctx, state) {
-  ctx.font = CONFIG.LABEL.FONT;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   for (let i = 0; i < state.nodes.length; i += 1) {
     const node = state.nodes[i];
-    const typeConfig = CONFIG.NODES.TYPES[node.type];
 
     ctx.beginPath();
     ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-    ctx.fillStyle = node.resolved ? CONFIG.NODES.RESOLVED_COLOR : typeConfig.color;
+    ctx.fillStyle = nodeColor(node);
     ctx.fill();
 
-    ctx.fillStyle = CONFIG.LABEL.COLOR;
-    ctx.fillText(typeConfig.label, node.x, node.y);
-  }
-}
-
-function drawProjectile(ctx, state) {
-  if (!state.projectile || !state.projectile.alive) {
-    return;
-  }
-
-  ctx.beginPath();
-  ctx.arc(state.projectile.x, state.projectile.y, state.projectile.radius, 0, Math.PI * 2);
-  ctx.fillStyle = CONFIG.PROJECTILE.COLOR;
-  ctx.fill();
-}
-
-function drawAimPreview(ctx, state) {
-  if (state.phase !== 'aim' || !state.aim.active || state.shotsRemaining <= 0) {
-    return;
-  }
-
-  const points = predictTrajectory(state, state.aim.x, state.aim.y);
-  if (points.length < 2) {
-    return;
-  }
-
-  ctx.save();
-
-  ctx.strokeStyle = CONFIG.VISUAL.TRAJECTORY_UNDERLAY_COLOR;
-  ctx.lineWidth = CONFIG.VISUAL.TRAJECTORY_UNDERLAY_WIDTH;
-  ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i += 1) {
-    ctx.lineTo(points[i].x, points[i].y);
-  }
-  ctx.stroke();
-
-  ctx.strokeStyle = CONFIG.TRAJECTORY.COLOR;
-  ctx.lineWidth = CONFIG.TRAJECTORY.WIDTH;
-  ctx.setLineDash(CONFIG.TRAJECTORY.DASH_PATTERN);
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i += 1) {
-    ctx.lineTo(points[i].x, points[i].y);
-  }
-  ctx.stroke();
-
-  ctx.fillStyle = CONFIG.TRAJECTORY.COLOR;
-  for (let i = 0; i < points.length; i += CONFIG.VISUAL.TRAJECTORY_DOT_STEP) {
-    ctx.beginPath();
-    ctx.arc(points[i].x, points[i].y, CONFIG.VISUAL.TRAJECTORY_DOT_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  const endPoint = points[points.length - 1];
-  ctx.beginPath();
-  ctx.arc(endPoint.x, endPoint.y, CONFIG.VISUAL.AIM_END_RADIUS, 0, Math.PI * 2);
-  ctx.strokeStyle = CONFIG.VISUAL.AIM_END_COLOR;
-  ctx.lineWidth = 2;
-  ctx.setLineDash([]);
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-function drawChainLinks(ctx, state) {
-  if (state.visualLinks.length === 0) {
-    return;
-  }
-
-  ctx.save();
-  ctx.lineWidth = CONFIG.VISUAL.CHAIN_LINK_WIDTH;
-
-  for (let i = 0; i < state.visualLinks.length; i += 1) {
-    const link = state.visualLinks[i];
-    const alpha = clamp(link.ttl / CONFIG.VISUAL.CHAIN_LINK_TTL, 0, 1);
-    ctx.strokeStyle = `rgba(255, 224, 130, ${alpha.toFixed(3)})`;
-    ctx.beginPath();
-    ctx.moveTo(link.x1, link.y1);
-    ctx.lineTo(link.x2, link.y2);
+    ctx.lineWidth = node.active ? 3 : 2;
+    ctx.strokeStyle = node.active
+      ? CONFIG.NODES.COLORS.activeStroke
+      : 'rgba(23, 39, 50, 0.9)';
     ctx.stroke();
-  }
 
-  ctx.restore();
+    if (state.hoverNodeId === node.id) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = CONFIG.NODES.COLORS.hoverStroke;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius + 5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = CONFIG.NODES.COLORS.label;
+    ctx.fillText(node.id, node.x, node.y - 1);
+
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#d2f2ff';
+
+    const chargeLabel = node.baseType === NODE_TYPES.CORE
+      ? `${node.charge}/${node.targetCharge}`
+      : `${node.charge}`;
+
+    ctx.fillText(chargeLabel, node.x, node.y + node.radius + 11);
+
+    if (node.baseType === NODE_TYPES.SWITCH && Array.isArray(node.switchModes) && node.switchModes.length > 0) {
+      const modeLabel = `M${node.activeMode + 1}/${node.switchModes.length}`;
+      ctx.fillStyle = '#dacbff';
+      ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.corrupted) {
+      ctx.fillStyle = '#ff9ab2';
+      ctx.fillText(`V:${node.corruptionProgress}`, node.x, node.y + node.radius + 24);
+    }
+  }
 }
 
-function drawParticles(ctx, state) {
-  if (state.particles.length === 0) {
+function drawPackets(ctx, state) {
+  const packets = state.effects.packets;
+  if (!Array.isArray(packets) || packets.length === 0) {
     return;
   }
 
-  ctx.save();
-  for (let i = 0; i < state.particles.length; i += 1) {
-    const particle = state.particles[i];
-    const alpha = clamp(particle.ttl / CONFIG.VISUAL.PARTICLE_TTL, 0, 1);
-    ctx.fillStyle = `rgba(255, 226, 150, ${alpha.toFixed(3)})`;
+  for (let i = 0; i < packets.length; i += 1) {
+    const packet = packets[i];
+    const from = state.nodes.find((node) => node.id === packet.fromNodeId);
+    const to = state.nodes.find((node) => node.id === packet.toNodeId);
+    if (!from || !to) {
+      continue;
+    }
+
+    const t = clamp(packet.t, 0, 1);
+    const x = lerp(from.x, to.x, t);
+    const y = lerp(from.y, to.y, t);
+
     ctx.beginPath();
-    ctx.arc(particle.x, particle.y, CONFIG.VISUAL.PARTICLE_RADIUS, 0, Math.PI * 2);
+    ctx.arc(x, y, CONFIG.FEEDBACK.PACKET_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = '#f7fbff';
     ctx.fill();
   }
-  ctx.restore();
 }
 
-function drawChainCues(ctx, state) {
-  if (state.chainCues.length === 0) {
+function drawFlash(ctx, state) {
+  if (state.effects.flashTtl <= 0) {
     return;
   }
 
-  ctx.save();
-  ctx.font = CONFIG.VISUAL.CHAIN_CUE_FONT;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  for (let i = 0; i < state.chainCues.length; i += 1) {
-    const cue = state.chainCues[i];
-    const alpha = clamp(cue.ttl / CONFIG.VISUAL.CHAIN_CUE_TTL, 0, 1);
-    ctx.fillStyle = `rgba(255, 244, 188, ${alpha.toFixed(3)})`;
-    ctx.fillText(`#${cue.step}`, cue.x, cue.y);
-  }
-
-  ctx.restore();
-}
-
-function drawHitFlash(ctx, state) {
-  if (state.hitFlashTtl <= 0) {
-    return;
-  }
-
-  const alphaBase = clamp(state.hitFlashTtl / CONFIG.VISUAL.HIT_FLASH_TTL, 0, 1);
-  const alpha = alphaBase * CONFIG.VISUAL.HIT_FLASH_MAX_ALPHA;
-  ctx.save();
+  const alpha = clamp(state.effects.flashTtl / CONFIG.FEEDBACK.FLASH_TTL, 0, 1) * CONFIG.FEEDBACK.FLASH_ALPHA;
   ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(3)})`;
   ctx.fillRect(0, 0, CONFIG.ARENA.WIDTH, CONFIG.ARENA.HEIGHT);
-  ctx.restore();
-}
-
-function drawEndHint(ctx, state) {
-  if (state.phase !== 'end') {
-    return;
-  }
-
-  ctx.font = CONFIG.RUN.LABEL_FONT;
-  ctx.fillStyle = state.result === 'win' ? CONFIG.RUN.WIN_COLOR : CONFIG.RUN.LOSE_COLOR;
-  ctx.fillText(
-    state.result === 'win' ? CONFIG.RUN.WIN_TEXT : CONFIG.RUN.LOSE_TEXT,
-    CONFIG.RUN.LABEL_X,
-    CONFIG.RUN.LABEL_Y
-  );
 }
 
 export function renderState(ctx, state) {
-  if (!state || !ctx) {
+  if (!ctx || !state) {
     return;
   }
 
-  const shakeIntensity = clamp(state.screenShakeTtl / CONFIG.VISUAL.SCREEN_SHAKE_TTL, 0, 1);
-  const shakePower = CONFIG.VISUAL.SCREEN_SHAKE_POWER * shakeIntensity;
-  const offsetX = (Math.random() * 2 - 1) * shakePower;
-  const offsetY = (Math.random() * 2 - 1) * shakePower;
-
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-  ctx.save();
-  ctx.translate(offsetX, offsetY);
   drawArena(ctx);
-  drawAimPreview(ctx, state);
-  drawChainLinks(ctx, state);
-  drawParticles(ctx, state);
-  drawShooter(ctx);
+  drawEdges(ctx, state);
+  drawPackets(ctx, state);
   drawNodes(ctx, state);
-  drawProjectile(ctx, state);
-  drawChainCues(ctx, state);
-  ctx.restore();
-
-  drawHitFlash(ctx, state);
-  drawEndHint(ctx, state);
+  drawFlash(ctx, state);
 }

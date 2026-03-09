@@ -1,73 +1,119 @@
-import { CONFIG } from './config.js';
-import { clamp } from './physicsLite.js';
+import { OBJECTIVE_TYPES } from './config.js';
+import { createObjectiveText, getCorruptedCount, getNodeById } from './gameState.js';
 
-export function getAccuracy(state) {
-  if (!state || state.shotsFired <= 0) {
-    return 0;
+function evaluatePowerCore(state, objective) {
+  const node = getNodeById(state, objective.nodeId);
+  if (!node) {
+    return false;
   }
 
-  return state.shotsHit / state.shotsFired;
+  return node.charge >= objective.requiredCharge;
 }
 
-export function applyNodeScore(state, nodeType, depth, modifiers) {
-  const typeConfig = CONFIG.NODES.TYPES[nodeType];
-  const depthBonus = depth * CONFIG.CHAIN.DEPTH_BONUS;
-  const basePoints = typeConfig.score + depthBonus;
-  const scoreFactor = 1 + (modifiers ? modifiers.scoreBonus : 0);
-  const points = Math.round(basePoints * state.chain.multiplier * scoreFactor);
+function evaluateActivateAll(state) {
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const node = state.nodes[i];
+    if (node.baseType === 'core') {
+      continue;
+    }
 
-  state.score += points;
-  return points;
-}
+    if (node.corrupted) {
+      continue;
+    }
 
-export function applyMultiplierGrowth(state, modifiers) {
-  const growthStep = CONFIG.CHAIN.MULTIPLIER_STEP * (1 + (modifiers ? modifiers.chainGrowthBonus : 0));
-  state.chain.multiplier = clamp(
-    state.chain.multiplier + growthStep,
-    CONFIG.CHAIN.START_MULTIPLIER,
-    CONFIG.CHAIN.MAX_MULTIPLIER
-  );
-}
-
-export function finalizeLastShotReport(state, resolution) {
-  const report = state.lastShotReport;
-
-  report.scoreAfter = state.score;
-  report.scoreGain = Math.max(0, state.score - report.scoreBefore);
-  report.chainSteps = state.chain.steps;
-  report.chainDepth = state.chain.maxDepth;
-  report.pointsMissing = Math.max(0, state.targetScore - state.score);
-  report.resolution = resolution;
-
-  if (!report.hit && !report.missReason) {
-    report.missReason = 'no_active_target';
+    if (!node.active) {
+      return false;
+    }
   }
+
+  return true;
 }
 
-export function buildRewardPacket(state) {
-  const creditsBase = Math.floor(state.score * CONFIG.REWARD.CREDIT_PER_SCORE);
-  const credits = creditsBase + (state.result === 'win' ? CONFIG.REWARD.WIN_BONUS_CREDITS : 0);
+function evaluateCleanCorruption(state) {
+  return getCorruptedCount(state) === 0;
+}
 
-  const techParts = Math.max(0, Math.floor(state.score / CONFIG.REWARD.SCORE_PER_PART));
+export function evaluateObjectives(state) {
+  const progress = [];
+  let allDone = true;
 
-  const moduleChanceRaw = CONFIG.REWARD.BASE_MODULE_CHANCE + state.chain.maxDepth * CONFIG.REWARD.DEPTH_MODULE_STEP;
-  const moduleChance = clamp(moduleChanceRaw, 0, CONFIG.REWARD.MAX_MODULE_CHANCE);
+  for (let i = 0; i < state.objectives.length; i += 1) {
+    const objective = state.objectives[i];
+    let done = false;
 
-  const tags = [];
-  if (state.result === 'win') {
-    tags.push('run_complete');
-  }
-  if (state.chain.maxDepth >= 2) {
-    tags.push('deep_chain');
-  }
-  if (getAccuracy(state) >= 1) {
-    tags.push('accurate');
+    if (objective.type === OBJECTIVE_TYPES.POWER_CORE) {
+      done = evaluatePowerCore(state, objective);
+    } else if (objective.type === OBJECTIVE_TYPES.ACTIVATE_ALL) {
+      done = evaluateActivateAll(state);
+    } else if (objective.type === OBJECTIVE_TYPES.CLEAN_CORRUPTION) {
+      done = evaluateCleanCorruption(state);
+    }
+
+    objective.done = done;
+    objective.text = createObjectiveText(objective);
+
+    progress.push({
+      id: objective.id,
+      type: objective.type,
+      done,
+      text: objective.text
+    });
+
+    if (!done) {
+      allDone = false;
+    }
   }
 
   return {
-    credits,
-    tech_parts: techParts,
-    tech_module_chance: Number(moduleChance.toFixed(3)),
-    performance_tags: tags
+    allDone,
+    progress
   };
+}
+
+export function evaluateLoseCondition(state) {
+  if (state.overload >= state.overloadLimit) {
+    return {
+      lose: true,
+      reason: 'energy_overload'
+    };
+  }
+
+  if (getCorruptedCount(state) >= state.collapseLimit) {
+    return {
+      lose: true,
+      reason: 'network_collapse'
+    };
+  }
+
+  if (state.movesUsed >= state.movesLimit) {
+    return {
+      lose: true,
+      reason: 'out_of_moves'
+    };
+  }
+
+  return {
+    lose: false,
+    reason: null
+  };
+}
+
+export function makeOutcomeStatus(result, reason) {
+  if (result === 'win') {
+    return 'Protocol stabilized. District secure.';
+  }
+
+  if (reason === 'energy_overload') {
+    return 'Failure: energy overload reached critical threshold.';
+  }
+
+  if (reason === 'network_collapse') {
+    return 'Failure: corruption collapse across the network.';
+  }
+
+  if (reason === 'out_of_moves') {
+    return 'Failure: operation budget exhausted.';
+  }
+
+  return 'Operation in progress.';
 }

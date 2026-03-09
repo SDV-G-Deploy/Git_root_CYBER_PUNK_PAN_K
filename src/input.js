@@ -1,13 +1,4 @@
-export function getCanvasPoint(canvas, event) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / Math.max(rect.width, 1);
-  const scaleY = canvas.height / Math.max(rect.height, 1);
-
-  return {
-    x: (event.clientX - rect.left) * scaleX,
-    y: (event.clientY - rect.top) * scaleY
-  };
-}
+import { getCanvasPoint } from './physicsLite.js';
 
 export function createInputController(options) {
   const {
@@ -22,8 +13,7 @@ export function createInputController(options) {
     onTutorialDismiss
   } = options;
 
-  const { canvas } = ui.refs;
-
+  const canvas = ui.refs.canvas;
   if (!canvas) {
     throw new Error('Canvas #chainlab-canvas not found.');
   }
@@ -73,15 +63,11 @@ export function createInputController(options) {
   });
 
   if (ui.refs.helpButton) {
-    ui.refs.helpButton.addEventListener('click', () => {
-      onHelpToggle();
-    });
+    ui.refs.helpButton.addEventListener('click', onHelpToggle);
   }
 
   if (ui.refs.tutorialStartButton) {
-    ui.refs.tutorialStartButton.addEventListener('click', () => {
-      onTutorialDismiss();
-    });
+    ui.refs.tutorialStartButton.addEventListener('click', onTutorialDismiss);
   }
 
   if (ui.refs.tutorialOverlay) {

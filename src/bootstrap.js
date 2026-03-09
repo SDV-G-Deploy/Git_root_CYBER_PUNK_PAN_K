@@ -1,15 +1,6 @@
 import legacyChainLabApi from './adapters/legacyChainLabApi.js';
-import { UPGRADE_DEFS } from './config.js';
 import { createInputController } from './input.js';
-import {
-  buildMetaModifiers,
-  loadMetaState,
-  loadPlaytestMode,
-  loadTutorialSeen,
-  saveMetaState,
-  savePlaytestMode,
-  saveTutorialSeen
-} from './persistence.js';
+import { loadPlaytestMode, loadTutorialSeen, savePlaytestMode, saveTutorialSeen } from './persistence.js';
 import { createUI } from './ui.js';
 
 function downloadTextFile(fileName, text, mimeType) {
@@ -46,7 +37,7 @@ function parseTelemetryRecords(raw) {
       try {
         records.push(JSON.parse(lines[i]));
       } catch (lineError) {
-        // Skip malformed lines in MVP report mode.
+        // ignore malformed line
       }
     }
 
@@ -60,13 +51,16 @@ function formatSeconds(value) {
 
 function buildTelemetryReport(records, levelList) {
   const runs = new Map();
-  const levelStats = new Map();
+  const perLevel = new Map();
+  let retries = 0;
 
   for (let i = 0; i < levelList.length; i += 1) {
-    levelStats.set(levelList[i].id, { attempts: 0, wins: 0, fails: 0 });
+    perLevel.set(levelList[i].id, {
+      attempts: 0,
+      wins: 0,
+      losses: 0
+    });
   }
-
-  let retryEvents = 0;
 
   for (let i = 0; i < records.length; i += 1) {
     const entry = records[i];
@@ -76,115 +70,95 @@ function buildTelemetryReport(records, levelList) {
 
     const runId = entry.runId || `unknown_${i}`;
     const payload = entry.payload || {};
+
     if (!runs.has(runId)) {
       runs.set(runId, {
+        levelId: payload.levelId || null,
         startAt: null,
         endAt: null,
-        levelId: payload.levelId || null,
-        result: null
+        result: null,
+        reason: null
       });
     }
 
     const run = runs.get(runId);
-    const eventType = entry.eventType;
 
-    if (eventType === 'run_start') {
+    if (entry.eventType === 'run_start') {
       run.startAt = entry.timestamp;
       run.levelId = payload.levelId || run.levelId;
     }
 
-    if (eventType === 'run_end') {
+    if (entry.eventType === 'run_end') {
       run.endAt = entry.timestamp;
-      run.result = payload.result || run.result;
+      run.result = payload.result || null;
+      run.reason = payload.reason || null;
       run.levelId = payload.levelId || run.levelId;
 
       if (run.levelId) {
-        if (!levelStats.has(run.levelId)) {
-          levelStats.set(run.levelId, { attempts: 0, wins: 0, fails: 0 });
+        if (!perLevel.has(run.levelId)) {
+          perLevel.set(run.levelId, { attempts: 0, wins: 0, losses: 0 });
         }
 
-        const stats = levelStats.get(run.levelId);
+        const stats = perLevel.get(run.levelId);
         stats.attempts += 1;
         if (run.result === 'win') {
           stats.wins += 1;
         } else {
-          stats.fails += 1;
+          stats.losses += 1;
         }
       }
     }
 
-    if (eventType === 'retry') {
-      retryEvents += 1;
+    if (entry.eventType === 'retry') {
+      retries += 1;
     }
   }
 
-  const runEntries = Array.from(runs.values());
-  const completedRuns = runEntries.filter((run) => Number.isFinite(run.startAt) && Number.isFinite(run.endAt));
-
-  let totalDurationSec = 0;
-  for (let i = 0; i < completedRuns.length; i += 1) {
-    totalDurationSec += Math.max(0, (completedRuns[i].endAt - completedRuns[i].startAt) / 1000);
-  }
-
-  const avgSessionSec = completedRuns.length > 0 ? totalDurationSec / completedRuns.length : 0;
-  const retryRate = runEntries.length > 0 ? retryEvents / runEntries.length : 0;
-
-  const levelIds = levelList.map((level) => level.id);
-  const funnelLines = [];
-  for (let i = 0; i < levelIds.length; i += 1) {
-    const id = levelIds[i];
-    const stats = levelStats.get(id) || { attempts: 0, wins: 0, fails: 0 };
-    const completionRate = stats.attempts > 0 ? (stats.wins / stats.attempts) * 100 : 0;
-    funnelLines.push(
-      `${id}: attempts=${stats.attempts}, wins=${stats.wins}, completion=${completionRate.toFixed(1)}%`
-    );
-  }
-
-  const failRanking = [];
-  levelStats.forEach((stats, levelId) => {
-    if (stats.fails > 0) {
-      failRanking.push({ levelId, fails: stats.fails, attempts: stats.attempts });
-    }
-  });
-
-  failRanking.sort((a, b) => {
-    if (b.fails !== a.fails) {
-      return b.fails - a.fails;
-    }
-    return a.levelId.localeCompare(b.levelId);
-  });
-
-  const topFailLines = failRanking.slice(0, 5).map((row) => `${row.levelId}: fails=${row.fails}/${row.attempts}`);
+  const runList = Array.from(runs.values());
+  const closedRuns = runList.filter((run) => Number.isFinite(run.startAt) && Number.isFinite(run.endAt));
+  const totalDuration = closedRuns.reduce((acc, run) => acc + Math.max(0, (run.endAt - run.startAt) / 1000), 0);
+  const avgSession = closedRuns.length > 0 ? totalDuration / closedRuns.length : 0;
+  const retryRate = runList.length > 0 ? retries / runList.length : 0;
 
   const lines = [];
-  lines.push('Telemetry Report (v0.1-playtest)');
+  lines.push('Telemetry Report (Signal Grid)');
   lines.push('');
-  lines.push(`Runs observed: ${runEntries.length}`);
-  lines.push(`Avg session length: ${formatSeconds(avgSessionSec)}`);
-  lines.push(`Retry rate: ${(retryRate * 100).toFixed(1)}% (${retryEvents} retries)`);
+  lines.push(`Runs observed: ${runList.length}`);
+  lines.push(`Avg session length: ${formatSeconds(avgSession)}`);
+  lines.push(`Retry rate: ${(retryRate * 100).toFixed(1)}% (${retries} retries)`);
   lines.push('');
-  lines.push('Level completion funnel (L1-L12):');
-  if (funnelLines.length === 0) {
-    lines.push('- no level data');
-  } else {
-    for (let i = 0; i < funnelLines.length; i += 1) {
-      lines.push(`- ${funnelLines[i]}`);
-    }
+  lines.push('Level funnel:');
+
+  const ids = levelList.map((level) => level.id);
+  for (let i = 0; i < ids.length; i += 1) {
+    const id = ids[i];
+    const stats = perLevel.get(id) || { attempts: 0, wins: 0, losses: 0 };
+    const completion = stats.attempts > 0 ? (stats.wins / stats.attempts) * 100 : 0;
+    lines.push(`- ${id}: attempts=${stats.attempts}, wins=${stats.wins}, completion=${completion.toFixed(1)}%`);
   }
+
   lines.push('');
   lines.push('Top fail levels:');
-  if (topFailLines.length === 0) {
+
+  const rankedFails = Array.from(perLevel.entries())
+    .map(([id, stats]) => ({ id, fails: stats.losses, attempts: stats.attempts }))
+    .filter((row) => row.fails > 0)
+    .sort((a, b) => {
+      if (b.fails !== a.fails) {
+        return b.fails - a.fails;
+      }
+      return a.id.localeCompare(b.id);
+    })
+    .slice(0, 5);
+
+  if (rankedFails.length === 0) {
     lines.push('- no fails captured');
   } else {
-    for (let i = 0; i < topFailLines.length; i += 1) {
-      lines.push(`- ${topFailLines[i]}`);
+    for (let i = 0; i < rankedFails.length; i += 1) {
+      const row = rankedFails[i];
+      lines.push(`- ${row.id}: fails=${row.fails}/${row.attempts}`);
     }
   }
-  lines.push('');
-  lines.push('Known issues:');
-  lines.push('- Screen shake can feel strong on dense chains.');
-  lines.push('- Telemetry is local-only and resets if storage is cleared.');
-  lines.push('- Completion funnel stabilizes only after enough external sessions.');
 
   return lines.join('\n');
 }
@@ -207,13 +181,7 @@ function bootstrap() {
     commandQueue.push(command);
   };
 
-  let metaState = loadMetaState();
   let playtestMode = loadPlaytestMode();
-
-  function setMetaStatus(message) {
-    metaState.lastStatus = message;
-    saveMetaState(metaState);
-  }
 
   function getSummary() {
     return game.getRunSummary();
@@ -231,21 +199,8 @@ function bootstrap() {
     ui.sync({
       snapshot: getSnapshot(),
       summary: getSummary(),
-      trace: getTrace(),
-      metaState
+      trace: getTrace()
     });
-  }
-
-  function applyModifiersFromMeta() {
-    game.setModifiers(buildMetaModifiers(metaState));
-  }
-
-  function applyPlaytestMode() {
-    ui.applyPlaytestMode(playtestMode);
-  }
-
-  function renderLevelSelect() {
-    ui.renderLevelSelect(game.getLevelList(), game.getCurrentLevelIndex());
   }
 
   function trackRetry(reason) {
@@ -280,100 +235,39 @@ function bootstrap() {
     return true;
   }
 
-  function tryPurchaseUpgrade(upgradeId) {
-    const def = UPGRADE_DEFS[upgradeId];
-    if (!def) {
-      return;
-    }
-
-    if (metaState.upgrades[upgradeId]) {
-      setMetaStatus(`${def.label} already unlocked.`);
-      syncUI();
-      return;
-    }
-
-    if (metaState.techParts < def.cost) {
-      setMetaStatus(`Not enough tech parts for ${def.label}.`);
-      syncUI();
-      return;
-    }
-
-    metaState.techParts -= def.cost;
-    metaState.upgrades[upgradeId] = true;
-    setMetaStatus(`Unlocked ${def.label}. Applied on next run.`);
-    saveMetaState(metaState);
-
-    applyModifiersFromMeta();
-    restartCurrentLevel('upgrade_refresh', false);
-  }
-
   function exportTelemetry(format) {
-    const normalized = format === 'jsonl' ? 'jsonl' : 'json';
-    const raw = game.exportTelemetry(normalized);
+    const mode = format === 'jsonl' ? 'jsonl' : 'json';
+    const raw = game.exportTelemetry(mode);
 
     if (!raw || raw.length === 0 || raw === '[]') {
-      setMetaStatus('No telemetry data yet. Play at least one run first.');
-      syncUI();
       return;
     }
 
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const ext = normalized === 'jsonl' ? 'jsonl' : 'json';
-    const mime = normalized === 'jsonl' ? 'application/jsonl' : 'application/json';
-    const fileName = `chainlab-telemetry-${stamp}.${ext}`;
+    const ext = mode === 'jsonl' ? 'jsonl' : 'json';
+    const mime = mode === 'jsonl' ? 'application/jsonl' : 'application/json';
+    const file = `chainlab-grid-telemetry-${stamp}.${ext}`;
 
-    downloadTextFile(fileName, raw, mime);
-    setMetaStatus(`Telemetry exported: ${fileName}`);
-    syncUI();
+    downloadTextFile(file, raw, mime);
   }
 
   function buildAndShowTelemetryReport() {
     const raw = game.exportTelemetry('json');
     const records = parseTelemetryRecords(raw);
-    const reportText = buildTelemetryReport(records, game.getLevelList());
+    const report = buildTelemetryReport(records, game.getLevelList());
 
-    ui.setTelemetryReport(reportText);
+    ui.setTelemetryReport(report);
 
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `chainlab-telemetry-report-${stamp}.txt`;
-    downloadTextFile(fileName, reportText, 'text/plain');
-
-    setMetaStatus(`Telemetry report generated: ${fileName}`);
-    syncUI();
-  }
-
-  function handleRunEnd(result, rewardPacket, summary) {
-    metaState.stats.runs += 1;
-
-    if (result === 'win') {
-      metaState.stats.wins += 1;
-      const payloadParts = rewardPacket && Number.isFinite(Number(rewardPacket.tech_parts))
-        ? Number(rewardPacket.tech_parts)
-        : 0;
-      const earnedTechParts = Math.max(1, Math.floor(payloadParts));
-      metaState.techParts += earnedTechParts;
-      const levelId = summary && summary.levelId ? summary.levelId : 'level';
-      setMetaStatus(`+${earnedTechParts} tech parts from ${levelId}.`);
-
-      game.trackEvent('reward_claimed', {
-        levelId,
-        tech_parts: earnedTechParts
-      });
-    } else {
-      setMetaStatus('Run failed. Retry to earn tech parts.');
-    }
-
-    saveMetaState(metaState);
+    downloadTextFile(`chainlab-grid-report-${stamp}.txt`, report, 'text/plain');
   }
 
   game.initGame(ui.refs.canvas, {
-    onRunEnd: handleRunEnd,
-    modifiers: buildMetaModifiers(metaState)
+    onRunEnd: () => {}
   });
 
-  renderLevelSelect();
-  applyModifiersFromMeta();
-  applyPlaytestMode();
+  ui.renderLevelSelect(game.getLevelList(), game.getCurrentLevelIndex());
+  ui.applyPlaytestMode(playtestMode);
   ui.setTutorialVisible(!loadTutorialSeen());
 
   createInputController({
@@ -397,8 +291,10 @@ function bootstrap() {
 
   if (ui.refs.levelSelect) {
     ui.refs.levelSelect.addEventListener('change', (event) => {
-      const levelIndex = Number(event.target.value);
-      enqueueCommand({ type: 'set_level', levelIndex });
+      enqueueCommand({
+        type: 'set_level',
+        levelIndex: Number(event.target.value)
+      });
     });
   }
 
@@ -420,23 +316,11 @@ function bootstrap() {
     });
   }
 
-  if (ui.refs.buyScoreBonusButton) {
-    ui.refs.buyScoreBonusButton.addEventListener('click', () => {
-      tryPurchaseUpgrade('score_bonus');
-    });
-  }
-
-  if (ui.refs.buyChainGrowthButton) {
-    ui.refs.buyChainGrowthButton.addEventListener('click', () => {
-      tryPurchaseUpgrade('chain_growth');
-    });
-  }
-
   if (ui.refs.playtestModeToggle) {
     ui.refs.playtestModeToggle.addEventListener('change', (event) => {
       playtestMode = Boolean(event.target.checked);
       savePlaytestMode(playtestMode);
-      applyPlaytestMode();
+      ui.applyPlaytestMode(playtestMode);
     });
   }
 
