@@ -10,13 +10,19 @@ export function createInputController(options) {
     onRetry,
     onNextLevel,
     onHelpToggle,
-    onTutorialDismiss
+    onTutorialDismiss,
+    onUserGesture
   } = options;
 
+  const handleUserGesture = typeof onUserGesture === 'function' ? onUserGesture : () => {};
   const canvas = ui.refs.canvas;
   if (!canvas) {
     throw new Error('Canvas #chainlab-canvas not found.');
   }
+
+  canvas.addEventListener('pointerdown', () => {
+    handleUserGesture();
+  });
 
   canvas.addEventListener('mousemove', (event) => {
     if (ui.isTutorialVisible()) {
@@ -46,6 +52,8 @@ export function createInputController(options) {
   });
 
   canvas.addEventListener('click', (event) => {
+    handleUserGesture();
+
     if (ui.isTutorialVisible()) {
       return;
     }
@@ -63,16 +71,23 @@ export function createInputController(options) {
   });
 
   if (ui.refs.helpButton) {
-    ui.refs.helpButton.addEventListener('click', onHelpToggle);
+    ui.refs.helpButton.addEventListener('click', () => {
+      handleUserGesture();
+      onHelpToggle();
+    });
   }
 
   if (ui.refs.tutorialStartButton) {
-    ui.refs.tutorialStartButton.addEventListener('click', onTutorialDismiss);
+    ui.refs.tutorialStartButton.addEventListener('click', () => {
+      handleUserGesture();
+      onTutorialDismiss();
+    });
   }
 
   if (ui.refs.tutorialOverlay) {
     ui.refs.tutorialOverlay.addEventListener('click', (event) => {
       if (event.target === ui.refs.tutorialOverlay) {
+        handleUserGesture();
         onTutorialDismiss();
       }
     });
@@ -80,6 +95,7 @@ export function createInputController(options) {
 
   windowRef.addEventListener('keydown', (event) => {
     const key = event.key.toLowerCase();
+    handleUserGesture();
 
     if (ui.isTutorialVisible()) {
       if (key === 'escape' || key === 'enter' || key === ' ') {

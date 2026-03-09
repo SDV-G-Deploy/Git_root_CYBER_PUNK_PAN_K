@@ -1,4 +1,5 @@
 import legacyChainLabApi from './adapters/legacyChainLabApi.js';
+import { createAudioController } from './audio.js';
 import { createInputController } from './input.js';
 import { loadPlaytestMode, loadTutorialSeen, savePlaytestMode, saveTutorialSeen } from './persistence.js';
 import { createUI } from './ui.js';
@@ -166,6 +167,7 @@ function buildTelemetryReport(records, levelList) {
 function bootstrap() {
   const game = legacyChainLabApi;
   const ui = createUI(document);
+  const audio = createAudioController();
 
   if (!ui.refs.canvas) {
     throw new Error('Canvas #chainlab-canvas not found.');
@@ -201,6 +203,11 @@ function bootstrap() {
       summary: getSummary(),
       trace: getTrace()
     });
+  }
+
+  function unlockAudio() {
+    audio.unlock();
+    ui.setSoundEnabled(!audio.isMuted());
   }
 
   function trackRetry(reason) {
@@ -263,12 +270,16 @@ function bootstrap() {
   }
 
   game.initGame(ui.refs.canvas, {
-    onRunEnd: () => {}
+    onRunEnd: () => {},
+    onUxEvent: (eventType, payload) => {
+      audio.play(eventType, payload);
+    }
   });
 
   ui.renderLevelSelect(game.getLevelList(), game.getCurrentLevelIndex());
   ui.applyPlaytestMode(playtestMode);
   ui.setTutorialVisible(!loadTutorialSeen());
+  ui.setSoundEnabled(true);
 
   createInputController({
     windowRef: window,
@@ -286,7 +297,8 @@ function bootstrap() {
     onTutorialDismiss: () => {
       ui.setTutorialVisible(false);
       saveTutorialSeen();
-    }
+    },
+    onUserGesture: unlockAudio
   });
 
   if (ui.refs.levelSelect) {
@@ -300,19 +312,30 @@ function bootstrap() {
 
   if (ui.refs.retryButton) {
     ui.refs.retryButton.addEventListener('click', () => {
+      unlockAudio();
       restartCurrentLevel('hud_retry', true);
     });
   }
 
   if (ui.refs.summaryRetryButton) {
     ui.refs.summaryRetryButton.addEventListener('click', () => {
+      unlockAudio();
       restartCurrentLevel('summary_retry', true);
     });
   }
 
   if (ui.refs.nextButton) {
     ui.refs.nextButton.addEventListener('click', () => {
+      unlockAudio();
       enqueueCommand({ type: 'next_level' });
+    });
+  }
+
+  if (ui.refs.soundToggleButton) {
+    ui.refs.soundToggleButton.addEventListener('click', () => {
+      unlockAudio();
+      const enabled = audio.toggleMute();
+      ui.setSoundEnabled(enabled);
     });
   }
 

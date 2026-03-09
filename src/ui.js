@@ -44,6 +44,82 @@ function buildTraceLine(entry) {
   return `#${entry.step} ${source} -> ${entry.toNodeId}${edge}, +${entry.energyAccepted}`;
 }
 
+function getCoachCopy(snapshot, summary) {
+  if (snapshot && snapshot.hoverInfo) {
+    return {
+      title: snapshot.hoverInfo.title,
+      body: snapshot.hoverInfo.actionText,
+      meta: snapshot.hoverInfo.detailText
+    };
+  }
+
+  if (!summary) {
+    return {
+      title: 'Signal Brief',
+      body: 'Charge the core to stabilize the district grid.',
+      meta: 'Hover nodes to inspect their role before committing a move.'
+    };
+  }
+
+  if (summary.phase === 'end') {
+    return {
+      title: summary.result === 'win' ? 'Run Complete' : 'Run Failed',
+      body: summary.lastTurn.status || 'Operation complete.',
+      meta: summary.result === 'win'
+        ? 'Press Enter or click the arena to move on.'
+        : 'Press Space, R, or Retry to restart quickly.'
+    };
+  }
+
+  if (summary.lastAction && !summary.lastAction.valid) {
+    if (summary.lastAction.reason === 'no_target') {
+      return {
+        title: 'No target selected',
+        body: 'Clicks only count on Power and Firewall nodes.',
+        meta: 'Hover a node first. Clickable nodes glow brighter than passive ones.'
+      };
+    }
+
+    if (summary.lastAction.reason === 'node_not_clickable') {
+      return {
+        title: 'That node is passive',
+        body: 'Relay, Overload, Virus, and Core nodes react automatically.',
+        meta: 'Use Power to inject energy and Firewall to route it.'
+      };
+    }
+  }
+
+  if (summary.turnIndex === 0) {
+    return {
+      title: 'Primary Objective',
+      body: summary.nextObjectiveText || 'Charge the core.',
+      meta: 'Open with a Power node. Firewalls let you redirect the flow.'
+    };
+  }
+
+  if (summary.lastTurn && summary.lastTurn.explodedNodes && summary.lastTurn.explodedNodes.length > 0) {
+    return {
+      title: 'Overload Detected',
+      body: 'Too much energy passed through an overload node in one turn.',
+      meta: 'Split the route, reduce feed, or open another firewall branch.'
+    };
+  }
+
+  if (summary.lastTurn && summary.lastTurn.corruptionNew && summary.lastTurn.corruptionNew.length > 0) {
+    return {
+      title: 'Virus Spread',
+      body: 'Infection advanced into adjacent nodes after the turn resolved.',
+      meta: 'Push energy faster toward the core or avoid feeding infected branches.'
+    };
+  }
+
+  return {
+    title: 'Next Move',
+    body: summary.nextObjectiveText || 'Charge the core.',
+    meta: 'Hover nodes to inspect them. Neon pulses show where energy just traveled.'
+  };
+}
+
 export function createUI(documentRef) {
   const refs = {
     canvas: getEl(documentRef, 'chainlab-canvas'),
@@ -55,6 +131,10 @@ export function createUI(documentRef) {
     levelSelect: getEl(documentRef, 'levelSelect'),
     helpButton: getEl(documentRef, 'helpButton'),
     retryButton: getEl(documentRef, 'retryButton'),
+    soundToggleButton: getEl(documentRef, 'soundToggleButton'),
+    coachTitle: getEl(documentRef, 'coachTitle'),
+    coachBody: getEl(documentRef, 'coachBody'),
+    coachMeta: getEl(documentRef, 'coachMeta'),
     outcomePanel: getEl(documentRef, 'outcomePanel'),
     outcomeText: getEl(documentRef, 'outcomeText'),
     outcomeReason: getEl(documentRef, 'outcomeReason'),
@@ -208,6 +288,13 @@ export function createUI(documentRef) {
     }
   }
 
+  function syncCoach(snapshot, summary) {
+    const coach = getCoachCopy(snapshot, summary);
+    setText(textCache, 'coach-title', refs.coachTitle, coach.title);
+    setText(textCache, 'coach-body', refs.coachBody, coach.body);
+    setText(textCache, 'coach-meta', refs.coachMeta, coach.meta);
+  }
+
   function sync({ snapshot, summary, trace }) {
     if (snapshot) {
       setText(textCache, 'hud-turn', refs.scoreLabel, `Turn: ${snapshot.turnIndex}`);
@@ -246,6 +333,8 @@ export function createUI(documentRef) {
       syncOutcome(summary);
       syncChain(summary, trace || []);
     }
+
+    syncCoach(snapshot, summary);
   }
 
   function setTelemetryReport(text) {
@@ -257,6 +346,11 @@ export function createUI(documentRef) {
     refs.telemetryReportOutput.classList.remove('hidden');
   }
 
+  function setSoundEnabled(enabled) {
+    const label = enabled ? 'Sound: On' : 'Sound: Off';
+    setText(textCache, 'sound-toggle', refs.soundToggleButton, label);
+  }
+
   return {
     refs,
     sync,
@@ -264,6 +358,7 @@ export function createUI(documentRef) {
     setTutorialVisible,
     isTutorialVisible,
     applyPlaytestMode,
-    setTelemetryReport
+    setTelemetryReport,
+    setSoundEnabled
   };
 }

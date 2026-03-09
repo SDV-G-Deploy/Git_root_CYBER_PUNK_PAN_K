@@ -19,6 +19,10 @@ function onRunEndStub() {
   return null;
 }
 
+function onUxEventStub() {
+  return null;
+}
+
 function buildRewardPacket(state) {
   const base = state.result === 'win' ? 40 : 10;
   const efficiency = Math.max(0, state.movesLimit - state.movesUsed);
@@ -53,6 +57,12 @@ function makeLastShotReport(state) {
   };
 }
 
+function trimEffectList(list, maxItems) {
+  if (list.length > maxItems) {
+    list.splice(0, list.length - maxItems);
+  }
+}
+
 export function createChainLabEngine() {
   const runtime = {
     canvas: null,
@@ -60,7 +70,8 @@ export function createChainLabEngine() {
     levels: [],
     levelIndex: 0,
     callbacks: {
-      onRunEnd: onRunEndStub
+      onRunEnd: onRunEndStub,
+      onUxEvent: onUxEventStub
     },
     telemetry: createTelemetryStore(CONFIG.TELEMETRY.MAX_LOG_ENTRIES),
     modifiers: {
@@ -75,6 +86,15 @@ export function createChainLabEngine() {
 
   function emitTelemetry(eventType, payload) {
     runtime.telemetry.emit(getState(), eventType, payload);
+  }
+
+  function emitUxEvent(eventType, payload) {
+    const state = getState();
+    try {
+      runtime.callbacks.onUxEvent(eventType, payload || {}, state);
+    } catch (error) {
+      // UX callback failures must not break the run
+    }
   }
 
   function bump() {
@@ -112,6 +132,68 @@ export function createChainLabEngine() {
     const objectiveResult = evaluateObjectives(state);
     state.lastTurn.objectiveProgress = objectiveResult.progress;
     return objectiveResult;
+  }
+
+  function pushPacketVisual(fromNodeId, toNodeId, energy, edgeId) {
+    const state = getState();
+    state.effects.packets.push({
+      fromNodeId,
+      toNodeId,
+      edgeId,
+      energy,
+      t: 0,
+      ttl: CONFIG.FEEDBACK.PACKET_TTL
+    });
+    trimEffectList(state.effects.packets, CONFIG.FEEDBACK.TRACE_MAX);
+  }
+
+  function pushNodePulse(nodeId, kind, color) {
+    const state = getState();
+    state.effects.pulses.push({
+      nodeId,
+      kind: kind || 'click',
+      color: color || '#f7fbff',
+      t: 0,
+      ttl: CONFIG.FEEDBACK.PULSE_TTL
+    });
+    trimEffectList(state.effects.pulses, CONFIG.FEEDBACK.MAX_PULSES);
+  }
+
+  function pushNodeBurst(nodeId, color, kind) {
+    const state = getState();
+    state.effects.nodeBursts.push({
+      nodeId,
+      color: color || '#f7fbff',
+      kind: kind || 'arrival',
+      t: 0,
+      ttl: CONFIG.FEEDBACK.NODE_BURST_TTL
+    });
+    trimEffectList(state.effects.nodeBursts, CONFIG.FEEDBACK.MAX_NODE_BURSTS);
+  }
+
+  function pushEdgeBurst(edgeId, energy) {
+    const state = getState();
+    if (!edgeId) {
+      return;
+    }
+
+    state.effects.edgeBursts.push({
+      edgeId,
+      energy: Math.max(1, energy || 1),
+      t: 0,
+      ttl: CONFIG.FEEDBACK.EDGE_BURST_TTL
+    });
+    trimEffectList(state.effects.edgeBursts, CONFIG.FEEDBACK.MAX_EDGE_BURSTS);
+  }
+
+  function triggerOverloadFx(nodeId) {
+    const state = getState();
+    state.effects.dangerFlashTtl = CONFIG.FEEDBACK.DANGER_FLASH_TTL;
+    state.effects.shakeTtl = CONFIG.FEEDBACK.SHAKE_TTL;
+    state.effects.shakeMagnitude = CONFIG.FEEDBACK.SHAKE_MAGNITUDE;
+    pushNodePulse(nodeId, 'explode', CONFIG.NODES.COLORS.overload);
+    pushNodeBurst(nodeId, CONFIG.NODES.COLORS.overload, 'explode');
+    emitUxEvent('overload', { nodeId });
   }
 
   function finalizeRun(result, reason) {
@@ -170,21 +252,6 @@ export function createChainLabEngine() {
     state.phase = 'await_input';
     state.lastTurn.status = 'Awaiting next move.';
     bump();
-  }
-
-  function pushPacketVisual(fromNodeId, toNodeId, energy) {
-    const state = getState();
-    state.effects.packets.push({
-      fromNodeId,
-      toNodeId,
-      energy,
-      t: 0,
-      ttl: CONFIG.FEEDBACK.PACKET_TTL
-    });
-
-    if (state.effects.packets.length > CONFIG.FEEDBACK.TRACE_MAX) {
-      state.effects.packets.splice(0, state.effects.packets.length - CONFIG.FEEDBACK.TRACE_MAX);
-    }
   }
 
   function activateNode(nodeId) {
@@ -269,11 +336,18 @@ export function createChainLabEngine() {
       }
     }
 
+    pushNodePulse(node.id, 'activate', '#f7fbff');
+    pushNodeBurst(node.id, '#f7fbff', 'activate');
+    state.effects.flashTtl = CONFIG.FEEDBACK.FLASH_TTL;
+    emitUxEvent('node_activated', {
+      nodeId,
+      nodeType: node.baseType,
+      injectPower
+    });
+
     if (injectPower > 0) {
       seedActionPacket(state, node, injectPower);
     }
-
-    state.effects.flashTtl = CONFIG.FEEDBACK.FLASH_TTL;
 
     emitTelemetry('move_committed', {
       levelId: state.levelId,
@@ -285,6 +359,7 @@ export function createChainLabEngine() {
 
     const propagation = resolvePropagation(state, {
       onPacketResolved: (packet, accepted) => {
+        pushNodeBurst(packet.nodeId, '#dffbff', 'arrival');
         emitTelemetry('propagation_step', {
           levelId: state.levelId,
           turnIndex: state.turnIndex,
@@ -295,9 +370,17 @@ export function createChainLabEngine() {
         });
       },
       onPacketEmitted: (packet) => {
-        pushPacketVisual(packet.fromNodeId, packet.toNodeId, packet.energy);
+        pushPacketVisual(packet.fromNodeId, packet.toNodeId, packet.energy, packet.edgeId);
+        pushEdgeBurst(packet.edgeId, packet.energy);
+        emitUxEvent('energy_flow', {
+          edgeId: packet.edgeId,
+          energy: packet.energy,
+          fromNodeId: packet.fromNodeId,
+          toNodeId: packet.toNodeId
+        });
       },
       onNodeExploded: (explodedNode) => {
+        triggerOverloadFx(explodedNode.id);
         emitTelemetry('node_exploded', {
           levelId: state.levelId,
           turnIndex: state.turnIndex,
@@ -364,6 +447,7 @@ export function createChainLabEngine() {
 
     const cfg = options || {};
     runtime.callbacks.onRunEnd = typeof cfg.onRunEnd === 'function' ? cfg.onRunEnd : onRunEndStub;
+    runtime.callbacks.onUxEvent = typeof cfg.onUxEvent === 'function' ? cfg.onUxEvent : onUxEventStub;
 
     setLevels(cfg.levels);
 
@@ -380,7 +464,7 @@ export function createChainLabEngine() {
       return;
     }
 
-    const hover = findClosestNode(state.nodes, x, y, CONFIG.NODES.CLICK_RADIUS + 8);
+    const hover = findClosestNode(state.nodes, x, y, CONFIG.NODES.CLICK_RADIUS + 10);
     state.hoverNodeId = hover ? hover.id : null;
     bump();
   }
@@ -452,7 +536,16 @@ export function createChainLabEngine() {
     const delta = Math.max(0, Number(dt) || 0);
     updatePackets(state, delta);
 
-    if (state.effects.packets.length > 0 || state.effects.flashTtl > 0) {
+    if (
+      state.effects.packets.length > 0 ||
+      state.effects.pulses.length > 0 ||
+      state.effects.edgeBursts.length > 0 ||
+      state.effects.nodeBursts.length > 0 ||
+      state.effects.flashTtl > 0 ||
+      state.effects.dangerFlashTtl > 0 ||
+      state.effects.shakeTtl > 0 ||
+      state.hoverNodeId
+    ) {
       bump();
     }
   }

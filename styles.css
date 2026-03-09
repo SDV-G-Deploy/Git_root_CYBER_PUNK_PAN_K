@@ -1,5 +1,18 @@
 :root {
   color-scheme: dark;
+  --bg-top: #15293a;
+  --bg-bottom: #050b11;
+  --panel: rgba(10, 20, 29, 0.88);
+  --panel-strong: rgba(8, 18, 27, 0.94);
+  --border: #35556d;
+  --text: #d7ecff;
+  --muted: #9cc1d4;
+  --power: #4cd2ff;
+  --relay: #7ad46f;
+  --firewall: #ba9cff;
+  --virus: #ff5e7e;
+  --overload: #ffb06a;
+  --core: #ffd166;
 }
 
 * {
@@ -10,8 +23,11 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: Consolas, 'Courier New', monospace;
-  background: radial-gradient(circle at top, #132435 0%, #070e15 70%);
-  color: #d7ecff;
+  background:
+    radial-gradient(circle at top, rgba(43, 89, 124, 0.24) 0%, transparent 38%),
+    radial-gradient(circle at 80% 20%, rgba(76, 210, 255, 0.12) 0%, transparent 28%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 78%);
+  color: var(--text);
 }
 
 .app {
@@ -24,13 +40,14 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
 .title {
   margin: 0;
   font-size: 20px;
+  letter-spacing: 0.04em;
 }
 
 .stats {
@@ -42,33 +59,51 @@ body {
 
 .level-select-wrap {
   font-size: 13px;
-  color: #9cc1d4;
+  color: var(--muted);
+}
+
+#levelSelect,
+#helpButton,
+#retryButton,
+#soundToggleButton,
+.outcome-actions button,
+.playtest-actions button,
+.upgrade-row button,
+#tutorialStartButton {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(18, 37, 54, 0.94), rgba(10, 22, 32, 0.96));
+  color: var(--text);
+  cursor: pointer;
 }
 
 #levelSelect {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
   padding: 6px 8px;
   min-width: 138px;
 }
 
 #helpButton,
-#retryButton {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
+#retryButton,
+#soundToggleButton {
   padding: 8px 14px;
-  cursor: pointer;
 }
 
-#helpButton {
+#soundToggleButton {
   margin-left: auto;
 }
 
+#helpButton,
+#retryButton {
+  margin-left: 0;
+}
+
 #helpButton:hover,
-#retryButton:hover {
-  background: #163248;
+#retryButton:hover,
+#soundToggleButton:hover,
+.outcome-actions button:hover,
+.playtest-actions button:hover,
+.upgrade-row button:hover,
+#tutorialStartButton:hover {
+  background: linear-gradient(180deg, rgba(24, 54, 78, 0.98), rgba(16, 41, 58, 0.98));
 }
 
 #chainlab-canvas {
@@ -78,6 +113,110 @@ body {
   border: 2px solid #26465a;
   background: #0c1f2b;
   display: block;
+  box-shadow: 0 0 0 1px rgba(111, 170, 203, 0.08), 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.coach-panel,
+.legend,
+.outcome,
+.chain-panel,
+.meta-panel,
+.playtest-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.coach-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  background:
+    linear-gradient(135deg, rgba(76, 210, 255, 0.08), transparent 35%),
+    var(--panel-strong);
+}
+
+.coach-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 640px;
+}
+
+.coach-eyebrow {
+  color: var(--power);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+#coachTitle {
+  font-size: 18px;
+}
+
+#coachBody,
+.coach-meta,
+.outcome-reason,
+.tutorial-tip,
+.meta-status,
+.chain-feed-status,
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.legend-title,
+.chain-title,
+.meta-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legend-item {
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(9, 16, 25, 0.84);
+}
+
+.legend-item strong {
+  margin-right: 6px;
+}
+
+.legend-item.power strong {
+  color: var(--power);
+}
+
+.legend-item.relay strong {
+  color: var(--relay);
+}
+
+.legend-item.firewall strong {
+  color: var(--firewall);
+}
+
+.legend-item.virus strong {
+  color: var(--virus);
+}
+
+.legend-item.overload strong {
+  color: var(--overload);
+}
+
+.legend-item.core strong {
+  color: var(--core);
 }
 
 .summary {
@@ -86,19 +225,10 @@ body {
   gap: 12px;
   margin-top: 10px;
   font-size: 13px;
-  color: #9cc1d4;
+  color: var(--muted);
 }
 
-.hint {
-  margin-top: 8px;
-  color: #8cb2c7;
-  font-size: 13px;
-}
 .outcome {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid #35556d;
-  background: rgba(16, 34, 49, 0.9);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -115,48 +245,32 @@ body {
   color: #ffc2cb;
 }
 
+.outcome-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .outcome-actions {
   display: flex;
   gap: 8px;
 }
 
-.outcome-actions button {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
+.outcome-actions button,
+.playtest-actions button,
+.upgrade-row button,
+#tutorialStartButton {
   padding: 6px 12px;
-  cursor: pointer;
-}
-
-.outcome-actions button:hover {
-  background: #163248;
 }
 
 .hidden {
   display: none;
-}
-.meta-panel {
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid #35556d;
-  background: rgba(11, 24, 36, 0.9);
-}
-
-.meta-title {
-  margin: 0 0 6px;
-  font-size: 15px;
 }
 
 .meta-tech {
   margin: 0;
   color: #b7ffd4;
   font-size: 14px;
-}
-
-.meta-status {
-  margin: 6px 0 10px;
-  color: #9cc1d4;
-  font-size: 12px;
 }
 
 .meta-upgrades {
@@ -174,23 +288,9 @@ body {
   font-size: 13px;
 }
 
-.upgrade-row button {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
 .upgrade-row button[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
-}
-.playtest-panel {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border: 1px solid #35556d;
-  background: rgba(10, 21, 31, 0.92);
 }
 
 .playtest-toggle {
@@ -207,108 +307,15 @@ body {
   margin-top: 10px;
 }
 
-.playtest-actions button {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-.playtest-actions button:hover {
-  background: #163248;
-}
-
 .telemetry-report {
   margin: 10px 0 0;
   padding: 10px;
-  border: 1px solid #35556d;
+  border: 1px solid var(--border);
   background: rgba(6, 15, 23, 0.9);
   color: #c9e6ff;
   white-space: pre-wrap;
   font-size: 12px;
   line-height: 1.35;
-}
-
-.playtest-mode .summary,
-.playtest-mode .meta-panel,
-.playtest-mode .level-select-wrap,
-.playtest-mode #levelSelect,
-.playtest-mode .hint,
-.playtest-mode .legend,
-.playtest-mode .chain-panel {
-  display: none;
-}
-.legend {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid #35556d;
-  background: rgba(10, 20, 29, 0.88);
-}
-
-.legend-title {
-  margin: 0 0 8px;
-  font-size: 14px;
-}
-
-.legend-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.legend-item {
-  font-size: 12px;
-  padding: 6px 8px;
-  border: 1px solid #35556d;
-  border-radius: 4px;
-  background: rgba(9, 16, 25, 0.84);
-}
-
-.legend-item strong {
-  margin-right: 6px;
-}
-
-.legend-item.bomb strong {
-  color: #ff5d73;
-}
-
-.legend-item.pusher strong {
-  color: #5cc8ff;
-}
-
-.legend-item.multiplier strong {
-  color: #9bff8a;
-}
-
-.outcome-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.outcome-reason {
-  margin: 0;
-  color: #c1d9e8;
-  font-size: 12px;
-}
-
-.chain-panel {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid #35556d;
-  background: rgba(7, 16, 24, 0.9);
-}
-
-.chain-title {
-  margin: 0;
-  font-size: 14px;
-}
-
-.chain-feed-status {
-  margin: 6px 0 8px;
-  color: #9cc1d4;
-  font-size: 12px;
 }
 
 .chain-log-list {
@@ -328,7 +335,7 @@ body {
 .tutorial-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 8, 12, 0.85);
+  background: rgba(3, 8, 12, 0.88);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,19 +348,62 @@ body {
 }
 
 .tutorial-card {
-  width: min(100%, 680px);
-  border: 1px solid #35556d;
-  background: #09151f;
-  padding: 16px;
+  width: min(100%, 760px);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(76, 210, 255, 0.08), transparent 38%),
+    #09151f;
+  padding: 18px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+}
+
+.tutorial-kicker {
+  margin: 0 0 8px;
+  color: var(--power);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
 }
 
 .tutorial-card h2 {
   margin: 0 0 10px;
-  font-size: 20px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.tutorial-lede {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tutorial-block {
+  padding: 12px;
+  border: 1px solid rgba(76, 132, 168, 0.35);
+  background: rgba(6, 14, 22, 0.9);
+}
+
+.tutorial-block h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.tutorial-block p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .tutorial-list {
-  margin: 0;
+  margin: 14px 0 0;
   padding-left: 20px;
   display: flex;
   flex-direction: column;
@@ -361,50 +411,43 @@ body {
   font-size: 14px;
 }
 
-.tutorial-tip {
-  margin: 10px 0 0;
-  color: #9cc1d4;
-  font-size: 13px;
-}
-
 .tutorial-actions {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   justify-content: flex-end;
 }
 
-#tutorialStartButton {
-  border: 1px solid #35556d;
-  background: #102231;
-  color: #d7ecff;
-  padding: 8px 16px;
-  cursor: pointer;
+.playtest-mode .summary,
+.playtest-mode .meta-panel,
+.playtest-mode .level-select-wrap,
+.playtest-mode #levelSelect,
+.playtest-mode .hint,
+.playtest-mode .legend,
+.playtest-mode .chain-panel,
+.playtest-mode .coach-panel {
+  display: none;
 }
 
-#tutorialStartButton:hover {
-  background: #163248;
-}
+@media (max-width: 760px) {
+  .app {
+    padding: 12px;
+  }
 
-.legend-item.power strong {
-  color: #4cd2ff;
-}
+  .hud {
+    gap: 10px;
+  }
 
-.legend-item.relay strong {
-  color: #7ad46f;
-}
+  #soundToggleButton {
+    margin-left: 0;
+  }
 
-.legend-item.firewall strong {
-  color: #ba9cff;
-}
+  .coach-panel,
+  .outcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.legend-item.virus strong {
-  color: #ff5e7e;
-}
-
-.legend-item.overload strong {
-  color: #ffb06a;
-}
-
-.legend-item.core strong {
-  color: #ffd166;
+  .tutorial-grid {
+    grid-template-columns: 1fr;
+  }
 }

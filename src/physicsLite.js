@@ -40,17 +40,30 @@ export function getCanvasPoint(canvas, event) {
   };
 }
 
-export function updatePackets(state, dt) {
-  const packets = state.effects.packets;
+function updateTimedCollection(items, dt) {
+  for (let i = items.length - 1; i >= 0; i -= 1) {
+    const item = items[i];
+    item.t += dt / Math.max(item.ttl, 0.0001);
 
-  for (let i = packets.length - 1; i >= 0; i -= 1) {
-    const packet = packets[i];
-    packet.t += dt / Math.max(packet.ttl, 0.0001);
-
-    if (packet.t >= 1) {
-      packets.splice(i, 1);
+    if (item.t >= 1) {
+      items.splice(i, 1);
     }
   }
+}
+
+export function updatePackets(state, dt) {
+  state.effects.time += dt;
+
+  updateTimedCollection(state.effects.packets, dt);
+  updateTimedCollection(state.effects.pulses, dt);
+  updateTimedCollection(state.effects.edgeBursts, dt);
+  updateTimedCollection(state.effects.nodeBursts, dt);
 
   state.effects.flashTtl = Math.max(0, state.effects.flashTtl - dt);
+  state.effects.dangerFlashTtl = Math.max(0, state.effects.dangerFlashTtl - dt);
+  state.effects.shakeTtl = Math.max(0, state.effects.shakeTtl - dt);
+
+  if (state.effects.shakeTtl <= 0) {
+    state.effects.shakeMagnitude = 0;
+  }
 }

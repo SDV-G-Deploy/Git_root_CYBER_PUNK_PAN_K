@@ -168,6 +168,106 @@ function buildObjectives(level) {
   }));
 }
 
+function getNodeTypeLabel(type) {
+  if (type === NODE_TYPES.POWER) {
+    return 'Power Node';
+  }
+
+  if (type === NODE_TYPES.RELAY) {
+    return 'Relay Node';
+  }
+
+  if (type === NODE_TYPES.FIREWALL) {
+    return 'Firewall Node';
+  }
+
+  if (type === NODE_TYPES.VIRUS) {
+    return 'Virus Node';
+  }
+
+  if (type === NODE_TYPES.OVERLOAD) {
+    return 'Overload Node';
+  }
+
+  if (type === NODE_TYPES.CORE) {
+    return 'Core Node';
+  }
+
+  return 'Node';
+}
+
+function getNextObjectiveText(state) {
+  for (let i = 0; i < state.objectives.length; i += 1) {
+    if (!state.objectives[i].done) {
+      return state.objectives[i].text || createObjectiveText(state.objectives[i]);
+    }
+  }
+
+  return 'All objectives complete.';
+}
+
+function buildHoverInfo(state) {
+  if (!state.hoverNodeId) {
+    return null;
+  }
+
+  const node = getNodeById(state, state.hoverNodeId);
+  if (!node) {
+    return null;
+  }
+
+  const clickable = (node.baseType === NODE_TYPES.POWER || node.baseType === NODE_TYPES.FIREWALL) && !node.exploded;
+  const chargeText = node.baseType === NODE_TYPES.CORE
+    ? `Charge ${node.charge}/${node.targetCharge}`
+    : `Charge ${node.charge}`;
+
+  let stateText = 'Idle';
+  if (node.exploded) {
+    stateText = 'Destroyed';
+  } else if (node.corrupted) {
+    stateText = 'Infected';
+  } else if (node.active) {
+    stateText = 'Active';
+  }
+
+  let actionText = 'Observe this node.';
+  let detailText = chargeText;
+
+  if (node.baseType === NODE_TYPES.POWER) {
+    actionText = 'Click to inject energy into connected routes.';
+    detailText = `${chargeText} | Injects ${node.injectPower} energy each click.`;
+  } else if (node.baseType === NODE_TYPES.FIREWALL) {
+    actionText = node.firewallOpen
+      ? 'Click to rotate this route or lock it again.'
+      : 'Click to open this route and let energy through.';
+    const modeText = Array.isArray(node.firewallModes) && node.firewallModes.length > 0
+      ? `${node.firewallModes.length} route modes available.`
+      : 'Single route gate.';
+    detailText = `${chargeText} | ${modeText}`;
+  } else if (node.baseType === NODE_TYPES.RELAY) {
+    actionText = 'Relay nodes auto-forward once charged enough.';
+    detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower}.`;
+  } else if (node.baseType === NODE_TYPES.VIRUS) {
+    actionText = 'Hazard node. It infects nearby nodes at the end of each turn.';
+    detailText = `Spread ${node.spreadRate} per turn | ${stateText}`;
+  } else if (node.baseType === NODE_TYPES.OVERLOAD) {
+    actionText = 'Auto-forwards charge but can explode if fed too much in one turn.';
+    detailText = `${chargeText} | Safe throughput ${node.overloadThreshold}.`;
+  } else if (node.baseType === NODE_TYPES.CORE) {
+    actionText = 'Main objective. Fill the core to the target charge.';
+    detailText = `${chargeText} | ${stateText}`;
+  }
+
+  return {
+    id: node.id,
+    type: node.baseType,
+    title: `${node.id} | ${getNodeTypeLabel(node.baseType)}`,
+    clickable,
+    actionText,
+    detailText: `${detailText} | ${stateText}`
+  };
+}
+
 export function createState(level, levelIndex, levelCount) {
   const nodes = level.nodes.map(makeRuntimeNode);
   const edges = level.edges.map(makeRuntimeEdge);
@@ -190,7 +290,6 @@ export function createState(level, levelIndex, levelCount) {
 
     overload: 0,
     overloadLimit: Number.isFinite(level.overloadLimit) ? level.overloadLimit : 8,
-
     collapseLimit: Number.isFinite(level.collapseLimit) ? level.collapseLimit : 4,
 
     nodes,
@@ -225,8 +324,15 @@ export function createState(level, levelIndex, levelCount) {
 
     hoverNodeId: null,
     effects: {
+      time: 0,
       packets: [],
-      flashTtl: 0
+      pulses: [],
+      edgeBursts: [],
+      nodeBursts: [],
+      flashTtl: 0,
+      dangerFlashTtl: 0,
+      shakeTtl: 0,
+      shakeMagnitude: 0
     },
 
     telemetry: [],
@@ -309,6 +415,8 @@ export function getSnapshot(state) {
     virusCount: getVirusCount(state),
     explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
+    hoverInfo: buildHoverInfo(state),
+    nextObjectiveText: getNextObjectiveText(state),
     revision: state.revision
   };
 }
@@ -334,6 +442,7 @@ export function getRunSummary(state) {
     virusCount: getVirusCount(state),
     explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
+    nextObjectiveText: getNextObjectiveText(state),
     objectives: state.objectives.map((objective) => ({ ...objective })),
     lastAction: { ...state.lastAction },
     lastTurn: {
