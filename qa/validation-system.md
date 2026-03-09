@@ -15,7 +15,7 @@
 - Each action is simulated through the real propagation pipeline: prepare turn -> inject action energy -> resolve propagation queue -> spread corruption -> decay -> evaluate objectives -> evaluate lose conditions.
 - Resulting states are hashed with a canonical state key and deduped.
 - Search uses bounded BFS so the first discovered win depth is meaningful and shortest winning paths can be reconstructed.
-- After graph expansion, a backward analysis pass marks which branches keep a win alive, counts solutions, and derives minimal winning paths and dead-state examples.
+- After graph expansion, a backward analysis pass marks which branches keep a win alive, counts solutions, and derives minimal winning paths, solverProof, and dead-state examples.
 
 ## Code Implementation Plan
 

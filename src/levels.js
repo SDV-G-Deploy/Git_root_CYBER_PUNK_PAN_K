@@ -605,7 +605,15 @@ function cloneLevel(level) {
     ...level,
     nodes: level.nodes.map((node) => ({ ...node })),
     edges: level.edges.map((edge) => ({ ...edge })),
-    objectives: level.objectives.map((objective) => ({ ...objective }))
+    objectives: level.objectives.map((objective) => ({ ...objective })),
+    solverProof: level.solverProof
+      ? {
+        ...level.solverProof,
+        solutionPath: Array.isArray(level.solverProof.solutionPath)
+          ? level.solverProof.solutionPath.map((action) => ({ ...action }))
+          : []
+      }
+      : undefined
   };
 }
 

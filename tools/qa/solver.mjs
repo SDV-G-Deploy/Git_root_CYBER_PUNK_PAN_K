@@ -246,6 +246,24 @@ export function simulateAction(state, action) {
   };
 }
 
+export function getNextHint(levelState, solutionPath) {
+  if (!Array.isArray(solutionPath) || solutionPath.length === 0) {
+    return null;
+  }
+
+  const completedActions = Array.isArray(levelState?.actionHistory)
+    ? levelState.actionHistory.length
+    : Number.isFinite(levelState?.movesUsed)
+      ? levelState.movesUsed
+      : 0;
+
+  if (completedActions < 0 || completedActions >= solutionPath.length) {
+    return null;
+  }
+
+  return cloneAction(solutionPath[completedActions]);
+}
+
 function buildGraphNode(index, state, key, parentIndex, actionFromParent) {
   return {
     index,
@@ -265,7 +283,40 @@ function buildGraphNode(index, state, key, parentIndex, actionFromParent) {
   };
 }
 
-function getPathToNode(graph, nodeIndex) {
+function cloneAction(action) {
+  if (!action) {
+    return null;
+  }
+
+  return {
+    type: action.type,
+    nodeId: action.nodeId,
+    nodeType: action.nodeType
+  };
+}
+
+function cloneSolutionPath(path) {
+  if (!Array.isArray(path)) {
+    return [];
+  }
+
+  return path.map((action) => cloneAction(action)).filter(Boolean);
+}
+
+function cloneSolverProof(proof) {
+  if (!proof) {
+    return null;
+  }
+
+  return {
+    solvable: Boolean(proof.solvable),
+    minMoves: Number.isFinite(proof.minMoves) ? proof.minMoves : null,
+    solutionCount: Number.isFinite(proof.solutionCount) ? proof.solutionCount : 0,
+    solutionPath: cloneSolutionPath(proof.solutionPath)
+  };
+}
+
+function getActionHistoryToNode(graph, nodeIndex) {
   const path = [];
   let currentIndex = nodeIndex;
 
@@ -275,11 +326,23 @@ function getPathToNode(graph, nodeIndex) {
       break;
     }
 
-    path.push(node.actionFromParent.nodeId);
+    path.push(cloneAction(node.actionFromParent));
     currentIndex = node.parentIndex;
   }
 
   return path.reverse();
+}
+
+function getPathToNode(graph, nodeIndex) {
+  return getActionHistoryToNode(graph, nodeIndex).map((action) => action.nodeId);
+}
+
+function actionPathToNodeIds(path) {
+  if (!Array.isArray(path)) {
+    return [];
+  }
+
+  return path.map((action) => action.nodeId);
 }
 
 function reconstructMinimalWinningPath(graph, nodeIndex) {
@@ -321,7 +384,7 @@ function reconstructMinimalWinningPath(graph, nodeIndex) {
       break;
     }
 
-    path.push(nextChoice.action.nodeId);
+    path.push(cloneAction(nextChoice.action));
     currentIndex = nextChoice.childIndex;
   }
 
@@ -570,7 +633,16 @@ export function solveLevel(level, levelIndex, levelCount, options) {
   }
 
   const root = graph[0];
-  const minimalWinningPath = root.analysis.solvable ? reconstructMinimalWinningPath(graph, 0) : [];
+  const solutionPath = root.analysis.solvable ? reconstructMinimalWinningPath(graph, 0) : [];
+  const minimalWinningPath = actionPathToNodeIds(solutionPath);
+  const solverProof = {
+    solvable: root.analysis.solvable,
+    minMoves: root.analysis.solvable ? root.analysis.minMovesToWin : null,
+    solutionCount: root.analysis.solutionCount,
+    solutionPath: cloneSolutionPath(solutionPath)
+  };
+  level.solverProof = cloneSolverProof(solverProof);
+
   const rootBranchAnalysis = root.children.map((childEdge) => {
     const childNode = graph[childEdge.childIndex];
     return {
@@ -639,8 +711,11 @@ export function solveLevel(level, levelIndex, levelCount, options) {
       ? Number((generatedTransitions / expandedStates).toFixed(2))
       : 0,
     solvable: root.analysis.solvable,
+    minMoves: root.analysis.solvable ? root.analysis.minMovesToWin : null,
     minimalMoves: root.analysis.solvable ? root.analysis.minMovesToWin : null,
     solutionCount: root.analysis.solutionCount,
+    solutionPath: cloneSolutionPath(solutionPath),
+    solverProof: cloneSolverProof(solverProof),
     deadStateCount: graph.filter((node) => node.state.phase !== 'end' && !node.analysis.solvable).length,
     searchCutoff,
     minimalWinningPath,
@@ -681,6 +756,15 @@ export function validateAllLevels(options) {
 
 export function validateLevels(options) {
   return validateAllLevels(options);
+}
+
+export function loadLevelsWithSolverProof(options) {
+  const levels = loadLevels();
+  for (let index = 0; index < levels.length; index += 1) {
+    solveLevel(levels[index], index, levels.length, options);
+  }
+
+  return levels;
 }
 
 export function createValidationSummary(results) {

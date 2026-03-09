@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-09T10:15:42.762Z",
+  "generatedAt": "2026-03-09T20:29:04.070Z",
   "summary": {
     "levelCount": 20,
     "solvableCount": 20,
@@ -38,8 +38,48 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 3,
       "minimalMoves": 3,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 3,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -115,8 +155,68 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -196,8 +296,58 @@
       "terminalLossStateCount": 12,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 4,
       "minimalMoves": 4,
       "solutionCount": 5,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 5,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 11,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -322,8 +472,48 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 3,
       "minimalMoves": 3,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 3,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -398,8 +588,68 @@
       "terminalLossStateCount": 61,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 37,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 37,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 49,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -527,8 +777,68 @@
       "terminalLossStateCount": 61,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 37,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 37,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 49,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -656,8 +966,78 @@
       "terminalLossStateCount": 534,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 6,
       "minimalMoves": 6,
       "solutionCount": 1648,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 6,
+        "solutionCount": 1648,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 443,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -802,8 +1182,78 @@
       "terminalLossStateCount": 73,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 6,
       "minimalMoves": 6,
       "solutionCount": 21,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 6,
+        "solutionCount": 21,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 90,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -932,8 +1382,68 @@
       "terminalLossStateCount": 34,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 5,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 5,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 36,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1059,8 +1569,68 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1139,8 +1709,68 @@
       "terminalLossStateCount": 46,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 15,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 15,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 49,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1266,8 +1896,78 @@
       "terminalLossStateCount": 7,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 6,
       "minimalMoves": 6,
       "solutionCount": 116,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 6,
+        "solutionCount": 116,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 2,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1393,8 +2093,48 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 3,
       "minimalMoves": 3,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 3,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1469,8 +2209,48 @@
       "terminalLossStateCount": 0,
       "averageBranchingFactor": 1,
       "solvable": true,
+      "minMoves": 3,
       "minimalMoves": 3,
       "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 3,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 0,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1545,8 +2325,58 @@
       "terminalLossStateCount": 32,
       "averageBranchingFactor": 2,
       "solvable": true,
+      "minMoves": 4,
       "minimalMoves": 4,
       "solutionCount": 54,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 54,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 25,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1678,8 +2508,68 @@
       "terminalLossStateCount": 121,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 5,
       "minimalMoves": 5,
       "solutionCount": 2511,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 2511,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
       "deadStateCount": 107,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1828,8 +2718,58 @@
       "terminalLossStateCount": 141,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 4,
       "minimalMoves": 4,
       "solutionCount": 2767,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 2767,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 98,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -1979,8 +2919,58 @@
       "terminalLossStateCount": 141,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 4,
       "minimalMoves": 4,
       "solutionCount": 2767,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 2767,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 98,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -2130,8 +3120,58 @@
       "terminalLossStateCount": 160,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 4,
       "minimalMoves": 4,
       "solutionCount": 7183,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 7183,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 112,
       "searchCutoff": false,
       "minimalWinningPath": [
@@ -2284,8 +3324,108 @@
       "terminalLossStateCount": 1570,
       "averageBranchingFactor": 3,
       "solvable": true,
+      "minMoves": 9,
       "minimalMoves": 9,
       "solutionCount": 1472,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 9,
+        "solutionCount": 1472,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
       "deadStateCount": 2032,
       "searchCutoff": false,
       "minimalWinningPath": [
