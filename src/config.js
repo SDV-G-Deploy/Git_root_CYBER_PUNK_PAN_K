@@ -9,11 +9,14 @@ export const CONFIG = Object.freeze({
     RADIUS: 21,
     CLICK_RADIUS: 26,
     COLORS: {
-      source: '#4cd2ff',
+      power: '#4cd2ff',
       relay: '#7ad46f',
+      firewall: '#ba9cff',
+      virus: '#ff5e7e',
+      overload: '#ffb06a',
       core: '#ffd166',
-      switch: '#ba9cff',
-      corrupted: '#ff5e7e',
+      infected: '#ff82a0',
+      broken: '#786f68',
       inactive: '#4a5d69',
       label: '#08131d',
       activeStroke: '#d9fbff',
@@ -29,10 +32,17 @@ export const CONFIG = Object.freeze({
   },
   TURN: {
     MAX_PROPAGATION_STEPS: 256,
-    SOURCE_INJECT_POWER: 5,
+    POWER_INJECT_POWER: 5,
     RELAY_THRESHOLD: 3,
     RELAY_EMIT_POWER: 3,
+    FIREWALL_THRESHOLD: 2,
+    FIREWALL_EMIT_POWER: 3,
+    FIREWALL_CLICK_INJECT: 2,
+    OVERLOAD_NODE_THRESHOLD: 5,
+    OVERLOAD_NODE_EMIT_POWER: 4,
+    OVERLOAD_EXPLOSION_PENALTY: 2,
     DECAY_PER_TURN: 1,
+    VIRUS_SPREAD_PER_TURN: 1,
     CORRUPTION_THRESHOLD: 2,
     CORRUPTION_ABSORB_FACTOR: 0.5,
     CLEANSE_THRESHOLD: 4
@@ -57,11 +67,13 @@ export const OBJECTIVE_TYPES = Object.freeze({
 });
 
 export const NODE_TYPES = Object.freeze({
-  SOURCE: 'source',
+  POWER: 'power',
   RELAY: 'relay',
+  FIREWALL: 'firewall',
+  VIRUS: 'virus',
+  OVERLOAD: 'overload',
   CORE: 'core',
-  SWITCH: 'switch',
-  CORRUPTED: 'corrupted'
+  INFECTED: 'infected'
 });
 
 export const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';

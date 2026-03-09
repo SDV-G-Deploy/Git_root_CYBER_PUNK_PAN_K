@@ -15,7 +15,7 @@
         <span id="shotsLabel">Moves: 0/0</span>
         <span id="targetLabel">Overload: 0/0</span>
         <span id="levelLabel">Level: L01</span>
-        <span id="chainStatusLabel">Corrupted: 0/0</span>
+        <span id="chainStatusLabel">Infected: 0/0 | Virus: 0</span>
       </div>
       <label class="level-select-wrap" for="levelSelect">Level</label>
       <select id="levelSelect" aria-label="Select level"></select>
@@ -26,11 +26,14 @@
     <canvas id="chainlab-canvas" width="960" height="540" aria-label="Chain Lab Arena"></canvas>
 
     <section class="legend" aria-label="Node legend">
-      <h2 class="legend-title">Network Rules</h2>
+      <h2 class="legend-title">Node Types</h2>
       <div class="legend-items">
-        <span class="legend-item bomb"><strong>S</strong> Source: click to inject energy into the grid.</span>
-        <span class="legend-item pusher"><strong>R</strong> Relay: activates and forwards energy downstream.</span>
-        <span class="legend-item multiplier"><strong>SW</strong> Switch: click to rotate active routes.</span>
+        <span class="legend-item power"><strong>P</strong> Power: click to inject energy.</span>
+        <span class="legend-item relay"><strong>R</strong> Relay: forwards charge when active.</span>
+        <span class="legend-item firewall"><strong>F</strong> Firewall: blocks routes until activated.</span>
+        <span class="legend-item virus"><strong>V</strong> Virus: spreads infection each turn.</span>
+        <span class="legend-item overload"><strong>O</strong> Overload: may explode if overfed.</span>
+        <span class="legend-item core"><strong>C</strong> Core: main objective node.</span>
       </div>
     </section>
 
@@ -38,13 +41,13 @@
       <span id="summaryResult">Result: in_progress</span>
       <span id="summaryScore">Core charge: 0</span>
       <span id="summaryDepth">Objectives: 0/0</span>
-      <span id="summaryAccuracy">Moves used: 0/0, overload 0/0</span>
+      <span id="summaryAccuracy">Moves: 0/0 | Overload: 0/0 | Exploded: 0</span>
     </section>
 
     <section id="outcomePanel" class="outcome hidden" aria-live="polite">
       <div class="outcome-copy">
         <strong id="outcomeText">Run status</strong>
-        <p id="outcomeReason" class="outcome-reason">Stabilize the district network.</p>
+        <p id="outcomeReason" class="outcome-reason">Charge the core before the network collapses.</p>
       </div>
       <div class="outcome-actions">
         <button id="summaryRetryButton" type="button">Retry</button>
@@ -56,7 +59,7 @@
       <h2 class="chain-title">Chain Feed</h2>
       <p id="chainFeedStatus" class="chain-feed-status">Awaiting move...</p>
       <ul id="chainLogList" class="chain-log-list">
-        <li class="chain-log-empty">Click a Source or Switch node to start propagation.</li>
+        <li class="chain-log-empty">Click a Power or Firewall node to start propagation.</li>
       </ul>
     </section>
 
@@ -89,19 +92,20 @@
       <pre id="telemetryReportOutput" class="telemetry-report hidden"></pre>
     </section>
 
-    <p class="hint">Click Source or Switch nodes. Each click costs one move. Stabilize the grid before collapse.</p>
+    <p class="hint">Click Power or Firewall nodes. Plan routes, avoid overload explosions, and keep infection below collapse limit.</p>
   </main>
 
   <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
     <div class="tutorial-card">
       <h2 id="tutorialTitle">How to Play Chain Lab</h2>
       <ol class="tutorial-list">
-        <li>Click Source nodes to inject energy and start propagation.</li>
-        <li>Each click spends one move. Manage overload and corruption every turn.</li>
-        <li>Energy travels along enabled links with attenuation and capacity limits.</li>
-        <li>Win by completing objectives: power core, activate relays, clean corruption.</li>
+        <li>Click Power nodes to inject energy into the graph.</li>
+        <li>Click Firewall nodes to open or switch routes.</li>
+        <li>Relay and Overload nodes forward charge when active; Overload can explode if fed too much.</li>
+        <li>Virus nodes infect neighbors every turn. Too many infected nodes causes collapse.</li>
+        <li>Win by reaching level objectives, usually charging the Core to target value.</li>
       </ol>
-      <p class="tutorial-tip">Tip: Overloaded links increase failure risk. Use switches to route safer paths.</p>
+      <p class="tutorial-tip">Tip: if a route is hot, rotate firewall paths and split load before overload threshold is exceeded.</p>
       <div class="tutorial-actions">
         <button id="tutorialStartButton" type="button">Start</button>
       </div>

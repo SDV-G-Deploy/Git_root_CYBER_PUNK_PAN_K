@@ -6,24 +6,62 @@ export function createRunId() {
   return `run_${now}_${random}`;
 }
 
+function defaultThresholdForType(type) {
+  if (type === NODE_TYPES.RELAY) {
+    return CONFIG.TURN.RELAY_THRESHOLD;
+  }
+
+  if (type === NODE_TYPES.FIREWALL) {
+    return CONFIG.TURN.FIREWALL_THRESHOLD;
+  }
+
+  if (type === NODE_TYPES.OVERLOAD) {
+    return CONFIG.TURN.RELAY_THRESHOLD;
+  }
+
+  return 0;
+}
+
+function defaultEmitForType(type, injectPower) {
+  if (type === NODE_TYPES.POWER) {
+    return injectPower;
+  }
+
+  if (type === NODE_TYPES.RELAY) {
+    return CONFIG.TURN.RELAY_EMIT_POWER;
+  }
+
+  if (type === NODE_TYPES.FIREWALL) {
+    return CONFIG.TURN.FIREWALL_EMIT_POWER;
+  }
+
+  if (type === NODE_TYPES.OVERLOAD) {
+    return CONFIG.TURN.OVERLOAD_NODE_EMIT_POWER;
+  }
+
+  return 0;
+}
+
 function makeRuntimeNode(node) {
   const threshold = Number.isFinite(node.threshold)
     ? node.threshold
-    : node.type === NODE_TYPES.RELAY || node.type === NODE_TYPES.SWITCH
-      ? CONFIG.TURN.RELAY_THRESHOLD
-      : 0;
+    : defaultThresholdForType(node.type);
 
   const injectPower = Number.isFinite(node.injectPower)
     ? node.injectPower
-    : CONFIG.TURN.SOURCE_INJECT_POWER;
+    : node.type === NODE_TYPES.POWER
+      ? CONFIG.TURN.POWER_INJECT_POWER
+      : node.type === NODE_TYPES.FIREWALL
+        ? CONFIG.TURN.FIREWALL_CLICK_INJECT
+        : 0;
 
   const emitPower = Number.isFinite(node.emitPower)
     ? node.emitPower
-    : node.type === NODE_TYPES.SOURCE
-      ? injectPower
-      : node.type === NODE_TYPES.RELAY || node.type === NODE_TYPES.SWITCH
-        ? CONFIG.TURN.RELAY_EMIT_POWER
-        : 0;
+    : defaultEmitForType(node.type, injectPower);
+
+  const firewallModes = Array.isArray(node.firewallModes)
+    ? node.firewallModes.map((mode) => (Array.isArray(mode) ? mode.slice() : []))
+    : null;
 
   return {
     id: node.id,
@@ -36,16 +74,25 @@ function makeRuntimeNode(node) {
     emitPower,
     targetCharge: Number.isFinite(node.targetCharge) ? node.targetCharge : 0,
     maxCharge: Number.isFinite(node.maxCharge) ? node.maxCharge : 99,
-    switchModes: Array.isArray(node.switchModes)
-      ? node.switchModes.map((mode) => (Array.isArray(mode) ? mode.slice() : []))
-      : null,
+    firewallModes,
     activeMode: Number.isFinite(node.activeMode) ? node.activeMode : 0,
-    injectOnClick: Boolean(node.injectOnClick),
-    corrupted: node.type === NODE_TYPES.CORRUPTED,
+    firewallOpen: Boolean(node.firewallOpen),
+    injectOnClick: Boolean(
+      node.injectOnClick !== undefined
+        ? node.injectOnClick
+        : node.type === NODE_TYPES.POWER || node.type === NODE_TYPES.FIREWALL
+    ),
+    spreadRate: Number.isFinite(node.spreadRate) ? node.spreadRate : CONFIG.TURN.VIRUS_SPREAD_PER_TURN,
+    overloadThreshold: Number.isFinite(node.overloadThreshold)
+      ? node.overloadThreshold
+      : CONFIG.TURN.OVERLOAD_NODE_THRESHOLD,
+    corrupted: Boolean(node.corrupted),
     charge: 0,
-    active: false,
+    active: node.type === NODE_TYPES.POWER,
     emittedThisTurn: false,
     receivedThisTurn: 0,
+    throughputThisTurn: 0,
+    exploded: false,
     corruptionProgress: 0,
     cleanseAccumulated: 0,
     radius: CONFIG.NODES.RADIUS
@@ -53,13 +100,15 @@ function makeRuntimeNode(node) {
 }
 
 function makeRuntimeEdge(edge) {
+  const enabled = edge.enabled !== false;
   return {
     id: edge.id,
     from: edge.from,
     to: edge.to,
     capacity: Number.isFinite(edge.capacity) ? edge.capacity : 3,
     attenuation: Number.isFinite(edge.attenuation) ? edge.attenuation : 1,
-    enabled: edge.enabled !== false,
+    enabled,
+    baseEnabled: enabled,
     overloadedThisTurn: false
   };
 }
@@ -107,6 +156,18 @@ function buildNeighborIndex(nodes, edges) {
   return neighbors;
 }
 
+function buildObjectives(level) {
+  const source = Array.isArray(level.objectives) ? level.objectives : [];
+  return source.map((objective, idx) => ({
+    id: `obj_${idx + 1}`,
+    type: objective.type,
+    nodeId: objective.nodeId || null,
+    requiredCharge: Number.isFinite(objective.requiredCharge) ? objective.requiredCharge : 0,
+    done: false,
+    text: ''
+  }));
+}
+
 export function createState(level, levelIndex, levelCount) {
   const nodes = level.nodes.map(makeRuntimeNode);
   const edges = level.edges.map(makeRuntimeEdge);
@@ -128,9 +189,9 @@ export function createState(level, levelIndex, levelCount) {
     movesRemaining: level.movesLimit,
 
     overload: 0,
-    overloadLimit: level.overloadLimit,
+    overloadLimit: Number.isFinite(level.overloadLimit) ? level.overloadLimit : 8,
 
-    collapseLimit: level.collapseLimit,
+    collapseLimit: Number.isFinite(level.collapseLimit) ? level.collapseLimit : 4,
 
     nodes,
     edges,
@@ -138,14 +199,7 @@ export function createState(level, levelIndex, levelCount) {
     outgoingByNode: buildOutgoingIndex(nodes, edges),
     neighborsByNode: buildNeighborIndex(nodes, edges),
 
-    objectives: level.objectives.map((objective, idx) => ({
-      id: `obj_${idx + 1}`,
-      type: objective.type,
-      nodeId: objective.nodeId || null,
-      requiredCharge: Number.isFinite(objective.requiredCharge) ? objective.requiredCharge : 0,
-      done: false,
-      text: ''
-    })),
+    objectives: buildObjectives(level),
 
     queue: [],
     queueHead: 0,
@@ -164,6 +218,7 @@ export function createState(level, levelIndex, levelCount) {
       overloadDelta: 0,
       corruptionNew: [],
       cleansedNodes: [],
+      explodedNodes: [],
       objectiveProgress: [],
       status: 'Awaiting input.'
     },
@@ -183,10 +238,30 @@ export function bumpRevision(state) {
   state.revision += 1;
 }
 
-export function getCorruptedCount(state) {
+export function getInfectedCount(state) {
   let count = 0;
   for (let i = 0; i < state.nodes.length; i += 1) {
     if (state.nodes[i].corrupted) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+export function getVirusCount(state) {
+  let count = 0;
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    if (state.nodes[i].baseType === NODE_TYPES.VIRUS) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+export function getExplodedCount(state) {
+  let count = 0;
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    if (state.nodes[i].exploded) {
       count += 1;
     }
   }
@@ -230,7 +305,9 @@ export function getSnapshot(state) {
     overload: state.overload,
     overloadLimit: state.overloadLimit,
     collapseLimit: state.collapseLimit,
-    corruptedCount: getCorruptedCount(state),
+    infectedCount: getInfectedCount(state),
+    virusCount: getVirusCount(state),
+    explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
     revision: state.revision
   };
@@ -253,7 +330,9 @@ export function getRunSummary(state) {
     overload: state.overload,
     overloadLimit: state.overloadLimit,
     collapseLimit: state.collapseLimit,
-    corruptedCount: getCorruptedCount(state),
+    infectedCount: getInfectedCount(state),
+    virusCount: getVirusCount(state),
+    explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
     objectives: state.objectives.map((objective) => ({ ...objective })),
     lastAction: { ...state.lastAction },
@@ -263,6 +342,7 @@ export function getRunSummary(state) {
       activatedNodes: state.lastTurn.activatedNodes.slice(),
       corruptionNew: state.lastTurn.corruptionNew.slice(),
       cleansedNodes: state.lastTurn.cleansedNodes.slice(),
+      explodedNodes: state.lastTurn.explodedNodes.slice(),
       objectiveProgress: state.lastTurn.objectiveProgress.slice()
     },
     revision: state.revision
@@ -271,15 +351,15 @@ export function getRunSummary(state) {
 
 export function createObjectiveText(objective) {
   if (objective.type === OBJECTIVE_TYPES.POWER_CORE) {
-    return `Power core ${objective.nodeId} to ${objective.requiredCharge}`;
+    return `Charge core ${objective.nodeId} to ${objective.requiredCharge}`;
   }
 
   if (objective.type === OBJECTIVE_TYPES.ACTIVATE_ALL) {
-    return 'Activate all non-corrupted network nodes';
+    return 'Activate all non-virus nodes';
   }
 
   if (objective.type === OBJECTIVE_TYPES.CLEAN_CORRUPTION) {
-    return 'Clean all corrupted nodes';
+    return 'Clear all infection from the network';
   }
 
   return 'Unknown objective';

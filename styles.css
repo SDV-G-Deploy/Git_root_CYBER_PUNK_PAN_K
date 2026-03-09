@@ -384,3 +384,27 @@ body {
 #tutorialStartButton:hover {
   background: #163248;
 }
+
+.legend-item.power strong {
+  color: #4cd2ff;
+}
+
+.legend-item.relay strong {
+  color: #7ad46f;
+}
+
+.legend-item.firewall strong {
+  color: #ba9cff;
+}
+
+.legend-item.virus strong {
+  color: #ff5e7e;
+}
+
+.legend-item.overload strong {
+  color: #ffb06a;
+}
+
+.legend-item.core strong {
+  color: #ffd166;
+}

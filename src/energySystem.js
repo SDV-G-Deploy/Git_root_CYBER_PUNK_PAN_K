@@ -40,16 +40,25 @@ function hasQueue(state) {
   return state.queueHead < state.queue.length;
 }
 
-function normalizeNodeOnCorruption(node) {
+function infectNode(node) {
+  if (node.corrupted || node.exploded || node.baseType === NODE_TYPES.VIRUS) {
+    return false;
+  }
+
   node.corrupted = true;
-  node.type = NODE_TYPES.CORRUPTED;
-  node.emitPower = 0;
-  node.threshold = 99;
-  node.active = false;
+  node.corruptionProgress = CONFIG.TURN.CORRUPTION_THRESHOLD;
+  node.cleanseAccumulated = 0;
+
+  if (node.baseType === NODE_TYPES.FIREWALL) {
+    node.firewallOpen = false;
+  }
+
+  updateActiveState(node);
+  return true;
 }
 
 function tryCleanseNode(node, cleansedNodes) {
-  if (!node.corrupted) {
+  if (!node.corrupted || node.baseType === NODE_TYPES.VIRUS) {
     return;
   }
 
@@ -60,17 +69,35 @@ function tryCleanseNode(node, cleansedNodes) {
   node.corrupted = false;
   node.corruptionProgress = 0;
   node.cleanseAccumulated = 0;
+  cleansedNodes.push(node.id);
+}
 
-  if (node.baseType === NODE_TYPES.CORRUPTED) {
-    node.baseType = NODE_TYPES.RELAY;
-    node.threshold = CONFIG.TURN.RELAY_THRESHOLD;
-    node.emitPower = CONFIG.TURN.RELAY_EMIT_POWER;
-    node.type = NODE_TYPES.RELAY;
-  } else {
-    node.type = node.baseType;
+function explodeOverloadNode(state, node) {
+  if (!node || node.exploded) {
+    return false;
   }
 
-  cleansedNodes.push(node.id);
+  node.exploded = true;
+  node.corrupted = false;
+  node.charge = 0;
+  node.corruptionProgress = 0;
+  node.cleanseAccumulated = 0;
+  updateActiveState(node);
+
+  for (let i = 0; i < state.edges.length; i += 1) {
+    const edge = state.edges[i];
+    if (edge.from === node.id || edge.to === node.id) {
+      edge.enabled = false;
+      edge.baseEnabled = false;
+      edge.overloadedThisTurn = true;
+    }
+  }
+
+  state.overload += CONFIG.TURN.OVERLOAD_EXPLOSION_PENALTY;
+  state.lastTurn.overloadDelta += CONFIG.TURN.OVERLOAD_EXPLOSION_PENALTY;
+  state.lastTurn.explodedNodes.push(node.id);
+
+  return true;
 }
 
 function processPacket(state, packet, hooks) {
@@ -101,7 +128,33 @@ function processPacket(state, packet, hooks) {
 
   tryCleanseNode(node, state.lastTurn.cleansedNodes);
 
-  hooks.onPacketResolved(packet, accepted);
+  if (
+    node.baseType === NODE_TYPES.OVERLOAD &&
+    !node.exploded &&
+    node.throughputThisTurn > node.overloadThreshold
+  ) {
+    const exploded = explodeOverloadNode(state, node);
+    if (exploded) {
+      state.lastTurn.trace.push({
+        step: state.propagationSteps,
+        fromNodeId: node.id,
+        toNodeId: node.id,
+        edgeId: null,
+        energyIn: 0,
+        energyAccepted: 0,
+        detail: 'overload_explosion'
+      });
+
+      if (hooks.onNodeExploded) {
+        hooks.onNodeExploded(node);
+      }
+    }
+    return;
+  }
+
+  if (hooks.onPacketResolved) {
+    hooks.onPacketResolved(packet, accepted);
+  }
 
   if (!canEmit(node)) {
     return;
@@ -123,7 +176,9 @@ function processPacket(state, packet, hooks) {
       energy: emitted.energy
     });
 
-    hooks.onPacketEmitted(emitted);
+    if (hooks.onPacketEmitted) {
+      hooks.onPacketEmitted(emitted);
+    }
   }
 }
 
@@ -132,7 +187,8 @@ function spreadCorruption(state) {
 
   for (let i = 0; i < state.nodes.length; i += 1) {
     const source = state.nodes[i];
-    if (!source.corrupted) {
+    const canSpread = source.baseType === NODE_TYPES.VIRUS || source.corrupted;
+    if (!canSpread || source.exploded) {
       continue;
     }
 
@@ -141,16 +197,21 @@ function spreadCorruption(state) {
       continue;
     }
 
+    const spreadStep = source.baseType === NODE_TYPES.VIRUS
+      ? Math.max(1, source.spreadRate)
+      : CONFIG.TURN.VIRUS_SPREAD_PER_TURN;
+
     neighbors.forEach((neighborId) => {
       const node = getNodeById(state, neighborId);
-      if (!node || node.corrupted || node.baseType === NODE_TYPES.SOURCE) {
+      if (!node || node.exploded || node.baseType === NODE_TYPES.VIRUS || node.corrupted) {
         return;
       }
 
-      node.corruptionProgress += 1;
+      node.corruptionProgress += spreadStep;
       if (node.corruptionProgress >= CONFIG.TURN.CORRUPTION_THRESHOLD) {
-        normalizeNodeOnCorruption(node);
-        newlyCorrupted.push(node.id);
+        if (infectNode(node)) {
+          newlyCorrupted.push(node.id);
+        }
       }
     });
   }
@@ -175,6 +236,7 @@ export function prepareTurn(state) {
     overloadDelta: 0,
     corruptionNew: [],
     cleansedNodes: [],
+    explodedNodes: [],
     objectiveProgress: [],
     status: 'Resolving network propagation...'
   };
@@ -212,7 +274,7 @@ export function resolvePropagation(state, hooks) {
       continue;
     }
 
-    processPacket(state, packet, hooks);
+    processPacket(state, packet, hooks || {});
   }
 
   spreadCorruption(state);

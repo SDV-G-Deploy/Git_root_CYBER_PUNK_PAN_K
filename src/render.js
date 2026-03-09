@@ -1,33 +1,41 @@
 import { CONFIG, NODE_TYPES } from './config.js';
 import { clamp, lerp } from './physicsLite.js';
 
-function nodeColor(node) {
-  if (node.corrupted) {
-    return CONFIG.NODES.COLORS.corrupted;
+function getNodeColor(node) {
+  if (node.exploded) {
+    return CONFIG.NODES.COLORS.broken;
   }
 
-  if (!node.active && node.baseType !== NODE_TYPES.CORE) {
-    if (node.baseType === NODE_TYPES.SOURCE) {
-      return CONFIG.NODES.COLORS.source;
-    }
+  if (node.baseType === NODE_TYPES.VIRUS) {
+    return CONFIG.NODES.COLORS.virus;
+  }
 
+  if (node.corrupted) {
+    return CONFIG.NODES.COLORS.infected;
+  }
+
+  if (!node.active && node.baseType !== NODE_TYPES.CORE && node.baseType !== NODE_TYPES.POWER) {
     return CONFIG.NODES.COLORS.inactive;
   }
 
-  if (node.baseType === NODE_TYPES.SOURCE) {
-    return CONFIG.NODES.COLORS.source;
+  if (node.baseType === NODE_TYPES.POWER) {
+    return CONFIG.NODES.COLORS.power;
   }
 
   if (node.baseType === NODE_TYPES.RELAY) {
     return CONFIG.NODES.COLORS.relay;
   }
 
-  if (node.baseType === NODE_TYPES.CORE) {
-    return CONFIG.NODES.COLORS.core;
+  if (node.baseType === NODE_TYPES.FIREWALL) {
+    return CONFIG.NODES.COLORS.firewall;
   }
 
-  if (node.baseType === NODE_TYPES.SWITCH) {
-    return CONFIG.NODES.COLORS.switch;
+  if (node.baseType === NODE_TYPES.OVERLOAD) {
+    return CONFIG.NODES.COLORS.overload;
+  }
+
+  if (node.baseType === NODE_TYPES.CORE) {
+    return CONFIG.NODES.COLORS.core;
   }
 
   return CONFIG.NODES.COLORS.inactive;
@@ -42,11 +50,19 @@ function drawArena(ctx) {
   ctx.strokeRect(0, 0, CONFIG.ARENA.WIDTH, CONFIG.ARENA.HEIGHT);
 }
 
-function drawEdges(ctx, state) {
+function buildNodeMap(nodes) {
+  const map = new Map();
+  for (let i = 0; i < nodes.length; i += 1) {
+    map.set(nodes[i].id, nodes[i]);
+  }
+  return map;
+}
+
+function drawEdges(ctx, state, nodeMap) {
   for (let i = 0; i < state.edges.length; i += 1) {
     const edge = state.edges[i];
-    const from = state.nodes.find((node) => node.id === edge.from);
-    const to = state.nodes.find((node) => node.id === edge.to);
+    const from = nodeMap.get(edge.from);
+    const to = nodeMap.get(edge.to);
 
     if (!from || !to) {
       continue;
@@ -96,6 +112,31 @@ function drawEdges(ctx, state) {
   }
 }
 
+function drawNodeTypeTag(ctx, node) {
+  let tag = '';
+  if (node.baseType === NODE_TYPES.POWER) {
+    tag = 'P';
+  } else if (node.baseType === NODE_TYPES.RELAY) {
+    tag = 'R';
+  } else if (node.baseType === NODE_TYPES.FIREWALL) {
+    tag = 'F';
+  } else if (node.baseType === NODE_TYPES.VIRUS) {
+    tag = 'V';
+  } else if (node.baseType === NODE_TYPES.OVERLOAD) {
+    tag = 'O';
+  } else if (node.baseType === NODE_TYPES.CORE) {
+    tag = 'C';
+  }
+
+  if (!tag) {
+    return;
+  }
+
+  ctx.fillStyle = '#ecf7ff';
+  ctx.font = 'bold 10px monospace';
+  ctx.fillText(tag, node.x - node.radius + 8, node.y - node.radius + 9);
+}
+
 function drawNodes(ctx, state) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -105,7 +146,7 @@ function drawNodes(ctx, state) {
 
     ctx.beginPath();
     ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-    ctx.fillStyle = nodeColor(node);
+    ctx.fillStyle = getNodeColor(node);
     ctx.fill();
 
     ctx.lineWidth = node.active ? 3 : 2;
@@ -122,6 +163,8 @@ function drawNodes(ctx, state) {
       ctx.stroke();
     }
 
+    drawNodeTypeTag(ctx, node);
+
     ctx.font = 'bold 12px monospace';
     ctx.fillStyle = CONFIG.NODES.COLORS.label;
     ctx.fillText(node.id, node.x, node.y - 1);
@@ -135,20 +178,37 @@ function drawNodes(ctx, state) {
 
     ctx.fillText(chargeLabel, node.x, node.y + node.radius + 11);
 
-    if (node.baseType === NODE_TYPES.SWITCH && Array.isArray(node.switchModes) && node.switchModes.length > 0) {
-      const modeLabel = `M${node.activeMode + 1}/${node.switchModes.length}`;
+    if (node.baseType === NODE_TYPES.FIREWALL) {
+      const modeLabel = node.firewallOpen
+        ? Array.isArray(node.firewallModes) && node.firewallModes.length > 0
+          ? `OPEN M${node.activeMode + 1}`
+          : 'OPEN'
+        : 'LOCKED';
       ctx.fillStyle = '#dacbff';
       ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
     }
 
+    if (node.baseType === NODE_TYPES.OVERLOAD) {
+      const overloadLabel = node.exploded
+        ? 'BOOM'
+        : `TP ${node.throughputThisTurn}/${node.overloadThreshold}`;
+      ctx.fillStyle = node.exploded ? '#ffd6b8' : '#ffe1be';
+      ctx.fillText(overloadLabel, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.baseType === NODE_TYPES.VIRUS) {
+      ctx.fillStyle = '#ffb5c7';
+      ctx.fillText(`SPREAD +${node.spreadRate}`, node.x, node.y + node.radius + 24);
+    }
+
     if (node.corrupted) {
-      ctx.fillStyle = '#ff9ab2';
-      ctx.fillText(`V:${node.corruptionProgress}`, node.x, node.y + node.radius + 24);
+      ctx.fillStyle = '#ffb5c7';
+      ctx.fillText(`INF ${node.corruptionProgress}/${CONFIG.TURN.CORRUPTION_THRESHOLD}`, node.x, node.y + node.radius + 24);
     }
   }
 }
 
-function drawPackets(ctx, state) {
+function drawPackets(ctx, state, nodeMap) {
   const packets = state.effects.packets;
   if (!Array.isArray(packets) || packets.length === 0) {
     return;
@@ -156,8 +216,8 @@ function drawPackets(ctx, state) {
 
   for (let i = 0; i < packets.length; i += 1) {
     const packet = packets[i];
-    const from = state.nodes.find((node) => node.id === packet.fromNodeId);
-    const to = state.nodes.find((node) => node.id === packet.toNodeId);
+    const from = nodeMap.get(packet.fromNodeId);
+    const to = nodeMap.get(packet.toNodeId);
     if (!from || !to) {
       continue;
     }
@@ -188,9 +248,11 @@ export function renderState(ctx, state) {
     return;
   }
 
+  const nodeMap = buildNodeMap(state.nodes);
+
   drawArena(ctx);
-  drawEdges(ctx, state);
-  drawPackets(ctx, state);
+  drawEdges(ctx, state, nodeMap);
+  drawPackets(ctx, state, nodeMap);
   drawNodes(ctx, state);
   drawFlash(ctx, state);
 }

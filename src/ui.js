@@ -131,7 +131,7 @@ export function createUI(documentRef) {
         refs.nextButton.disabled = false;
       }
       setText(textCache, 'outcome-text', refs.outcomeText, 'Operation in progress');
-      setText(textCache, 'outcome-reason', refs.outcomeReason, 'Stabilize the district network.');
+      setText(textCache, 'outcome-reason', refs.outcomeReason, 'Charge the core before the network collapses.');
       return;
     }
 
@@ -203,7 +203,7 @@ export function createUI(documentRef) {
     } else {
       const row = documentRef.createElement('li');
       row.className = 'chain-log-empty';
-      row.textContent = 'No propagation yet. Click a source or switch node.';
+      row.textContent = 'No propagation yet. Click a Power or Firewall node.';
       refs.chainLogList.appendChild(row);
     }
   }
@@ -216,9 +216,9 @@ export function createUI(documentRef) {
       setText(textCache, 'hud-level', refs.levelLabel, `Level: ${snapshot.levelId} - ${snapshot.levelName}`);
       setText(
         textCache,
-        'hud-corruption',
+        'hud-infected',
         refs.chainStatusLabel,
-        `Corrupted: ${snapshot.corruptedCount}/${snapshot.collapseLimit}`
+        `Infected: ${snapshot.infectedCount}/${snapshot.collapseLimit} | Virus: ${snapshot.virusCount}`
       );
 
       if (refs.levelSelect) {
@@ -240,7 +240,7 @@ export function createUI(documentRef) {
         textCache,
         'summary-metrics',
         refs.summaryAccuracy,
-        `Moves used: ${summary.movesUsed}/${summary.movesLimit}, overload ${summary.overload}/${summary.overloadLimit}`
+        `Moves: ${summary.movesUsed}/${summary.movesLimit} | Overload: ${summary.overload}/${summary.overloadLimit} | Exploded: ${summary.explodedCount}`
       );
 
       syncOutcome(summary);

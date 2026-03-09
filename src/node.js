@@ -2,18 +2,29 @@ import { CONFIG, NODE_TYPES } from './config.js';
 import { clamp } from './physicsLite.js';
 
 export function isClickableNode(node) {
-  return node && (node.baseType === NODE_TYPES.SOURCE || node.baseType === NODE_TYPES.SWITCH);
+  return node && (node.baseType === NODE_TYPES.POWER || node.baseType === NODE_TYPES.FIREWALL);
 }
 
 export function beginTurnForNode(node) {
   node.emittedThisTurn = false;
   node.receivedThisTurn = 0;
   node.cleanseAccumulated = 0;
+  node.throughputThisTurn = 0;
 }
 
 export function updateActiveState(node) {
+  if (node.exploded) {
+    node.active = false;
+    return;
+  }
+
   if (node.baseType === NODE_TYPES.CORE) {
     node.active = node.charge > 0;
+    return;
+  }
+
+  if (node.baseType === NODE_TYPES.VIRUS) {
+    node.active = true;
     return;
   }
 
@@ -22,44 +33,81 @@ export function updateActiveState(node) {
     return;
   }
 
-  if (node.baseType === NODE_TYPES.SOURCE) {
+  if (node.baseType === NODE_TYPES.POWER) {
     node.active = true;
+    return;
+  }
+
+  if (node.baseType === NODE_TYPES.FIREWALL) {
+    node.active = node.firewallOpen && node.charge >= node.threshold;
     return;
   }
 
   node.active = node.charge >= node.threshold;
 }
 
-export function applySwitchMode(state, switchNode) {
-  if (!switchNode || !Array.isArray(switchNode.switchModes) || switchNode.switchModes.length === 0) {
+export function applyFirewallMode(state, firewallNode) {
+  if (!firewallNode || firewallNode.baseType !== NODE_TYPES.FIREWALL) {
     return;
   }
 
-  const modeIndex = clamp(switchNode.activeMode, 0, switchNode.switchModes.length - 1);
-  switchNode.activeMode = modeIndex;
+  const outgoing = state.outgoingByNode.get(firewallNode.id) || [];
+  if (outgoing.length === 0) {
+    return;
+  }
 
-  const allowed = new Set(switchNode.switchModes[modeIndex]);
+  if (!firewallNode.firewallOpen) {
+    for (let i = 0; i < outgoing.length; i += 1) {
+      const edge = state.edges[outgoing[i]];
+      edge.enabled = false;
+    }
+    return;
+  }
 
-  const outgoing = state.outgoingByNode.get(switchNode.id) || [];
+  const hasModes = Array.isArray(firewallNode.firewallModes) && firewallNode.firewallModes.length > 0;
+  const activeMode = hasModes
+    ? clamp(firewallNode.activeMode, 0, firewallNode.firewallModes.length - 1)
+    : 0;
+
+  firewallNode.activeMode = activeMode;
+  const allowedSet = hasModes ? new Set(firewallNode.firewallModes[activeMode]) : null;
+
   for (let i = 0; i < outgoing.length; i += 1) {
     const edge = state.edges[outgoing[i]];
-    edge.enabled = allowed.has(edge.id);
+    if (!edge.baseEnabled) {
+      edge.enabled = false;
+      continue;
+    }
+
+    edge.enabled = hasModes ? allowedSet.has(edge.id) : true;
   }
 }
 
-export function toggleSwitchMode(state, switchNode) {
-  if (!switchNode || !Array.isArray(switchNode.switchModes) || switchNode.switchModes.length === 0) {
+export function toggleFirewallMode(state, firewallNode) {
+  if (!firewallNode || firewallNode.baseType !== NODE_TYPES.FIREWALL) {
     return false;
   }
 
-  switchNode.activeMode = (switchNode.activeMode + 1) % switchNode.switchModes.length;
-  applySwitchMode(state, switchNode);
+  const hasModes = Array.isArray(firewallNode.firewallModes) && firewallNode.firewallModes.length > 0;
+
+  if (!firewallNode.firewallOpen) {
+    firewallNode.firewallOpen = true;
+    if (hasModes) {
+      firewallNode.activeMode = clamp(firewallNode.activeMode, 0, firewallNode.firewallModes.length - 1);
+    }
+  } else if (hasModes && firewallNode.firewallModes.length > 1) {
+    firewallNode.activeMode = (firewallNode.activeMode + 1) % firewallNode.firewallModes.length;
+  } else {
+    firewallNode.firewallOpen = false;
+  }
+
+  applyFirewallMode(state, firewallNode);
   return true;
 }
 
 export function receiveEnergy(node, energy) {
   const incoming = Math.max(0, energy);
-  if (incoming <= 0) {
+  if (incoming <= 0 || node.exploded) {
     return 0;
   }
 
@@ -74,7 +122,12 @@ export function receiveEnergy(node, energy) {
   const before = node.charge;
   node.charge = Math.min(node.maxCharge, node.charge + effective);
   const accepted = Math.max(0, node.charge - before);
+
   node.receivedThisTurn += accepted;
+
+  if (node.baseType === NODE_TYPES.OVERLOAD) {
+    node.throughputThisTurn += accepted;
+  }
 
   if (node.corrupted) {
     node.cleanseAccumulated += accepted;
@@ -84,16 +137,20 @@ export function receiveEnergy(node, energy) {
 }
 
 export function canEmit(node) {
-  if (node.emittedThisTurn) {
+  if (node.emittedThisTurn || node.exploded) {
     return false;
   }
 
-  if (node.corrupted || node.baseType === NODE_TYPES.CORE) {
+  if (node.corrupted || node.baseType === NODE_TYPES.CORE || node.baseType === NODE_TYPES.VIRUS) {
     return false;
   }
 
-  if (node.baseType === NODE_TYPES.SOURCE) {
+  if (node.baseType === NODE_TYPES.POWER) {
     return true;
+  }
+
+  if (node.baseType === NODE_TYPES.FIREWALL && !node.firewallOpen) {
+    return false;
   }
 
   return node.charge >= node.threshold;
@@ -108,7 +165,7 @@ export function emitPackets(state, node) {
     const edge = state.edges[outgoing[i]];
     edge.overloadedThisTurn = false;
 
-    if (!edge.enabled) {
+    if (!edge.enabled || node.exploded) {
       continue;
     }
 
@@ -144,7 +201,12 @@ export function emitPackets(state, node) {
 }
 
 export function applyDecay(node) {
-  if (node.baseType === NODE_TYPES.CORE || node.baseType === NODE_TYPES.SOURCE) {
+  if (
+    node.baseType === NODE_TYPES.CORE ||
+    node.baseType === NODE_TYPES.POWER ||
+    node.baseType === NODE_TYPES.VIRUS ||
+    node.exploded
+  ) {
     return;
   }
 

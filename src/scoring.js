@@ -1,5 +1,5 @@
-import { OBJECTIVE_TYPES } from './config.js';
-import { createObjectiveText, getCorruptedCount, getNodeById } from './gameState.js';
+import { NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
+import { createObjectiveText, getInfectedCount, getNodeById } from './gameState.js';
 
 function evaluatePowerCore(state, objective) {
   const node = getNodeById(state, objective.nodeId);
@@ -13,15 +13,11 @@ function evaluatePowerCore(state, objective) {
 function evaluateActivateAll(state) {
   for (let i = 0; i < state.nodes.length; i += 1) {
     const node = state.nodes[i];
-    if (node.baseType === 'core') {
+    if (node.baseType === NODE_TYPES.CORE || node.baseType === NODE_TYPES.VIRUS) {
       continue;
     }
 
-    if (node.corrupted) {
-      continue;
-    }
-
-    if (!node.active) {
+    if (node.exploded || node.corrupted || !node.active) {
       return false;
     }
   }
@@ -30,7 +26,7 @@ function evaluateActivateAll(state) {
 }
 
 function evaluateCleanCorruption(state) {
-  return getCorruptedCount(state) === 0;
+  return getInfectedCount(state) === 0;
 }
 
 export function evaluateObjectives(state) {
@@ -78,7 +74,7 @@ export function evaluateLoseCondition(state) {
     };
   }
 
-  if (getCorruptedCount(state) >= state.collapseLimit) {
+  if (getInfectedCount(state) >= state.collapseLimit) {
     return {
       lose: true,
       reason: 'network_collapse'
@@ -100,19 +96,23 @@ export function evaluateLoseCondition(state) {
 
 export function makeOutcomeStatus(result, reason) {
   if (result === 'win') {
-    return 'Protocol stabilized. District secure.';
+    return 'Protocol stabilized. Core is online.';
   }
 
   if (reason === 'energy_overload') {
-    return 'Failure: energy overload reached critical threshold.';
+    return 'Failure: overload reached critical threshold.';
   }
 
   if (reason === 'network_collapse') {
-    return 'Failure: corruption collapse across the network.';
+    return 'Failure: infection collapsed the district network.';
   }
 
   if (reason === 'out_of_moves') {
-    return 'Failure: operation budget exhausted.';
+    return 'Failure: move budget exhausted.';
+  }
+
+  if (reason === 'simulation_overflow') {
+    return 'Failure: propagation overflow safeguard triggered.';
   }
 
   return 'Operation in progress.';

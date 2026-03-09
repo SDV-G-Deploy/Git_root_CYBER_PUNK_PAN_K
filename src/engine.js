@@ -2,6 +2,7 @@ import { CONFIG, NODE_TYPES } from './config.js';
 import {
   bumpRevision,
   createState,
+  getInfectedCount,
   getNodeById,
   getRunSummary,
   getSnapshot
@@ -9,7 +10,7 @@ import {
 import { clampLevelIndex, loadLevels } from './levels.js';
 import { createTelemetryStore } from './telemetry.js';
 import { findClosestNode, updatePackets } from './physicsLite.js';
-import { applySwitchMode, isClickableNode, toggleSwitchMode, updateActiveState } from './node.js';
+import { applyFirewallMode, isClickableNode, toggleFirewallMode, updateActiveState } from './node.js';
 import { evaluateLoseCondition, evaluateObjectives, makeOutcomeStatus } from './scoring.js';
 import { prepareTurn, resolvePropagation, seedActionPacket } from './energySystem.js';
 import { renderState } from './render.js';
@@ -22,14 +23,16 @@ function buildRewardPacket(state) {
   const base = state.result === 'win' ? 40 : 10;
   const efficiency = Math.max(0, state.movesLimit - state.movesUsed);
   const controlBonus = Math.max(0, state.overloadLimit - state.overload);
+  const infectionPenalty = getInfectedCount(state);
 
   return {
-    credits: base + efficiency * 4,
+    credits: Math.max(0, base + efficiency * 4 - infectionPenalty * 2),
     tech_parts: state.result === 'win' ? 2 + Math.floor(controlBonus / 2) : 1,
     tech_module_chance: Number(Math.min(0.75, 0.1 + controlBonus * 0.03).toFixed(2)),
     performance_tags: [
       state.result === 'win' ? 'protocol_stable' : 'protocol_failed',
-      controlBonus >= 3 ? 'low_overload' : 'high_overload'
+      controlBonus >= 3 ? 'low_overload' : 'high_overload',
+      infectionPenalty === 0 ? 'clean_network' : 'infected_network'
     ]
   };
 }
@@ -45,7 +48,7 @@ function makeLastShotReport(state) {
     scoreGain: 0,
     chainSteps: state.lastTurn.trace.length,
     chainDepth: 0,
-    pointsMissing: Math.max(0, state.objectives.filter((o) => !o.done).length),
+    pointsMissing: Math.max(0, state.objectives.filter((objective) => !objective.done).length),
     resolution: state.result
   };
 }
@@ -87,11 +90,11 @@ export function createChainLabEngine() {
     }
   }
 
-  function initializeSwitches(state) {
+  function initializeFirewalls(state) {
     for (let i = 0; i < state.nodes.length; i += 1) {
       const node = state.nodes[i];
-      if (node.baseType === NODE_TYPES.SWITCH) {
-        applySwitchMode(state, node);
+      if (node.baseType === NODE_TYPES.FIREWALL) {
+        applyFirewallMode(state, node);
       }
     }
   }
@@ -130,7 +133,8 @@ export function createChainLabEngine() {
       reason,
       movesUsed: state.movesUsed,
       overload: state.overload,
-      corruptedCount: state.nodes.filter((node) => node.corrupted).length
+      infectedCount: getInfectedCount(state),
+      explodedCount: state.nodes.filter((node) => node.exploded).length
     });
 
     emitTelemetry('reward_generated', {
@@ -240,12 +244,12 @@ export function createChainLabEngine() {
 
     let injectPower = 0;
 
-    if (node.baseType === NODE_TYPES.SOURCE) {
+    if (node.baseType === NODE_TYPES.POWER) {
       injectPower = node.injectPower;
     }
 
-    if (node.baseType === NODE_TYPES.SWITCH) {
-      const toggled = toggleSwitchMode(state, node);
+    if (node.baseType === NODE_TYPES.FIREWALL) {
+      const toggled = toggleFirewallMode(state, node);
       if (toggled) {
         state.lastTurn.trace.push({
           step: 0,
@@ -254,11 +258,13 @@ export function createChainLabEngine() {
           edgeId: null,
           energyIn: 0,
           energyAccepted: 0,
-          detail: `switch_mode_${node.activeMode + 1}`
+          detail: node.firewallOpen
+            ? `firewall_open_m${node.activeMode + 1}`
+            : 'firewall_closed'
         });
       }
 
-      if (node.injectOnClick) {
+      if (node.injectOnClick && node.firewallOpen) {
         injectPower = node.injectPower;
       }
     }
@@ -290,6 +296,13 @@ export function createChainLabEngine() {
       },
       onPacketEmitted: (packet) => {
         pushPacketVisual(packet.fromNodeId, packet.toNodeId, packet.energy);
+      },
+      onNodeExploded: (explodedNode) => {
+        emitTelemetry('node_exploded', {
+          levelId: state.levelId,
+          turnIndex: state.turnIndex,
+          nodeId: explodedNode.id
+        });
       }
     });
 
@@ -300,8 +313,9 @@ export function createChainLabEngine() {
       turnIndex: state.turnIndex,
       overload: state.overload,
       overflow: propagation.overflow,
-      corruptionNew: state.lastTurn.corruptionNew.slice(),
-      cleansedNodes: state.lastTurn.cleansedNodes.slice()
+      infectionNew: state.lastTurn.corruptionNew.slice(),
+      cleansedNodes: state.lastTurn.cleansedNodes.slice(),
+      explodedNodes: state.lastTurn.explodedNodes.slice()
     });
 
     checkWinLoseAfterTurn(state, propagation.overflow);
@@ -315,7 +329,7 @@ export function createChainLabEngine() {
     const level = getCurrentLevel();
     runtime.state = createState(level, runtime.levelIndex, runtime.levels.length);
 
-    initializeSwitches(runtime.state);
+    initializeFirewalls(runtime.state);
     refreshAllNodeActivity(runtime.state);
     updateObjectiveState(runtime.state);
 
@@ -325,7 +339,8 @@ export function createChainLabEngine() {
       levelIndex: runtime.state.levelIndex,
       movesLimit: runtime.state.movesLimit,
       overloadLimit: runtime.state.overloadLimit,
-      collapseLimit: runtime.state.collapseLimit
+      collapseLimit: runtime.state.collapseLimit,
+      virusCount: runtime.state.nodes.filter((node) => node.baseType === NODE_TYPES.VIRUS).length
     });
 
     bump();
@@ -495,12 +510,14 @@ export function createChainLabEngine() {
 
   function getLastShotReport() {
     const state = getState();
-    return state ? makeLastShotReport(state) : makeLastShotReport({
-      lastAction: { valid: false, nodeId: null, reason: 'idle' },
-      lastTurn: { trace: [] },
-      result: 'in_progress',
-      objectives: []
-    });
+    return state
+      ? makeLastShotReport(state)
+      : makeLastShotReport({
+        lastAction: { valid: false, nodeId: null, reason: 'idle' },
+        lastTurn: { trace: [] },
+        result: 'in_progress',
+        objectives: []
+      });
   }
 
   function setModifiers(modifiers) {
