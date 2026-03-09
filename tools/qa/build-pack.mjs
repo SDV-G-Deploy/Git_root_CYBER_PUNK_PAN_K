@@ -144,6 +144,7 @@ const report = {
   packStructure: pack.packStructure,
   slotAssignments: formatSlotAssignments(pack.acceptedEntries),
   unfilledSlots: pack.unfilledSlots,
+  slotDiagnostics: pack.slotDiagnostics || [],
   telemetryCalibration: telemetry ? {
     summary: telemetry.report.summary,
     solverBucketCalibration: telemetry.report.solverBucketCalibration
@@ -180,6 +181,20 @@ if (report.unfilledSlots.length > 0) {
   for (let index = 0; index < report.unfilledSlots.length; index += 1) {
     const slot = report.unfilledSlots[index];
     console.log(`- #${slot.slotIndex} ${slot.role}: ${slot.reason}`);
+
+    const failureCounts = slot.constraintSummary && slot.constraintSummary.failureCounts
+      ? slot.constraintSummary.failureCounts
+      : {};
+    const sortedReasons = Object.entries(failureCounts)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 3);
+
+    if (sortedReasons.length > 0) {
+      for (let reasonIndex = 0; reasonIndex < sortedReasons.length; reasonIndex += 1) {
+        const [reason, count] = sortedReasons[reasonIndex];
+        console.log(`  * ${reason}: ${count}`);
+      }
+    }
   }
 }
 if (telemetry) {

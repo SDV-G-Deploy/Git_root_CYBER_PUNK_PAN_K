@@ -73,6 +73,8 @@ function buildRunMap(records) {
         levelId: payload.levelId || null,
         startAt: null,
         endAt: null,
+        hasStart: false,
+        hasEnd: false,
         result: null,
         reason: null,
         movesUsed: null,
@@ -89,12 +91,14 @@ function buildRunMap(records) {
     }
 
     if (entry.eventType === 'run_start') {
+      run.hasStart = true;
       if (Number.isFinite(Number(entry.timestamp))) {
         run.startAt = Number(entry.timestamp);
       }
     }
 
     if (entry.eventType === 'run_end') {
+      run.hasEnd = true;
       if (Number.isFinite(Number(entry.timestamp))) {
         run.endAt = Number(entry.timestamp);
       }
@@ -120,9 +124,13 @@ function createEmptyLevelStats(level, solverResult) {
     levelName: level.name,
     solverDifficulty: solverResult?.difficultyEstimate || 'unknown',
     optimalMoves,
+    startedRuns: 0,
     attempts: 0,
+    closedRuns: 0,
+    openRuns: 0,
     wins: 0,
     fails: 0,
+    abandons: 0,
     retries: 0,
     totalSolveTime: 0,
     solvedRuns: 0,
@@ -131,6 +139,7 @@ function createEmptyLevelStats(level, solverResult) {
     avgSolveTime: null,
     retryRate: 0,
     failRate: 0,
+    abandonRate: 0,
     avgMovesOverOptimal: null,
     actualDifficultyScore: null,
     actualDifficultyClass: 'unknown'
@@ -156,6 +165,10 @@ export function buildTelemetryDifficultyReport(records, options) {
 
   const runs = buildRunMap(records);
   let totalRetries = 0;
+  let totalStartedRuns = 0;
+  let totalClosedRuns = 0;
+  let totalOpenRuns = 0;
+  let totalAbandons = 0;
 
   for (const run of runs.values()) {
     const levelId = run.levelId;
@@ -164,7 +177,21 @@ export function buildTelemetryDifficultyReport(records, options) {
     }
 
     const stats = levelStats.get(levelId);
+    if (run.hasStart) {
+      stats.startedRuns += 1;
+      totalStartedRuns += 1;
+    }
+
+    if (!run.hasEnd) {
+      stats.openRuns += 1;
+      totalOpenRuns += 1;
+      continue;
+    }
+
     stats.attempts += 1;
+    stats.closedRuns += 1;
+    totalClosedRuns += 1;
+
     stats.retries += run.retryCount;
     totalRetries += run.retryCount;
 
@@ -176,6 +203,9 @@ export function buildTelemetryDifficultyReport(records, options) {
       }
     } else if (run.result === 'lose') {
       stats.fails += 1;
+    } else if (run.result === 'abandoned') {
+      stats.abandons += 1;
+      totalAbandons += 1;
     }
 
     if (Number.isFinite(run.movesUsed) && Number.isFinite(stats.optimalMoves)) {
@@ -199,6 +229,7 @@ export function buildTelemetryDifficultyReport(records, options) {
     stats.avgSolveTime = stats.solvedRuns > 0 ? roundNumber(stats.totalSolveTime / stats.solvedRuns, 2) : null;
     stats.retryRate = stats.attempts > 0 ? roundNumber(stats.retries / stats.attempts, 4) : 0;
     stats.failRate = stats.attempts > 0 ? roundNumber(stats.fails / stats.attempts, 4) : 0;
+    stats.abandonRate = stats.attempts > 0 ? roundNumber(stats.abandons / stats.attempts, 4) : 0;
     stats.avgMovesOverOptimal = stats.moveSamples > 0 ? roundNumber(stats.totalMovesOverOptimal / stats.moveSamples, 2) : null;
     stats.actualDifficultyScore = computeActualDifficultyScore(stats, options?.scoreModel);
     stats.actualDifficultyClass = classifyActualDifficultyScore(stats.actualDifficultyScore);
@@ -233,6 +264,9 @@ export function buildTelemetryDifficultyReport(records, options) {
   const averageRetryRate = observedAttempts > 0
     ? roundNumber(perLevel.reduce((sum, entry) => sum + entry.retries, 0) / observedAttempts, 4)
     : 0;
+  const averageAbandonRate = observedAttempts > 0
+    ? roundNumber(perLevel.reduce((sum, entry) => sum + entry.abandons, 0) / observedAttempts, 4)
+    : 0;
 
   const classifiedTotal = ACTUAL_DIFFICULTY_BUCKETS.reduce((sum, bucket) => sum + (difficultyDistribution[bucket] || 0), 0);
   const normalizedActualDifficultyDistribution = classifiedTotal > 0
@@ -251,9 +285,15 @@ export function buildTelemetryDifficultyReport(records, options) {
 
   const summary = {
     levelsObserved: levels.length,
+    startedRunsObserved: totalStartedRuns,
+    closedRunsObserved: totalClosedRuns,
+    openRunsObserved: totalOpenRuns,
     attemptsObserved: observedAttempts,
     retriesObserved: totalRetries,
+    abandonsObserved: totalAbandons,
+    closedRunRate: totalStartedRuns > 0 ? roundNumber(totalClosedRuns / totalStartedRuns, 4) : 0,
     avgRetryRate: averageRetryRate,
+    avgAbandonRate: averageAbandonRate,
     actualDifficultyDistribution: difficultyDistribution,
     normalizedActualDifficultyDistribution
   };

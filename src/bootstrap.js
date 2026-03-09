@@ -1,4 +1,4 @@
-﻿import legacyChainLabApi from './adapters/legacyChainLabApi.js';
+import legacyChainLabApi from './adapters/legacyChainLabApi.js';
 import { createAudioController } from './audio.js';
 import { createInputController } from './input.js';
 import {
@@ -65,7 +65,8 @@ function buildTelemetryReport(records, levelList) {
     perLevel.set(levelList[i].id, {
       attempts: 0,
       wins: 0,
-      losses: 0
+      losses: 0,
+      abandons: 0
     });
   }
 
@@ -83,6 +84,8 @@ function buildTelemetryReport(records, levelList) {
         levelId: payload.levelId || null,
         startAt: null,
         endAt: null,
+        hasStart: false,
+        hasEnd: false,
         result: null,
         reason: null
       });
@@ -92,26 +95,30 @@ function buildTelemetryReport(records, levelList) {
 
     if (entry.eventType === 'run_start') {
       run.startAt = entry.timestamp;
+      run.hasStart = true;
       run.levelId = payload.levelId || run.levelId;
     }
 
     if (entry.eventType === 'run_end') {
       run.endAt = entry.timestamp;
+      run.hasEnd = true;
       run.result = payload.result || null;
       run.reason = payload.reason || null;
       run.levelId = payload.levelId || run.levelId;
 
       if (run.levelId) {
         if (!perLevel.has(run.levelId)) {
-          perLevel.set(run.levelId, { attempts: 0, wins: 0, losses: 0 });
+          perLevel.set(run.levelId, { attempts: 0, wins: 0, losses: 0, abandons: 0 });
         }
 
         const stats = perLevel.get(run.levelId);
         stats.attempts += 1;
         if (run.result === 'win') {
           stats.wins += 1;
-        } else {
+        } else if (run.result === 'lose') {
           stats.losses += 1;
+        } else if (run.result === 'abandoned') {
+          stats.abandons += 1;
         }
       }
     }
@@ -122,15 +129,25 @@ function buildTelemetryReport(records, levelList) {
   }
 
   const runList = Array.from(runs.values());
-  const closedRuns = runList.filter((run) => Number.isFinite(run.startAt) && Number.isFinite(run.endAt));
-  const totalDuration = closedRuns.reduce((acc, run) => acc + Math.max(0, (run.endAt - run.startAt) / 1000), 0);
-  const avgSession = closedRuns.length > 0 ? totalDuration / closedRuns.length : 0;
-  const retryRate = runList.length > 0 ? retries / runList.length : 0;
+  const closedRuns = runList.filter((run) => run.hasEnd);
+  const openRuns = runList.length - closedRuns.length;
+  const abandonedRuns = closedRuns.filter((run) => run.result === 'abandoned').length;
+
+  const timedRuns = closedRuns.filter((run) => Number.isFinite(run.startAt) && Number.isFinite(run.endAt));
+  const totalDuration = timedRuns.reduce((acc, run) => acc + Math.max(0, (run.endAt - run.startAt) / 1000), 0);
+  const avgSession = timedRuns.length > 0 ? totalDuration / timedRuns.length : 0;
+
+  const retryRate = closedRuns.length > 0 ? retries / closedRuns.length : 0;
+  const abandonRate = closedRuns.length > 0 ? abandonedRuns / closedRuns.length : 0;
+  const closedRunRate = runList.length > 0 ? closedRuns.length / runList.length : 0;
 
   const lines = [];
   lines.push('Telemetry Report (Signal Grid)');
   lines.push('');
   lines.push(`Runs observed: ${runList.length}`);
+  lines.push(`Closed run rate: ${(closedRunRate * 100).toFixed(1)}% (${closedRuns.length}/${runList.length})`);
+  lines.push(`Open runs: ${openRuns}`);
+  lines.push(`Abandon rate: ${(abandonRate * 100).toFixed(1)}% (${abandonedRuns} abandoned runs)`);
   lines.push(`Avg session length: ${formatSeconds(avgSession)}`);
   lines.push(`Retry rate: ${(retryRate * 100).toFixed(1)}% (${retries} retries)`);
   lines.push('');
@@ -139,9 +156,11 @@ function buildTelemetryReport(records, levelList) {
   const ids = levelList.map((level) => level.id);
   for (let i = 0; i < ids.length; i += 1) {
     const id = ids[i];
-    const stats = perLevel.get(id) || { attempts: 0, wins: 0, losses: 0 };
+    const stats = perLevel.get(id) || { attempts: 0, wins: 0, losses: 0, abandons: 0 };
     const completion = stats.attempts > 0 ? (stats.wins / stats.attempts) * 100 : 0;
-    lines.push(`- ${id}: attempts=${stats.attempts}, wins=${stats.wins}, completion=${completion.toFixed(1)}%`);
+    lines.push(
+      `- ${id}: attempts=${stats.attempts}, wins=${stats.wins}, losses=${stats.losses}, abandons=${stats.abandons}, completion=${completion.toFixed(1)}%`
+    );
   }
 
   lines.push('');
@@ -169,7 +188,6 @@ function buildTelemetryReport(records, levelList) {
 
   return lines.join('\n');
 }
-
 function bootstrap() {
   const game = legacyChainLabApi;
   const ui = createUI(document);

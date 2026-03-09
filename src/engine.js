@@ -1,4 +1,4 @@
-﻿import { CONFIG, NODE_TYPES } from './config.js';
+import { CONFIG, NODE_TYPES } from './config.js';
 import {
   bumpRevision,
   createState,
@@ -26,6 +26,10 @@ function onRunEndStub() {
 
 function onUxEventStub() {
   return null;
+}
+
+function isRunResultFinal(result) {
+  return result === 'win' || result === 'lose' || result === 'abandoned';
 }
 
 function buildRewardPacket(state) {
@@ -219,7 +223,7 @@ export function createChainLabEngine() {
 
   function finalizeRun(result, reason) {
     const state = getState();
-    if (!state || state.ended) {
+    if (!state || state.ended || isRunResultFinal(state.result)) {
       return;
     }
 
@@ -255,6 +259,36 @@ export function createChainLabEngine() {
     } catch (error) {
       // callback errors should not break game
     }
+  }
+
+  function closeActiveRunIfOpen(reason) {
+    const state = getState();
+    if (!state || state.ended || isRunResultFinal(state.result)) {
+      return false;
+    }
+
+    state.ended = true;
+    state.result = 'abandoned';
+    state.phase = 'end';
+    state.lastTurn.status = makeOutcomeStatus('abandoned', reason);
+    updateScoreState(state);
+    bump();
+
+    emitTelemetry('run_end', {
+      levelId: state.levelId,
+      result: 'abandoned',
+      reason: reason || 'abandoned_transition',
+      movesUsed: state.movesUsed,
+      overload: state.overload,
+      infectedCount: getInfectedCount(state),
+      explodedCount: state.nodes.filter((node) => node.exploded).length,
+      totalScore: state.totalScore,
+      rank: state.rank,
+      objectivesCompleted: state.objectivesCompleted,
+      objectivesTotal: state.objectivesTotal
+    });
+
+    return true;
   }
 
   function checkWinLoseAfterTurn(state, overflow) {
@@ -434,7 +468,11 @@ export function createChainLabEngine() {
     return true;
   }
 
-  function startLevel(levelIndex) {
+  function startLevel(levelIndex, transitionReason) {
+    if (transitionReason) {
+      closeActiveRunIfOpen(transitionReason);
+    }
+
     runtime.levelIndex = clampLevelIndex(levelIndex, runtime.levels);
     const level = getCurrentLevel();
     runtime.state = createState(level, runtime.levelIndex, runtime.levels.length);
@@ -554,14 +592,14 @@ export function createChainLabEngine() {
         activateNode(command.nodeId);
         break;
       case 'reset_level':
-        startLevel(runtime.levelIndex);
+        startLevel(runtime.levelIndex, 'abandoned_retry');
         break;
       case 'set_level':
-        startLevel(command.levelIndex);
+        startLevel(command.levelIndex, 'abandoned_level_switch');
         break;
       case 'next_level':
         if (runtime.levelIndex < runtime.levels.length - 1) {
-          startLevel(runtime.levelIndex + 1);
+          startLevel(runtime.levelIndex + 1, 'abandoned_level_switch');
         }
         break;
       default:
@@ -607,11 +645,11 @@ export function createChainLabEngine() {
   }
 
   function resetLevel() {
-    return startLevel(runtime.levelIndex);
+    return startLevel(runtime.levelIndex, 'abandoned_retry');
   }
 
   function setLevel(levelIndex) {
-    return startLevel(levelIndex);
+    return startLevel(levelIndex, 'abandoned_level_switch');
   }
 
   function nextLevel() {
@@ -619,7 +657,7 @@ export function createChainLabEngine() {
       return false;
     }
 
-    startLevel(runtime.levelIndex + 1);
+    startLevel(runtime.levelIndex + 1, 'abandoned_level_switch');
     return true;
   }
 

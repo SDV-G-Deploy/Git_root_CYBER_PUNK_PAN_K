@@ -1,4 +1,4 @@
-﻿import { CONFIG, PLAYTEST_MODE_KEY, TUTORIAL_SEEN_KEY } from './config.js';
+import { CONFIG, PLAYTEST_MODE_KEY, TUTORIAL_SEEN_KEY } from './config.js';
 
 const RANK_ORDER = {
   failed: 0,
@@ -191,6 +191,25 @@ function getHigherRank(left, right) {
   return rightOrder > leftOrder ? right : left;
 }
 
+function pickBestLowerValue(previousValue, incomingValue) {
+  const hasPrevious = Number.isFinite(previousValue);
+  const hasIncoming = Number.isFinite(incomingValue);
+
+  if (hasPrevious && hasIncoming) {
+    return Math.min(previousValue, incomingValue);
+  }
+
+  if (hasPrevious) {
+    return previousValue;
+  }
+
+  if (hasIncoming) {
+    return incomingValue;
+  }
+
+  return null;
+}
+
 export function applyRunSummaryToSave(saveData, summary, levelCount) {
   const next = sanitizeSaveData(saveData);
   if (!summary || summary.result !== 'win') {
@@ -221,12 +240,8 @@ export function applyRunSummaryToSave(saveData, summary, levelCount) {
   next.bestResultsByLevel[summary.levelId] = {
     bestScore: previous ? Math.max(previous.bestScore, incomingScore) : incomingScore,
     bestRank: previous ? getHigherRank(previous.bestRank, summary.rank) : summary.rank,
-    bestMovesUsed: previous && Number.isFinite(previous.bestMovesUsed)
-      ? Math.min(previous.bestMovesUsed, incomingMovesUsed)
-      : incomingMovesUsed,
-    lowestOverload: previous && Number.isFinite(previous.lowestOverload)
-      ? Math.min(previous.lowestOverload, incomingOverload)
-      : incomingOverload,
+    bestMovesUsed: pickBestLowerValue(previous ? previous.bestMovesUsed : null, incomingMovesUsed),
+    lowestOverload: pickBestLowerValue(previous ? previous.lowestOverload : null, incomingOverload),
     lastCompletedAt: Date.now()
   };
 

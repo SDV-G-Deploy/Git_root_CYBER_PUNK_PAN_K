@@ -4,16 +4,16 @@ import { solveLevel } from './solver.mjs';
 import { computeTopologyFingerprint } from './topology-fingerprint.mjs';
 
 export const DEFAULT_PACK_SLOT_TEMPLATE = Object.freeze([
-  Object.freeze({ id: 'slot1', role: 'warmup', label: 'Warmup Puzzle', targetBand: 'easy', preferredTags: ['warmup'], preferredActual: ['easy'], fallbackTags: ['easy'], maxBranching: 1.6, maxNodeCount: 4, maxEdgeCount: 4, maxMinMoves: 4 }),
-  Object.freeze({ id: 'slot2', role: 'easy', label: 'Easy Puzzle A', targetBand: 'easy', preferredTags: ['easy', 'warmup'], preferredActual: ['easy'], fallbackTags: ['medium'] }),
-  Object.freeze({ id: 'slot3', role: 'easy', label: 'Easy Puzzle B', targetBand: 'easy', preferredTags: ['easy', 'warmup'], preferredActual: ['easy'], fallbackTags: ['medium'] }),
-  Object.freeze({ id: 'slot4', role: 'medium', label: 'Medium Puzzle A', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'] }),
-  Object.freeze({ id: 'slot5', role: 'medium', label: 'Medium Puzzle B', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'] }),
-  Object.freeze({ id: 'slot6', role: 'medium', label: 'Medium Puzzle C', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'] }),
-  Object.freeze({ id: 'slot7', role: 'hard', label: 'Hard Puzzle A', targetBand: 'hard', preferredTags: ['hard'], preferredActual: ['hard'], fallbackTags: ['medium', 'challenge'] }),
-  Object.freeze({ id: 'slot8', role: 'hard', label: 'Hard Puzzle B', targetBand: 'hard', preferredTags: ['hard'], preferredActual: ['hard'], fallbackTags: ['medium', 'challenge'] }),
-  Object.freeze({ id: 'slot9', role: 'challenge', label: 'Challenge Puzzle', targetBand: 'hard', preferredTags: ['challenge', 'hard'], preferredActual: ['hard', 'extreme'], fallbackTags: ['medium'], minMinMoves: 5, minBranching: 2 }),
-  Object.freeze({ id: 'slot10', role: 'boss', label: 'Boss Puzzle', targetBand: 'extreme', preferredTags: ['boss', 'challenge', 'hard'], preferredActual: ['hard', 'extreme'], fallbackTags: ['medium'], minMinMoves: 6, minBranching: 2.2, minNodeCount: 6, minEdgeCount: 7 })
+  Object.freeze({ id: 'slot1', role: 'warmup', label: 'Warmup Puzzle', targetBand: 'easy', preferredTags: ['warmup'], preferredActual: ['easy'], fallbackTags: ['easy'], minActual: 'easy', maxActual: 'medium', maxBranching: 1.6, maxNodeCount: 4, maxEdgeCount: 4, maxMinMoves: 4, maxComplexity: 10.5 }),
+  Object.freeze({ id: 'slot2', role: 'easy', label: 'Easy Puzzle A', targetBand: 'easy', preferredTags: ['easy', 'warmup'], preferredActual: ['easy'], fallbackTags: ['medium'], minActual: 'easy', maxActual: 'medium', maxComplexity: 12.5 }),
+  Object.freeze({ id: 'slot3', role: 'easy', label: 'Easy Puzzle B', targetBand: 'easy', preferredTags: ['easy', 'warmup'], preferredActual: ['easy'], fallbackTags: ['medium'], minActual: 'easy', maxActual: 'medium', maxComplexity: 12.5 }),
+  Object.freeze({ id: 'slot4', role: 'medium', label: 'Medium Puzzle A', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'], minActual: 'easy', maxActual: 'hard', minComplexity: 8.5, maxComplexity: 17.5 }),
+  Object.freeze({ id: 'slot5', role: 'medium', label: 'Medium Puzzle B', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'], minActual: 'easy', maxActual: 'hard', minComplexity: 8.5, maxComplexity: 17.5 }),
+  Object.freeze({ id: 'slot6', role: 'medium', label: 'Medium Puzzle C', targetBand: 'medium', preferredTags: ['medium'], preferredActual: ['medium'], fallbackTags: ['easy', 'hard'], minActual: 'easy', maxActual: 'hard', minComplexity: 8.5, maxComplexity: 17.5 }),
+  Object.freeze({ id: 'slot7', role: 'hard', label: 'Hard Puzzle A', targetBand: 'hard', preferredTags: ['hard'], preferredActual: ['hard'], fallbackTags: ['medium', 'challenge'], minActual: 'medium', maxActual: 'extreme', minComplexity: 11.5 }),
+  Object.freeze({ id: 'slot8', role: 'hard', label: 'Hard Puzzle B', targetBand: 'hard', preferredTags: ['hard'], preferredActual: ['hard'], fallbackTags: ['medium', 'challenge'], minActual: 'medium', maxActual: 'extreme', minComplexity: 11.5 }),
+  Object.freeze({ id: 'slot9', role: 'challenge', label: 'Challenge Puzzle', targetBand: 'hard', preferredTags: ['challenge', 'hard'], preferredActual: ['hard', 'extreme'], fallbackTags: ['medium'], minActual: 'hard', maxActual: 'extreme', minMinMoves: 5, minBranching: 2, minComplexity: 14.5 }),
+  Object.freeze({ id: 'slot10', role: 'boss', label: 'Boss Puzzle', targetBand: 'extreme', preferredTags: ['boss', 'challenge', 'hard'], preferredActual: ['hard', 'extreme'], fallbackTags: ['medium'], minActual: 'hard', maxActual: 'extreme', minMinMoves: 6, minBranching: 2.2, minNodeCount: 6, minEdgeCount: 7, minComplexity: 18 })
 ]);
 
 export const PACK_BUILDER_DEFAULTS = Object.freeze({
@@ -45,6 +45,10 @@ const ACTUAL_BUCKET_ORDER = Object.freeze({
   hard: 3,
   extreme: 4
 });
+
+function getActualBucketOrder(bucket) {
+  return ACTUAL_BUCKET_ORDER[bucket] || 0;
+}
 
 function withDefaults(options) {
   const merged = {
@@ -230,54 +234,105 @@ function buildCandidateEntry(level, index, options) {
   };
 }
 
-function candidateHardConstraintsPass(entry, slot) {
+function collectHardConstraintFailures(entry, slot) {
   const traits = entry.candidateTraits;
+  const failures = [];
 
   if (slot.role === 'warmup' && !traits.lowBranching) {
-    return false;
+    failures.push('warmup_requires_low_branching');
   }
 
   if (Number.isFinite(slot.maxBranching) && traits.branching > slot.maxBranching) {
-    return false;
+    failures.push('branching_above_slot_max');
   }
 
   if (Number.isFinite(slot.minBranching) && traits.branching < slot.minBranching) {
-    return false;
+    failures.push('branching_below_slot_min');
   }
 
   if (Number.isFinite(slot.maxNodeCount) && traits.nodeCount > slot.maxNodeCount) {
-    return false;
+    failures.push('node_count_above_slot_max');
   }
 
   if (Number.isFinite(slot.minNodeCount) && traits.nodeCount < slot.minNodeCount) {
-    return false;
+    failures.push('node_count_below_slot_min');
   }
 
   if (Number.isFinite(slot.maxEdgeCount) && traits.edgeCount > slot.maxEdgeCount) {
-    return false;
+    failures.push('edge_count_above_slot_max');
   }
 
   if (Number.isFinite(slot.minEdgeCount) && traits.edgeCount < slot.minEdgeCount) {
-    return false;
+    failures.push('edge_count_below_slot_min');
   }
 
   if (Number.isFinite(slot.maxMinMoves) && traits.minMoves > slot.maxMinMoves) {
-    return false;
+    failures.push('min_moves_above_slot_max');
   }
 
   if (Number.isFinite(slot.minMinMoves) && traits.minMoves < slot.minMinMoves) {
-    return false;
+    failures.push('min_moves_below_slot_min');
+  }
+
+  if (Number.isFinite(slot.maxComplexity) && traits.complexityScore > slot.maxComplexity) {
+    failures.push('complexity_above_slot_max');
+  }
+
+  if (Number.isFinite(slot.minComplexity) && traits.complexityScore < slot.minComplexity) {
+    failures.push('complexity_below_slot_min');
+  }
+
+  const entryActual = getActualBucketOrder(entry.predictedActualDifficultyClass);
+  if (slot.minActual && entryActual < getActualBucketOrder(slot.minActual)) {
+    failures.push('actual_difficulty_below_slot_min');
+  }
+
+  if (slot.maxActual && entryActual > getActualBucketOrder(slot.maxActual)) {
+    failures.push('actual_difficulty_above_slot_max');
   }
 
   if (slot.role === 'challenge' && !traits.challengeEligible) {
-    return false;
+    failures.push('challenge_requires_higher_pressure');
   }
 
   if (slot.role === 'boss' && !traits.bossEligible) {
-    return false;
+    failures.push('boss_requires_large_complex_topology');
   }
 
-  return true;
+  return failures;
+}
+
+function candidateHardConstraintsPass(entry, slot) {
+  return collectHardConstraintFailures(entry, slot).length === 0;
+}
+
+function summarizeSlotConstraintFailures(slot, pool, usedLevelIds, usedFingerprints) {
+  const counts = {};
+  let inspected = 0;
+
+  for (let index = 0; index < pool.length; index += 1) {
+    const entry = pool[index];
+    if (usedLevelIds.has(entry.levelId) || usedFingerprints.has(entry.topologyFingerprint)) {
+      continue;
+    }
+
+    inspected += 1;
+    const failures = collectHardConstraintFailures(entry, slot);
+    if (failures.length === 0) {
+      counts.no_fit_after_scoring = (counts.no_fit_after_scoring || 0) + 1;
+      continue;
+    }
+
+    for (let failureIndex = 0; failureIndex < failures.length; failureIndex += 1) {
+      const reason = failures[failureIndex];
+      counts[reason] = (counts[reason] || 0) + 1;
+    }
+  }
+
+  return {
+    inspectedCandidates: inspected,
+    failureCounts: counts
+  };
 }
 
 function scoreCandidateForSlot(entry, slot, strictMode) {
@@ -359,6 +414,7 @@ function createStructuredPack(entries, options) {
   const usedFingerprints = new Set();
   const usedLevelIds = new Set();
   const unfilledSlots = [];
+  const slotDiagnostics = [];
   const slotFillOrder = ['boss', 'warmup', 'challenge', 'hard', 'hard', 'medium', 'medium', 'medium', 'easy', 'easy'];
 
   const preRejected = [];
@@ -418,12 +474,24 @@ function createStructuredPack(entries, options) {
     }
 
     if (!bestEntry) {
+      const slotConstraintSummary = summarizeSlotConstraintFailures(slot, pool, usedLevelIds, usedFingerprints);
       unfilledSlots.push({
         slotId: slot.id,
         slotIndex: slotIndex + 1,
         role: slot.role,
         label: slot.label,
-        reason: 'no_matching_candidate'
+        reason: 'no_matching_candidate',
+        constraintSummary: slotConstraintSummary
+      });
+
+      slotDiagnostics.push({
+        slotId: slot.id,
+        slotIndex: slotIndex + 1,
+        role: slot.role,
+        label: slot.label,
+        selectedLevelId: null,
+        selectedLevelName: null,
+        constraintSummary: slotConstraintSummary
       });
       continue;
     }
@@ -442,6 +510,17 @@ function createStructuredPack(entries, options) {
 
     selectedEntries.push(slottedEntry);
     selectedLevels.push(bestEntry.level);
+
+    slotDiagnostics.push({
+      slotId: slot.id,
+      slotIndex: slotIndex + 1,
+      role: slot.role,
+      label: slot.label,
+      selectedLevelId: slottedEntry.levelId,
+      selectedLevelName: slottedEntry.levelName,
+      slotScore: slottedEntry.slotScore,
+      constraintSummary: null
+    });
   }
 
   for (let index = 0; index < pool.length; index += 1) {
@@ -467,6 +546,7 @@ function createStructuredPack(entries, options) {
     rejectedEntries,
     usedFingerprints,
     unfilledSlots,
+    slotDiagnostics,
     slotTemplate: slots.map((slot, index) => ({ ...slot, slotIndex: index + 1 }))
   };
 }
@@ -489,7 +569,8 @@ export function buildValidatedPack(candidateLevels, options) {
     acceptedDifficultyCounts: countDifficultyBuckets(structuredPack.selectedEntries),
     acceptedSlotCounts: countSlotRoles(structuredPack.selectedEntries),
     packStructure: structuredPack.slotTemplate,
-    unfilledSlots: structuredPack.unfilledSlots
+    unfilledSlots: structuredPack.unfilledSlots,
+    slotDiagnostics: structuredPack.slotDiagnostics
   };
 }
 

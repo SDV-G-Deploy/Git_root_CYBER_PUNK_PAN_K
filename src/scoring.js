@@ -1,4 +1,4 @@
-﻿import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
+import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
 import {
   createObjectiveText,
   getExplodedCount,
@@ -209,6 +209,18 @@ export function makeOutcomeStatus(result, reason) {
 
   if (reason === 'simulation_overflow') {
     return 'Failure: propagation overflow safeguard triggered during resolution.';
+  }
+
+  if (reason === 'abandoned_retry') {
+    return 'Run closed: player restarted before completion.';
+  }
+
+  if (reason === 'abandoned_level_switch') {
+    return 'Run closed: player switched levels before completion.';
+  }
+
+  if (result === 'abandoned') {
+    return 'Run closed before completion.';
   }
 
   return 'Operation in progress.';

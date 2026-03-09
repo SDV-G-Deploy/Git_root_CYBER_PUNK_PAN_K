@@ -42,9 +42,15 @@ function formatConsoleReport(report) {
   lines.push('Signal District / Telemetry Difficulty Report');
   lines.push('');
   lines.push(`Levels observed: ${report.summary.levelsObserved}`);
+  lines.push(`Started runs observed: ${report.summary.startedRunsObserved}`);
+  lines.push(`Closed runs observed: ${report.summary.closedRunsObserved}`);
+  lines.push(`Open runs observed: ${report.summary.openRunsObserved}`);
+  lines.push(`Closed run rate: ${(report.summary.closedRunRate * 100).toFixed(1)}%`);
   lines.push(`Attempts observed: ${report.summary.attemptsObserved}`);
   lines.push(`Retries observed: ${report.summary.retriesObserved}`);
+  lines.push(`Abandons observed: ${report.summary.abandonsObserved}`);
   lines.push(`Avg retry rate: ${(report.summary.avgRetryRate * 100).toFixed(1)}%`);
+  lines.push(`Avg abandon rate: ${(report.summary.avgAbandonRate * 100).toFixed(1)}%`);
   lines.push('');
   lines.push('Actual difficulty distribution:');
   for (const bucket of Object.keys(DEFAULT_TARGET_DIFFICULTY_DISTRIBUTION)) {
@@ -57,7 +63,8 @@ function formatConsoleReport(report) {
     lines.push(
       `- ${row.levelId}: actual=${row.actualDifficultyClass} (${row.actualDifficultyScore ?? 'n/a'}), ` +
       `avgSolveTime=${row.avgSolveTime ?? 'n/a'}s, retryRate=${(row.retryRate * 100).toFixed(1)}%, ` +
-      `failRate=${(row.failRate * 100).toFixed(1)}%, avgMovesOverOptimal=${row.avgMovesOverOptimal ?? 'n/a'}`
+      `failRate=${(row.failRate * 100).toFixed(1)}%, abandonRate=${(row.abandonRate * 100).toFixed(1)}%, ` +
+      `avgMovesOverOptimal=${row.avgMovesOverOptimal ?? 'n/a'}`
     );
   }
 
