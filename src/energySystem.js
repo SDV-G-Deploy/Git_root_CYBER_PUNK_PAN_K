@@ -187,7 +187,7 @@ function spreadCorruption(state) {
 
   for (let i = 0; i < state.nodes.length; i += 1) {
     const source = state.nodes[i];
-    const canSpread = source.baseType === NODE_TYPES.VIRUS || source.corrupted;
+    const canSpread = source.baseType === NODE_TYPES.VIRUS;
     if (!canSpread || source.exploded) {
       continue;
     }
@@ -284,3 +284,4 @@ export function resolvePropagation(state, hooks) {
     overflow: false
   };
 }
+

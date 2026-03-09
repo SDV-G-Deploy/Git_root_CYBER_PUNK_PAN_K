@@ -51,7 +51,7 @@ export const CONFIG = Object.freeze({
     VIRUS_SPREAD_PER_TURN: 1,
     CORRUPTION_THRESHOLD: 2,
     CORRUPTION_ABSORB_FACTOR: 0.5,
-    CLEANSE_THRESHOLD: 4
+    CLEANSE_THRESHOLD: 2
   },
   SCORING: {
     CLEAR_BONUS: 1000,
@@ -115,3 +115,4 @@ export const NODE_TYPES = Object.freeze({
 
 export const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';
 export const TUTORIAL_SEEN_KEY = 'signal_district_chainlab_tutorial_seen';
+
