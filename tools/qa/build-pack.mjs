@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadLevels } from '../../src/levels.js';
-import { DEFAULT_TARGET_DIFFICULTY_DISTRIBUTION, normalizeDifficultyDistribution } from './difficulty-model.mjs';
 import { buildTelemetryDifficultyReportFromRaw } from './telemetry-analysis.mjs';
 import { buildValidatedPack } from './pack-builder.mjs';
 
@@ -12,31 +11,11 @@ const projectRoot = path.resolve(__dirname, '..', '..');
 const qaDir = path.join(projectRoot, 'qa');
 const reportPath = path.join(qaDir, 'pack-build-report.json');
 
-function parseDistribution(value) {
-  if (!value) {
-    return { ...DEFAULT_TARGET_DIFFICULTY_DISTRIBUTION };
-  }
-
-  const trimmed = String(value).trim();
-  if (trimmed.startsWith('{')) {
-    return normalizeDifficultyDistribution(JSON.parse(trimmed));
-  }
-
-  const resolved = path.resolve(projectRoot, trimmed);
-  if (fs.existsSync(resolved)) {
-    return normalizeDifficultyDistribution(JSON.parse(fs.readFileSync(resolved, 'utf8')));
-  }
-
-  throw new Error(`Unable to parse target difficulty distribution from: ${value}`);
-}
-
 function parseArgs(argv) {
   const options = {
     candidatePath: null,
     telemetryPath: null,
-    outputPath: reportPath,
-    packSize: null,
-    targetDistribution: { ...DEFAULT_TARGET_DIFFICULTY_DISTRIBUTION }
+    outputPath: reportPath
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -49,18 +28,6 @@ function parseArgs(argv) {
 
     if (token === '--output' && argv[index + 1]) {
       options.outputPath = argv[index + 1];
-      index += 1;
-      continue;
-    }
-
-    if (token === '--pack-size' && argv[index + 1]) {
-      options.packSize = Number(argv[index + 1]);
-      index += 1;
-      continue;
-    }
-
-    if (token === '--target' && argv[index + 1]) {
-      options.targetDistribution = parseDistribution(argv[index + 1]);
       index += 1;
       continue;
     }
@@ -118,29 +85,72 @@ function summarizeByReason(entries) {
   return counts;
 }
 
+function formatSlotAssignments(entries) {
+  return entries
+    .slice()
+    .sort((left, right) => left.slotIndex - right.slotIndex)
+    .map((entry) => ({
+      slotIndex: entry.slotIndex,
+      slotId: entry.slotId,
+      slotRole: entry.slotRole,
+      slotLabel: entry.slotLabel,
+      levelId: entry.levelId,
+      levelName: entry.levelName,
+      authoredDifficultyTag: entry.authoredDifficultyTag,
+      predictedActualDifficultyClass: entry.predictedActualDifficultyClass,
+      topologyScale: entry.topologyScale,
+      complexityScore: entry.complexityScore,
+      slotScore: entry.slotScore
+    }));
+}
+
+function summarizeEntries(entries) {
+  return entries.map((entry) => ({
+    levelId: entry.levelId,
+    levelName: entry.levelName,
+    authoredDifficultyTag: entry.authoredDifficultyTag,
+    predictedActualDifficultyClass: entry.predictedActualDifficultyClass,
+    predictedActualDifficultyScore: entry.predictedActualDifficultyScore,
+    minMoves: entry.minMoves,
+    solutionCount: entry.solutionCount,
+    averageBranchingFactor: entry.averageBranchingFactor,
+    complexityScore: entry.complexityScore,
+    topologyScale: entry.topologyScale,
+    slotId: entry.slotId || null,
+    slotRole: entry.slotRole || null,
+    slotIndex: entry.slotIndex || null,
+    slotScore: entry.slotScore || null,
+    rejectionReasons: entry.rejectionReasons,
+    topologyFingerprint: entry.topologyFingerprint
+  }));
+}
+
 const args = parseArgs(process.argv.slice(2));
 const candidateLevels = loadCandidateLevels(args.candidatePath);
 const telemetry = loadDifficultyCalibration(args.telemetryPath);
 const pack = buildValidatedPack(candidateLevels, {
-  difficultyCalibration: telemetry?.calibrationProfile || null,
-  targetDifficultyDistribution: args.targetDistribution,
-  targetPackSize: Number.isFinite(args.packSize) && args.packSize > 0 ? args.packSize : candidateLevels.length
+  difficultyCalibration: telemetry?.calibrationProfile || null
 });
 
 const report = {
   generatedAt: new Date().toISOString(),
   candidateCount: candidateLevels.length,
   acceptedCount: pack.acceptedEntries.length,
+  deferredCount: pack.deferredEntries.length,
   rejectedCount: pack.rejectedEntries.length,
   rejectionCounts: summarizeByReason(pack.rejectedEntries),
-  targetDifficulty: pack.targetDifficulty,
   acceptedDifficultyCounts: pack.acceptedDifficultyCounts,
+  acceptedSlotCounts: pack.acceptedSlotCounts,
+  packStructure: pack.packStructure,
+  slotAssignments: formatSlotAssignments(pack.acceptedEntries),
+  unfilledSlots: pack.unfilledSlots,
   telemetryCalibration: telemetry ? {
     summary: telemetry.report.summary,
     solverBucketCalibration: telemetry.report.solverBucketCalibration
   } : null,
-  acceptedEntries: pack.acceptedEntries,
-  rejectedEntries: pack.rejectedEntries,
+  acceptedEntries: summarizeEntries(pack.acceptedEntries),
+  deferredEntries: summarizeEntries(pack.deferredEntries),
+  rejectedEntries: summarizeEntries(pack.rejectedEntries),
   topologyFingerprints: pack.topologyFingerprints
 };
 
@@ -148,15 +158,32 @@ const resolvedOutput = path.resolve(projectRoot, args.outputPath);
 fs.mkdirSync(path.dirname(resolvedOutput), { recursive: true });
 fs.writeFileSync(resolvedOutput, JSON.stringify(report, null, 2));
 
-console.log('Signal District / Pack Builder');
+console.log('Signal District / Structured Pack Builder');
 console.log('');
 console.log(`Candidates: ${report.candidateCount}`);
-console.log(`Accepted: ${report.acceptedCount}`);
+console.log(`Accepted into pack: ${report.acceptedCount}`);
+console.log(`Deferred: ${report.deferredCount}`);
 console.log(`Rejected: ${report.rejectedCount}`);
 console.log(`Report: ${resolvedOutput}`);
-console.log(`Target distribution: ${JSON.stringify(report.targetDifficulty?.distribution || args.targetDistribution)}`);
-console.log(`Accepted distribution: ${JSON.stringify(report.acceptedDifficultyCounts)}`);
+console.log('');
+console.log('Pack slots:');
+for (let index = 0; index < report.slotAssignments.length; index += 1) {
+  const slot = report.slotAssignments[index];
+  console.log(
+    `- #${slot.slotIndex} ${slot.slotRole}: ${slot.levelId} (${slot.levelName}) | ` +
+    `tag=${slot.authoredDifficultyTag} | actual=${slot.predictedActualDifficultyClass} | complexity=${slot.complexityScore}`
+  );
+}
+if (report.unfilledSlots.length > 0) {
+  console.log('');
+  console.log('Unfilled slots:');
+  for (let index = 0; index < report.unfilledSlots.length; index += 1) {
+    const slot = report.unfilledSlots[index];
+    console.log(`- #${slot.slotIndex} ${slot.role}: ${slot.reason}`);
+  }
+}
 if (telemetry) {
+  console.log('');
   console.log('Telemetry calibration: enabled');
 }
 if (report.rejectedCount > 0) {

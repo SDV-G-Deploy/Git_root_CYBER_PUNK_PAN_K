@@ -143,8 +143,8 @@ function buildValidationSystemDoc() {
 2. Run \`node tools/qa/validate-levels.mjs\` or \`powershell -ExecutionPolicy Bypass -File scripts/validate-levels.ps1\` for authored content.
 3. Run \`node tools/qa/analyze-telemetry.mjs --input <telemetry.json|jsonl>\` or \`powershell -ExecutionPolicy Bypass -File scripts/telemetry-report.ps1 -InputPath <telemetry.json|jsonl>\` to compute actual difficulty from player runs.
 4. Run \`node tools/qa/build-pack.mjs <candidate-file.json> --telemetry <telemetry.json|jsonl>\` or \`powershell -ExecutionPolicy Bypass -File scripts/build-pack.ps1 <candidate-file.json> --telemetry <telemetry.json|jsonl>\` for generated candidate batches.
-5. Inspect \`qa/level-validation.json\`, \`qa_report.md\`, telemetry difficulty reports, and generated pack reports for unsolved, degenerate, duplicate-topology, or target-distribution violations.
-6. Fix content or generator parameters and rerun the pipeline until the pack is stable.
+5. Inspect \`qa/level-validation.json\`, \`qa_report.md\`, telemetry difficulty reports, and generated pack reports for unsolved, degenerate, duplicate-topology, or slot-composition violations.
+6. Fix content or generator parameters and rerun the pipeline until the structured slot progression is stable.
 
 ## Integration Instructions
 
@@ -152,7 +152,7 @@ function buildValidationSystemDoc() {
 - CLI use: run \`node tools/qa/validate-levels.mjs\` for authored levels, \`node tools/qa/analyze-telemetry.mjs --input <telemetry.json|jsonl>\` for actual-difficulty analysis, or \`node tools/qa/build-pack.mjs <candidate-file.json> --telemetry <telemetry.json|jsonl>\` for generated candidates.
 - Windows helpers: run \`scripts/validate-levels.ps1\`, \`scripts/telemetry-report.ps1\`, or \`scripts/build-pack.ps1\`.
 - Recommended triggers: after any level-authoring pass, after any propagation-rule change, after each telemetry review, and after any procedural candidate generation batch.
-- Future extension: procedural generation should emit candidate levels into the same pipeline and reject any layout marked unsolved, degenerate, duplicated by topology, over-target for the desired difficulty mix, unstable, or too chaotic.
+- Future extension: procedural generation should emit candidate levels into the same pipeline and reject any layout marked unsolved, degenerate, duplicated by topology, unable to satisfy the structured slot progression, unstable, or too chaotic.
 `;
 }
 const results = validateLevels();

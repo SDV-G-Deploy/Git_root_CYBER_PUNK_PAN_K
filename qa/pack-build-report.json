@@ -1,0 +1,740 @@
+{
+  "generatedAt": "2026-03-09T22:30:20.281Z",
+  "candidateCount": 20,
+  "acceptedCount": 10,
+  "deferredCount": 9,
+  "rejectedCount": 1,
+  "rejectionCounts": {
+    "solution_count_extremely_high": 1
+  },
+  "acceptedDifficultyCounts": {
+    "easy": 3,
+    "medium": 3,
+    "hard": 3,
+    "extreme": 1
+  },
+  "acceptedSlotCounts": {
+    "boss": 1,
+    "warmup": 1,
+    "challenge": 1,
+    "hard": 2,
+    "medium": 3,
+    "easy": 2
+  },
+  "packStructure": [
+    {
+      "id": "slot1",
+      "role": "warmup",
+      "label": "Warmup Puzzle",
+      "targetBand": "easy",
+      "preferredTags": [
+        "warmup"
+      ],
+      "preferredActual": [
+        "easy"
+      ],
+      "fallbackTags": [
+        "easy"
+      ],
+      "maxBranching": 1.6,
+      "maxNodeCount": 4,
+      "maxEdgeCount": 4,
+      "maxMinMoves": 4,
+      "slotIndex": 1
+    },
+    {
+      "id": "slot2",
+      "role": "easy",
+      "label": "Easy Puzzle A",
+      "targetBand": "easy",
+      "preferredTags": [
+        "easy",
+        "warmup"
+      ],
+      "preferredActual": [
+        "easy"
+      ],
+      "fallbackTags": [
+        "medium"
+      ],
+      "slotIndex": 2
+    },
+    {
+      "id": "slot3",
+      "role": "easy",
+      "label": "Easy Puzzle B",
+      "targetBand": "easy",
+      "preferredTags": [
+        "easy",
+        "warmup"
+      ],
+      "preferredActual": [
+        "easy"
+      ],
+      "fallbackTags": [
+        "medium"
+      ],
+      "slotIndex": 3
+    },
+    {
+      "id": "slot4",
+      "role": "medium",
+      "label": "Medium Puzzle A",
+      "targetBand": "medium",
+      "preferredTags": [
+        "medium"
+      ],
+      "preferredActual": [
+        "medium"
+      ],
+      "fallbackTags": [
+        "easy",
+        "hard"
+      ],
+      "slotIndex": 4
+    },
+    {
+      "id": "slot5",
+      "role": "medium",
+      "label": "Medium Puzzle B",
+      "targetBand": "medium",
+      "preferredTags": [
+        "medium"
+      ],
+      "preferredActual": [
+        "medium"
+      ],
+      "fallbackTags": [
+        "easy",
+        "hard"
+      ],
+      "slotIndex": 5
+    },
+    {
+      "id": "slot6",
+      "role": "medium",
+      "label": "Medium Puzzle C",
+      "targetBand": "medium",
+      "preferredTags": [
+        "medium"
+      ],
+      "preferredActual": [
+        "medium"
+      ],
+      "fallbackTags": [
+        "easy",
+        "hard"
+      ],
+      "slotIndex": 6
+    },
+    {
+      "id": "slot7",
+      "role": "hard",
+      "label": "Hard Puzzle A",
+      "targetBand": "hard",
+      "preferredTags": [
+        "hard"
+      ],
+      "preferredActual": [
+        "hard"
+      ],
+      "fallbackTags": [
+        "medium",
+        "challenge"
+      ],
+      "slotIndex": 7
+    },
+    {
+      "id": "slot8",
+      "role": "hard",
+      "label": "Hard Puzzle B",
+      "targetBand": "hard",
+      "preferredTags": [
+        "hard"
+      ],
+      "preferredActual": [
+        "hard"
+      ],
+      "fallbackTags": [
+        "medium",
+        "challenge"
+      ],
+      "slotIndex": 8
+    },
+    {
+      "id": "slot9",
+      "role": "challenge",
+      "label": "Challenge Puzzle",
+      "targetBand": "hard",
+      "preferredTags": [
+        "challenge",
+        "hard"
+      ],
+      "preferredActual": [
+        "hard",
+        "extreme"
+      ],
+      "fallbackTags": [
+        "medium"
+      ],
+      "minMinMoves": 5,
+      "minBranching": 2,
+      "slotIndex": 9
+    },
+    {
+      "id": "slot10",
+      "role": "boss",
+      "label": "Boss Puzzle",
+      "targetBand": "extreme",
+      "preferredTags": [
+        "boss",
+        "challenge",
+        "hard"
+      ],
+      "preferredActual": [
+        "hard",
+        "extreme"
+      ],
+      "fallbackTags": [
+        "medium"
+      ],
+      "minMinMoves": 6,
+      "minBranching": 2.2,
+      "minNodeCount": 6,
+      "minEdgeCount": 7,
+      "slotIndex": 10
+    }
+  ],
+  "slotAssignments": [
+    {
+      "slotIndex": 1,
+      "slotId": "slot1",
+      "slotRole": "warmup",
+      "slotLabel": "Warmup Puzzle",
+      "levelId": "L1",
+      "levelName": "Boot Link",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 4,
+      "complexityScore": 7.5,
+      "slotScore": 95.5
+    },
+    {
+      "slotIndex": 2,
+      "slotId": "slot2",
+      "slotRole": "easy",
+      "slotLabel": "Easy Puzzle A",
+      "levelId": "L4",
+      "levelName": "Split Charge",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "easy",
+      "topologyScale": 6,
+      "complexityScore": 8.8,
+      "slotScore": 106.75
+    },
+    {
+      "slotIndex": 3,
+      "slotId": "slot3",
+      "slotRole": "easy",
+      "slotLabel": "Easy Puzzle B",
+      "levelId": "L2",
+      "levelName": "Relay Ladder",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 5.5,
+      "complexityScore": 10.45,
+      "slotScore": 85.4
+    },
+    {
+      "slotIndex": 4,
+      "slotId": "slot4",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle A",
+      "levelId": "L13",
+      "levelName": "Overload Trap",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "topologyScale": 7.5,
+      "complexityScore": 9.75,
+      "slotScore": 93.45
+    },
+    {
+      "slotIndex": 5,
+      "slotId": "slot5",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle B",
+      "levelId": "L14",
+      "levelName": "Split Feed",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "topologyScale": 7.5,
+      "complexityScore": 9.75,
+      "slotScore": 93.3
+    },
+    {
+      "slotIndex": 6,
+      "slotId": "slot6",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle C",
+      "levelId": "L8",
+      "levelName": "Activate Grid",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 7.5,
+      "complexityScore": 16.39,
+      "slotScore": 93.06
+    },
+    {
+      "slotIndex": 7,
+      "slotId": "slot7",
+      "slotRole": "hard",
+      "slotLabel": "Hard Puzzle A",
+      "levelId": "L15",
+      "levelName": "Heat Sink",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 7.5,
+      "complexityScore": 13.34,
+      "slotScore": 98.06
+    },
+    {
+      "slotIndex": 8,
+      "slotId": "slot8",
+      "slotRole": "hard",
+      "slotLabel": "Hard Puzzle B",
+      "levelId": "L12",
+      "levelName": "Virus Pressure",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 11,
+      "complexityScore": 17.04,
+      "slotScore": 94.81
+    },
+    {
+      "slotIndex": 9,
+      "slotId": "slot9",
+      "slotRole": "challenge",
+      "slotLabel": "Challenge Puzzle",
+      "levelId": "L16",
+      "levelName": "Pressure Valve",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 9,
+      "complexityScore": 17.21,
+      "slotScore": 166.05
+    },
+    {
+      "slotIndex": 10,
+      "slotId": "slot10",
+      "slotRole": "boss",
+      "slotLabel": "Boss Puzzle",
+      "levelId": "L20",
+      "levelName": "District Core",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "extreme",
+      "topologyScale": 12,
+      "complexityScore": 24.7,
+      "slotScore": 267.25
+    }
+  ],
+  "unfilledSlots": [],
+  "telemetryCalibration": null,
+  "acceptedEntries": [
+    {
+      "levelId": "L20",
+      "levelName": "District Core",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 80,
+      "minMoves": 9,
+      "solutionCount": 1472,
+      "averageBranchingFactor": 3,
+      "complexityScore": 24.7,
+      "topologyScale": 12,
+      "slotId": "slot10",
+      "slotRole": "boss",
+      "slotIndex": 10,
+      "slotScore": 267.25,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_4d4055d2"
+    },
+    {
+      "levelId": "L1",
+      "levelName": "Boot Link",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 32,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 7.5,
+      "topologyScale": 4,
+      "slotId": "slot1",
+      "slotRole": "warmup",
+      "slotIndex": 1,
+      "slotScore": 95.5,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_9bb0827e"
+    },
+    {
+      "levelId": "L16",
+      "levelName": "Pressure Valve",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 5,
+      "solutionCount": 2511,
+      "averageBranchingFactor": 3,
+      "complexityScore": 17.21,
+      "topologyScale": 9,
+      "slotId": "slot9",
+      "slotRole": "challenge",
+      "slotIndex": 9,
+      "slotScore": 166.05,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_2d212b04"
+    },
+    {
+      "levelId": "L15",
+      "levelName": "Heat Sink",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 54,
+      "averageBranchingFactor": 2,
+      "complexityScore": 13.34,
+      "topologyScale": 7.5,
+      "slotId": "slot7",
+      "slotRole": "hard",
+      "slotIndex": 7,
+      "slotScore": 98.06,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_3d462328"
+    },
+    {
+      "levelId": "L12",
+      "levelName": "Virus Pressure",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 6,
+      "solutionCount": 116,
+      "averageBranchingFactor": 2,
+      "complexityScore": 17.04,
+      "topologyScale": 11,
+      "slotId": "slot8",
+      "slotRole": "hard",
+      "slotIndex": 8,
+      "slotScore": 94.81,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_dcad37c4"
+    },
+    {
+      "levelId": "L13",
+      "levelName": "Overload Trap",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 9.75,
+      "topologyScale": 7.5,
+      "slotId": "slot4",
+      "slotRole": "medium",
+      "slotIndex": 4,
+      "slotScore": 93.45,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_8d543b60"
+    },
+    {
+      "levelId": "L14",
+      "levelName": "Split Feed",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 9.75,
+      "topologyScale": 7.5,
+      "slotId": "slot5",
+      "slotRole": "medium",
+      "slotIndex": 5,
+      "slotScore": 93.3,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_0e5c2522"
+    },
+    {
+      "levelId": "L8",
+      "levelName": "Activate Grid",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 21,
+      "averageBranchingFactor": 2,
+      "complexityScore": 16.39,
+      "topologyScale": 7.5,
+      "slotId": "slot6",
+      "slotRole": "medium",
+      "slotIndex": 6,
+      "slotScore": 93.06,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_615e040e"
+    },
+    {
+      "levelId": "L4",
+      "levelName": "Split Charge",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 8.8,
+      "topologyScale": 6,
+      "slotId": "slot2",
+      "slotRole": "easy",
+      "slotIndex": 2,
+      "slotScore": 106.75,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_ed53586a"
+    },
+    {
+      "levelId": "L2",
+      "levelName": "Relay Ladder",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 63,
+      "minMoves": 5,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 10.45,
+      "topologyScale": 5.5,
+      "slotId": "slot3",
+      "slotRole": "easy",
+      "slotIndex": 3,
+      "slotScore": 85.4,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_a993e5e6"
+    }
+  ],
+  "deferredEntries": [
+    {
+      "levelId": "L3",
+      "levelName": "First Firewall",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 53,
+      "minMoves": 4,
+      "solutionCount": 5,
+      "averageBranchingFactor": 2,
+      "complexityScore": 11.63,
+      "topologyScale": 4,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_2db4e036"
+    },
+    {
+      "levelId": "L5",
+      "levelName": "Firewall Router",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 5,
+      "solutionCount": 37,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.79,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_757a0c69"
+    },
+    {
+      "levelId": "L6",
+      "levelName": "Branch Lock",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 5,
+      "solutionCount": 37,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.79,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_baa7ee9a"
+    },
+    {
+      "levelId": "L7",
+      "levelName": "Gate Cascade",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 6,
+      "solutionCount": 1648,
+      "averageBranchingFactor": 3,
+      "complexityScore": 18.89,
+      "topologyScale": 9,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_ba09051c"
+    },
+    {
+      "levelId": "L9",
+      "levelName": "Virus Wake",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 78,
+      "minMoves": 5,
+      "solutionCount": 5,
+      "averageBranchingFactor": 2,
+      "complexityScore": 16.34,
+      "topologyScale": 9,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_0dd3407f"
+    },
+    {
+      "levelId": "L10",
+      "levelName": "Clean Sweep",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 51,
+      "minMoves": 5,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 12.1,
+      "topologyScale": 8,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_4a9603f1"
+    },
+    {
+      "levelId": "L11",
+      "levelName": "Quarantine Fork",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 5,
+      "solutionCount": 15,
+      "averageBranchingFactor": 2,
+      "complexityScore": 16.11,
+      "topologyScale": 9,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_ae7b7f08"
+    },
+    {
+      "levelId": "L17",
+      "levelName": "Dual Feed",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 37,
+      "minMoves": 4,
+      "solutionCount": 2767,
+      "averageBranchingFactor": 3,
+      "complexityScore": 17.2,
+      "topologyScale": 10.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_add62ca9"
+    },
+    {
+      "levelId": "L18",
+      "levelName": "Crossfire District",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 37,
+      "minMoves": 4,
+      "solutionCount": 2767,
+      "averageBranchingFactor": 3,
+      "complexityScore": 17.2,
+      "topologyScale": 10.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_290afab3"
+    }
+  ],
+  "rejectedEntries": [
+    {
+      "levelId": "L19",
+      "levelName": "Zero Infection",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 37,
+      "minMoves": 4,
+      "solutionCount": 7183,
+      "averageBranchingFactor": 3,
+      "complexityScore": 17.13,
+      "topologyScale": 10.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "solution_count_extremely_high"
+      ],
+      "topologyFingerprint": "topo_d52cb800"
+    }
+  ],
+  "topologyFingerprints": [
+    "topo_4d4055d2",
+    "topo_9bb0827e",
+    "topo_2d212b04",
+    "topo_3d462328",
+    "topo_dcad37c4",
+    "topo_8d543b60",
+    "topo_0e5c2522",
+    "topo_615e040e",
+    "topo_ed53586a",
+    "topo_a993e5e6"
+  ]
+}
