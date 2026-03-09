@@ -1,7 +1,13 @@
-import legacyChainLabApi from './adapters/legacyChainLabApi.js';
+﻿import legacyChainLabApi from './adapters/legacyChainLabApi.js';
 import { createAudioController } from './audio.js';
 import { createInputController } from './input.js';
-import { loadPlaytestMode, loadTutorialSeen, savePlaytestMode, saveTutorialSeen } from './persistence.js';
+import {
+  applyRunSummaryToSave,
+  loadSaveData,
+  saveSaveData,
+  setPlaytestMode,
+  setTutorialSeen
+} from './persistence.js';
 import { createUI } from './ui.js';
 
 function downloadTextFile(fileName, text, mimeType) {
@@ -183,7 +189,15 @@ function bootstrap() {
     commandQueue.push(command);
   };
 
-  let playtestMode = loadPlaytestMode();
+  const loadedSave = loadSaveData();
+  let saveData = loadedSave.data;
+  if (loadedSave.needsSave) {
+    saveSaveData(saveData);
+  }
+
+  function persistSave() {
+    saveSaveData(saveData);
+  }
 
   function getSummary() {
     return game.getRunSummary();
@@ -195,6 +209,31 @@ function bootstrap() {
 
   function getTrace() {
     return game.getChainTrace();
+  }
+
+  function buildLevelSelectViewModel() {
+    const levels = game.getLevelList();
+    const completedSet = new Set(saveData.progress.completedLevelIds);
+    const perfectSet = new Set(saveData.progress.perfectLevelIds);
+    const highestUnlockedLevelIndex = Math.min(
+      Math.max(0, saveData.progress.highestUnlockedLevelIndex),
+      Math.max(0, levels.length - 1)
+    );
+
+    return levels.map((level) => {
+      const best = saveData.bestResultsByLevel[level.id] || null;
+      return {
+        ...level,
+        locked: level.index > highestUnlockedLevelIndex,
+        completed: completedSet.has(level.id),
+        perfect: perfectSet.has(level.id),
+        bestScore: best ? best.bestScore : 0
+      };
+    });
+  }
+
+  function renderLevelSelect() {
+    ui.renderLevelSelect(buildLevelSelectViewModel(), game.getCurrentLevelIndex());
   }
 
   function syncUI() {
@@ -269,17 +308,24 @@ function bootstrap() {
     downloadTextFile(`chainlab-grid-report-${stamp}.txt`, report, 'text/plain');
   }
 
+  const startLevelIndex = Math.max(0, saveData.progress.highestUnlockedLevelIndex);
+
   game.initGame(ui.refs.canvas, {
-    onRunEnd: () => {},
+    startLevelIndex,
+    onRunEnd: (result, rewardPacket, summary) => {
+      saveData = applyRunSummaryToSave(saveData, summary, game.getLevelList().length);
+      persistSave();
+      renderLevelSelect();
+    },
     onUxEvent: (eventType, payload) => {
       audio.play(eventType, payload);
     }
   });
 
-  ui.renderLevelSelect(game.getLevelList(), game.getCurrentLevelIndex());
-  ui.applyPlaytestMode(playtestMode);
-  ui.setTutorialVisible(!loadTutorialSeen());
-  ui.setSoundEnabled(true);
+  renderLevelSelect();
+  ui.applyPlaytestMode(saveData.playtestMode);
+  ui.setTutorialVisible(!saveData.tutorialSeen);
+  ui.setSoundEnabled(!audio.isMuted());
 
   createInputController({
     windowRef: window,
@@ -296,16 +342,25 @@ function bootstrap() {
     },
     onTutorialDismiss: () => {
       ui.setTutorialVisible(false);
-      saveTutorialSeen();
+      saveData = setTutorialSeen(saveData, true);
+      persistSave();
     },
     onUserGesture: unlockAudio
   });
 
   if (ui.refs.levelSelect) {
     ui.refs.levelSelect.addEventListener('change', (event) => {
+      const nextIndex = Number(event.target.value);
+      const levels = buildLevelSelectViewModel();
+      const selected = levels.find((level) => level.index === nextIndex);
+      if (!selected || selected.locked) {
+        renderLevelSelect();
+        return;
+      }
+
       enqueueCommand({
         type: 'set_level',
-        levelIndex: Number(event.target.value)
+        levelIndex: nextIndex
       });
     });
   }
@@ -341,9 +396,9 @@ function bootstrap() {
 
   if (ui.refs.playtestModeToggle) {
     ui.refs.playtestModeToggle.addEventListener('change', (event) => {
-      playtestMode = Boolean(event.target.checked);
-      savePlaytestMode(playtestMode);
-      ui.applyPlaytestMode(playtestMode);
+      saveData = setPlaytestMode(saveData, Boolean(event.target.checked));
+      persistSave();
+      ui.applyPlaytestMode(saveData.playtestMode);
     });
   }
 
@@ -388,3 +443,4 @@ function bootstrap() {
 }
 
 window.addEventListener('DOMContentLoaded', bootstrap);
+

@@ -1,4 +1,4 @@
-import { CONFIG, NODE_TYPES } from './config.js';
+﻿import { CONFIG, NODE_TYPES } from './config.js';
 import {
   bumpRevision,
   createState,
@@ -11,7 +11,12 @@ import { clampLevelIndex, loadLevels } from './levels.js';
 import { createTelemetryStore } from './telemetry.js';
 import { findClosestNode, updatePackets } from './physicsLite.js';
 import { applyFirewallMode, isClickableNode, toggleFirewallMode, updateActiveState } from './node.js';
-import { evaluateLoseCondition, evaluateObjectives, makeOutcomeStatus } from './scoring.js';
+import {
+  buildScoreSummary,
+  evaluateLoseCondition,
+  evaluateObjectives,
+  makeOutcomeStatus
+} from './scoring.js';
 import { prepareTurn, resolvePropagation, seedActionPacket } from './energySystem.js';
 import { renderState } from './render.js';
 
@@ -36,23 +41,28 @@ function buildRewardPacket(state) {
     performance_tags: [
       state.result === 'win' ? 'protocol_stable' : 'protocol_failed',
       controlBonus >= 3 ? 'low_overload' : 'high_overload',
-      infectionPenalty === 0 ? 'clean_network' : 'infected_network'
+      infectionPenalty === 0 ? 'clean_network' : 'infected_network',
+      state.rank || 'pending'
     ]
   };
 }
 
 function makeLastShotReport(state) {
+  const scoreBefore = 0;
+  const scoreAfter = Number.isFinite(state.totalScore) ? state.totalScore : 0;
+  const objectivesRemaining = Math.max(0, state.objectivesTotal - state.objectivesCompleted);
+
   return {
     fired: state.lastAction.valid,
     hit: state.lastAction.valid,
     targetNodeId: state.lastAction.nodeId,
     missReason: state.lastAction.valid ? null : state.lastAction.reason,
-    scoreBefore: 0,
-    scoreAfter: 0,
-    scoreGain: 0,
+    scoreBefore,
+    scoreAfter,
+    scoreGain: Math.max(0, scoreAfter - scoreBefore),
     chainSteps: state.lastTurn.trace.length,
     chainDepth: 0,
-    pointsMissing: Math.max(0, state.objectives.filter((objective) => !objective.done).length),
+    pointsMissing: objectivesRemaining,
     resolution: state.result
   };
 }
@@ -104,6 +114,16 @@ export function createChainLabEngine() {
     }
   }
 
+  function updateScoreState(state) {
+    const scoreSummary = buildScoreSummary(state);
+    state.scoreBreakdown = { ...scoreSummary.scoreBreakdown };
+    state.totalScore = scoreSummary.totalScore;
+    state.rank = scoreSummary.rank;
+    state.objectivesCompleted = scoreSummary.objectivesCompleted;
+    state.objectivesTotal = scoreSummary.objectivesTotal;
+    return scoreSummary;
+  }
+
   function refreshAllNodeActivity(state) {
     for (let i = 0; i < state.nodes.length; i += 1) {
       updateActiveState(state.nodes[i]);
@@ -131,6 +151,7 @@ export function createChainLabEngine() {
   function updateObjectiveState(state) {
     const objectiveResult = evaluateObjectives(state);
     state.lastTurn.objectiveProgress = objectiveResult.progress;
+    updateScoreState(state);
     return objectiveResult;
   }
 
@@ -206,6 +227,7 @@ export function createChainLabEngine() {
     state.result = result;
     state.phase = 'end';
     state.lastTurn.status = makeOutcomeStatus(result, reason);
+    updateScoreState(state);
     state.rewardPacket = buildRewardPacket(state);
     bump();
 
@@ -216,7 +238,11 @@ export function createChainLabEngine() {
       movesUsed: state.movesUsed,
       overload: state.overload,
       infectedCount: getInfectedCount(state),
-      explodedCount: state.nodes.filter((node) => node.exploded).length
+      explodedCount: state.nodes.filter((node) => node.exploded).length,
+      totalScore: state.totalScore,
+      rank: state.rank,
+      objectivesCompleted: state.objectivesCompleted,
+      objectivesTotal: state.objectivesTotal
     });
 
     emitTelemetry('reward_generated', {
@@ -251,6 +277,7 @@ export function createChainLabEngine() {
 
     state.phase = 'await_input';
     state.lastTurn.status = 'Awaiting next move.';
+    updateScoreState(state);
     bump();
   }
 
@@ -455,18 +482,39 @@ export function createChainLabEngine() {
     return startLevel(startIndex);
   }
 
+  function getActivationRadius() {
+    const canvas = runtime.canvas;
+    const mobileWidth = canvas && canvas.clientWidth > 0
+      ? canvas.clientWidth <= CONFIG.UI.MOBILE_BREAKPOINT
+      : false;
+
+    return mobileWidth
+      ? CONFIG.NODES.CLICK_RADIUS + CONFIG.INPUT.TOUCH_RADIUS_BONUS
+      : CONFIG.NODES.CLICK_RADIUS;
+  }
+
   function setAim(x, y, active) {
     const state = getState();
-    if (!state || !active || state.phase === 'end') {
-      if (state) {
+    if (!state) {
+      return;
+    }
+
+    if (!active || state.phase === 'end') {
+      if (state.hoverNodeId !== null) {
         state.hoverNodeId = null;
+        bump();
       }
       return;
     }
 
-    const hover = findClosestNode(state.nodes, x, y, CONFIG.NODES.CLICK_RADIUS + 10);
-    state.hoverNodeId = hover ? hover.id : null;
-    bump();
+    const hoverRadius = getActivationRadius() + 10;
+    const hover = findClosestNode(state.nodes, x, y, hoverRadius);
+    const nextHoverId = hover ? hover.id : null;
+
+    if (state.hoverNodeId !== nextHoverId) {
+      state.hoverNodeId = nextHoverId;
+      bump();
+    }
   }
 
   function fireShot(targetX, targetY) {
@@ -475,7 +523,7 @@ export function createChainLabEngine() {
       return false;
     }
 
-    const node = findClosestNode(state.nodes, targetX, targetY, CONFIG.NODES.CLICK_RADIUS);
+    const node = findClosestNode(state.nodes, targetX, targetY, getActivationRadius());
     if (!node) {
       state.lastAction = {
         type: 'activate',
@@ -580,9 +628,13 @@ export function createChainLabEngine() {
       index,
       id: level.id,
       name: level.name,
+      chapter: level.chapter,
+      difficulty: level.difficulty,
+      difficultyTag: level.difficultyTag,
+      teachingGoal: level.teachingGoal,
+      parScore: level.parScore,
       movesLimit: level.movesLimit,
-      overloadLimit: level.overloadLimit,
-      difficultyTag: level.difficultyTag
+      overloadLimit: level.overloadLimit
     }));
   }
 
@@ -609,7 +661,9 @@ export function createChainLabEngine() {
         lastAction: { valid: false, nodeId: null, reason: 'idle' },
         lastTurn: { trace: [] },
         result: 'in_progress',
-        objectives: []
+        objectivesCompleted: 0,
+        objectivesTotal: 0,
+        totalScore: 0
       });
   }
 

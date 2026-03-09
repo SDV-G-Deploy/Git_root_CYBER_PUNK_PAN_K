@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: dark;
   --bg-top: #15293a;
   --bg-bottom: #050b11;
@@ -70,6 +70,7 @@ body {
 .playtest-actions button,
 .upgrade-row button,
 #tutorialStartButton {
+  min-height: 40px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(18, 37, 54, 0.94), rgba(10, 22, 32, 0.96));
   color: var(--text);
@@ -78,7 +79,7 @@ body {
 
 #levelSelect {
   padding: 6px 8px;
-  min-width: 138px;
+  min-width: 180px;
 }
 
 #helpButton,
@@ -89,11 +90,6 @@ body {
 
 #soundToggleButton {
   margin-left: auto;
-}
-
-#helpButton,
-#retryButton {
-  margin-left: 0;
 }
 
 #helpButton:hover,
@@ -113,6 +109,7 @@ body {
   border: 2px solid #26465a;
   background: #0c1f2b;
   display: block;
+  touch-action: manipulation;
   box-shadow: 0 0 0 1px rgba(111, 170, 203, 0.08), 0 16px 36px rgba(0, 0, 0, 0.35);
 }
 
@@ -160,6 +157,7 @@ body {
 #coachBody,
 .coach-meta,
 .outcome-reason,
+.outcome-rank-reason,
 .tutorial-tip,
 .meta-status,
 .chain-feed-status,
@@ -229,10 +227,10 @@ body {
 }
 
 .outcome {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.1fr) minmax(280px, 1.4fr) auto;
+  gap: 16px;
+  align-items: start;
 }
 
 .outcome.win {
@@ -251,8 +249,33 @@ body {
   gap: 4px;
 }
 
+.outcome-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.outcome-bonus-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .outcome-actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
@@ -260,7 +283,7 @@ body {
 .playtest-actions button,
 .upgrade-row button,
 #tutorialStartButton {
-  padding: 6px 12px;
+  padding: 8px 12px;
 }
 
 .hidden {
@@ -435,16 +458,60 @@ body {
 
   .hud {
     gap: 10px;
+    align-items: stretch;
   }
 
-  #soundToggleButton {
+  .title,
+  .stats,
+  .level-select-wrap {
+    width: 100%;
+  }
+
+  .stats {
+    gap: 8px;
+  }
+
+  #levelSelect,
+  #soundToggleButton,
+  #helpButton,
+  #retryButton {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    width: 100%;
     margin-left: 0;
+  }
+
+  .summary {
+    flex-direction: column;
+    gap: 8px;
   }
 
   .coach-panel,
   .outcome {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .outcome-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .outcome-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .outcome-actions button {
+    flex: 1 1 0;
+  }
+
+  .playtest-actions {
+    flex-direction: column;
+  }
+
+  .playtest-actions button {
+    width: 100%;
   }
 
   .tutorial-grid {

@@ -1,4 +1,4 @@
-function getEl(documentRef, id) {
+﻿function getEl(documentRef, id) {
   return documentRef.getElementById(id);
 }
 
@@ -44,6 +44,89 @@ function buildTraceLine(entry) {
   return `#${entry.step} ${source} -> ${entry.toNodeId}${edge}, +${entry.energyAccepted}`;
 }
 
+function formatRankLabel(rank) {
+  if (rank === 'perfect') {
+    return 'Perfect';
+  }
+
+  if (rank === 'strong') {
+    return 'Strong';
+  }
+
+  if (rank === 'clear') {
+    return 'Clear';
+  }
+
+  if (rank === 'failed') {
+    return 'Failed';
+  }
+
+  return 'Pending';
+}
+
+function formatStateLabel(summary) {
+  if (!summary) {
+    return 'Booting';
+  }
+
+  if (summary.phase === 'end') {
+    return summary.result === 'win' ? 'Run Complete' : 'Run Failed';
+  }
+
+  if (summary.phase === 'resolving') {
+    return 'Resolving';
+  }
+
+  return 'Awaiting Input';
+}
+
+function buildRankReason(summary) {
+  if (!summary || summary.phase !== 'end') {
+    return 'Complete the objectives to lock in a final score and rank.';
+  }
+
+  if (summary.rank === 'perfect') {
+    return 'Perfect: no exploded nodes, no infection left, and at least 2 unused moves.';
+  }
+
+  if (summary.rank === 'strong') {
+    return 'Strong: you won with efficient routing or controlled overload usage.';
+  }
+
+  if (summary.rank === 'clear') {
+    return 'Clear: objectives complete, but there is room to improve efficiency or control.';
+  }
+
+  return 'Failed: retry with a safer route, fewer overload spikes, or faster containment.';
+}
+
+function buildBonusLines(summary) {
+  if (!summary || !summary.scoreBreakdown) {
+    return [];
+  }
+
+  const breakdown = summary.scoreBreakdown;
+  return [
+    `Clear bonus: ${breakdown.clearBonus}`,
+    `Efficiency bonus: ${breakdown.efficiencyBonus}`,
+    `Overload control bonus: ${breakdown.overloadControlBonus}`,
+    `Clean network bonus: ${breakdown.cleanNetworkBonus}`,
+    `Failure floor: ${breakdown.failureFloor}`
+  ];
+}
+
+function buildLevelOptionLabel(level) {
+  const prefix = level.locked
+    ? '[LOCKED]'
+    : level.perfect
+      ? '[PERFECT]'
+      : level.completed
+        ? '[CLEAR]'
+        : '[OPEN]';
+  const score = level.bestScore > 0 ? ` | ${level.bestScore}` : '';
+  return `${prefix} ${level.id} ${level.name}${score}`;
+}
+
 function getCoachCopy(snapshot, summary) {
   if (snapshot && snapshot.hoverInfo) {
     return {
@@ -65,9 +148,7 @@ function getCoachCopy(snapshot, summary) {
     return {
       title: summary.result === 'win' ? 'Run Complete' : 'Run Failed',
       body: summary.lastTurn.status || 'Operation complete.',
-      meta: summary.result === 'win'
-        ? 'Press Enter or click the arena to move on.'
-        : 'Press Space, R, or Retry to restart quickly.'
+      meta: `Score ${summary.totalScore} | Rank ${formatRankLabel(summary.rank)} | ${buildRankReason(summary)}`
     };
   }
 
@@ -93,7 +174,7 @@ function getCoachCopy(snapshot, summary) {
     return {
       title: 'Primary Objective',
       body: summary.nextObjectiveText || 'Charge the core.',
-      meta: 'Open with a Power node. Firewalls let you redirect the flow.'
+      meta: summary.teachingGoal || 'Open with a Power node. Firewalls let you redirect the flow.'
     };
   }
 
@@ -116,7 +197,7 @@ function getCoachCopy(snapshot, summary) {
   return {
     title: 'Next Move',
     body: summary.nextObjectiveText || 'Charge the core.',
-    meta: 'Hover nodes to inspect them. Neon pulses show where energy just traveled.'
+    meta: `Par ${summary.parScore} | Hover nodes to inspect them. Neon pulses show where energy just traveled.`
   };
 }
 
@@ -138,6 +219,14 @@ export function createUI(documentRef) {
     outcomePanel: getEl(documentRef, 'outcomePanel'),
     outcomeText: getEl(documentRef, 'outcomeText'),
     outcomeReason: getEl(documentRef, 'outcomeReason'),
+    outcomeRank: getEl(documentRef, 'outcomeRank'),
+    outcomeScoreTotal: getEl(documentRef, 'outcomeScoreTotal'),
+    outcomeObjectives: getEl(documentRef, 'outcomeObjectives'),
+    outcomeMoves: getEl(documentRef, 'outcomeMoves'),
+    outcomeOverload: getEl(documentRef, 'outcomeOverload'),
+    outcomeExploded: getEl(documentRef, 'outcomeExploded'),
+    outcomeRankReason: getEl(documentRef, 'outcomeRankReason'),
+    outcomeBonusList: getEl(documentRef, 'outcomeBonusList'),
     summaryRetryButton: getEl(documentRef, 'summaryRetryButton'),
     nextButton: getEl(documentRef, 'nextButton'),
     summaryResult: getEl(documentRef, 'summaryResult'),
@@ -164,17 +253,27 @@ export function createUI(documentRef) {
   const toggleCache = new Map();
   let tutorialVisible = false;
   let chainKey = '';
+  let levelSelectKey = '';
+  let bonusListKey = '';
 
   function renderLevelSelect(levels, currentIndex) {
     if (!refs.levelSelect) {
       return;
     }
 
+    const nextKey = JSON.stringify({ levels, currentIndex });
+    if (nextKey === levelSelectKey) {
+      refs.levelSelect.value = String(currentIndex);
+      return;
+    }
+
+    levelSelectKey = nextKey;
     refs.levelSelect.innerHTML = '';
     levels.forEach((level) => {
       const option = documentRef.createElement('option');
       option.value = String(level.index);
-      option.textContent = `${level.id} ${level.name}`;
+      option.textContent = buildLevelOptionLabel(level);
+      option.disabled = Boolean(level.locked);
       refs.levelSelect.appendChild(option);
     });
 
@@ -198,6 +297,27 @@ export function createUI(documentRef) {
     }
   }
 
+  function renderOutcomeBonusList(summary) {
+    if (!refs.outcomeBonusList) {
+      return;
+    }
+
+    const bonusLines = buildBonusLines(summary);
+    const nextKey = JSON.stringify(bonusLines);
+    if (nextKey === bonusListKey) {
+      return;
+    }
+
+    bonusListKey = nextKey;
+    refs.outcomeBonusList.innerHTML = '';
+
+    for (let i = 0; i < bonusLines.length; i += 1) {
+      const item = documentRef.createElement('li');
+      item.textContent = bonusLines[i];
+      refs.outcomeBonusList.appendChild(item);
+    }
+  }
+
   function syncOutcome(summary) {
     if (!summary || !refs.outcomePanel) {
       return;
@@ -210,8 +330,6 @@ export function createUI(documentRef) {
       if (refs.nextButton) {
         refs.nextButton.disabled = false;
       }
-      setText(textCache, 'outcome-text', refs.outcomeText, 'Operation in progress');
-      setText(textCache, 'outcome-reason', refs.outcomeReason, 'Charge the core before the network collapses.');
       return;
     }
 
@@ -226,16 +344,44 @@ export function createUI(documentRef) {
         'outcome-text',
         refs.outcomeText,
         hasNextLevel
-          ? 'Protocol complete. Press Enter or click arena for next level.'
-          : 'Campaign complete. Press R to replay current level.'
+          ? 'Protocol complete. Continue to the next sector when ready.'
+          : 'Protocol complete. Final sector cleared.'
       );
     } else {
       setToggle(toggleCache, 'outcome-win', refs.outcomePanel, 'win', false);
       setToggle(toggleCache, 'outcome-lose', refs.outcomePanel, 'lose', true);
-      setText(textCache, 'outcome-text', refs.outcomeText, 'Operation failed. Press Space/click arena to retry.');
+      setText(textCache, 'outcome-text', refs.outcomeText, 'Operation failed. Retry the current route.');
     }
 
     setText(textCache, 'outcome-reason', refs.outcomeReason, summary.lastTurn.status || '');
+    setText(textCache, 'outcome-rank', refs.outcomeRank, `Rank: ${formatRankLabel(summary.rank)}`);
+    setText(textCache, 'outcome-score-total', refs.outcomeScoreTotal, `Total score: ${summary.totalScore}`);
+    setText(
+      textCache,
+      'outcome-objectives',
+      refs.outcomeObjectives,
+      `Objectives: ${summary.objectivesCompleted}/${summary.objectivesTotal}`
+    );
+    setText(
+      textCache,
+      'outcome-moves',
+      refs.outcomeMoves,
+      `Moves used: ${summary.movesUsed} | Moves left: ${summary.movesRemaining}`
+    );
+    setText(
+      textCache,
+      'outcome-overload',
+      refs.outcomeOverload,
+      `Overload: ${summary.overload}/${summary.overloadLimit}`
+    );
+    setText(
+      textCache,
+      'outcome-exploded',
+      refs.outcomeExploded,
+      `Exploded nodes: ${summary.explodedCount}`
+    );
+    setText(textCache, 'outcome-rank-reason', refs.outcomeRankReason, buildRankReason(summary));
+    renderOutcomeBonusList(summary);
 
     if (refs.nextButton) {
       refs.nextButton.disabled = !hasNextLevel || summary.result !== 'win';
@@ -255,6 +401,7 @@ export function createUI(documentRef) {
 
     const objectives = Array.isArray(summary.objectives) ? summary.objectives : [];
     const chainHash = JSON.stringify({
+      revision: summary.revision,
       turn: summary.turnIndex,
       result: summary.result,
       objectives,
@@ -300,7 +447,12 @@ export function createUI(documentRef) {
       setText(textCache, 'hud-turn', refs.scoreLabel, `Turn: ${snapshot.turnIndex}`);
       setText(textCache, 'hud-moves', refs.shotsLabel, `Moves: ${snapshot.movesRemaining}/${snapshot.movesLimit}`);
       setText(textCache, 'hud-overload', refs.targetLabel, `Overload: ${snapshot.overload}/${snapshot.overloadLimit}`);
-      setText(textCache, 'hud-level', refs.levelLabel, `Level: ${snapshot.levelId} - ${snapshot.levelName}`);
+      setText(
+        textCache,
+        'hud-level',
+        refs.levelLabel,
+        `Level: ${snapshot.levelId} - ${snapshot.levelName} | ${snapshot.chapter}`
+      );
       setText(
         textCache,
         'hud-infected',
@@ -314,20 +466,29 @@ export function createUI(documentRef) {
     }
 
     if (summary) {
-      const completed = summary.objectives.filter((objective) => objective.done).length;
-      setText(textCache, 'summary-result', refs.summaryResult, `Result: ${summary.result}`);
-      setText(textCache, 'summary-core', refs.summaryScore, `Core charge: ${summary.coreCharge}`);
+      setText(
+        textCache,
+        'summary-result',
+        refs.summaryResult,
+        `State: ${formatStateLabel(summary)} | Rank: ${formatRankLabel(summary.rank)}`
+      );
+      setText(
+        textCache,
+        'summary-score',
+        refs.summaryScore,
+        `Score: ${summary.totalScore} | Par: ${summary.parScore}`
+      );
       setText(
         textCache,
         'summary-objectives',
         refs.summaryDepth,
-        `Objectives: ${completed}/${summary.objectives.length}`
+        `Objectives: ${summary.objectivesCompleted}/${summary.objectivesTotal} | Core charge: ${summary.coreCharge}`
       );
       setText(
         textCache,
         'summary-metrics',
         refs.summaryAccuracy,
-        `Moves: ${summary.movesUsed}/${summary.movesLimit} | Overload: ${summary.overload}/${summary.overloadLimit} | Exploded: ${summary.explodedCount}`
+        `Moves left: ${summary.movesRemaining}/${summary.movesLimit} | Overload: ${summary.overload}/${summary.overloadLimit} | Exploded: ${summary.explodedCount}`
       );
 
       syncOutcome(summary);

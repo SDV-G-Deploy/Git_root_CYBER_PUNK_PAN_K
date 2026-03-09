@@ -1,9 +1,19 @@
-import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
+﻿import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
 
 export function createRunId() {
   const now = Date.now().toString(36);
   const random = Math.floor(Math.random() * 0xffffff).toString(36);
   return `run_${now}_${random}`;
+}
+
+function createDefaultScoreBreakdown() {
+  return {
+    clearBonus: 0,
+    efficiencyBonus: 0,
+    overloadControlBonus: 0,
+    cleanNetworkBonus: 0,
+    failureFloor: 0
+  };
 }
 
 function defaultThresholdForType(type) {
@@ -278,7 +288,11 @@ export function createState(level, levelIndex, levelCount) {
     levelName: level.name || level.id,
     levelIndex,
     levelCount,
-    difficultyTag: level.difficultyTag || 'intro',
+    chapter: level.chapter || 'Sector 1',
+    difficulty: level.difficulty || level.difficultyTag || 'intro',
+    difficultyTag: level.difficultyTag || level.difficulty || 'intro',
+    teachingGoal: level.teachingGoal || 'Charge the core.',
+    parScore: Number.isFinite(level.parScore) ? level.parScore : 0,
     phase: 'await_input',
     result: 'in_progress',
     ended: false,
@@ -299,6 +313,8 @@ export function createState(level, levelIndex, levelCount) {
     neighborsByNode: buildNeighborIndex(nodes, edges),
 
     objectives: buildObjectives(level),
+    objectivesCompleted: 0,
+    objectivesTotal: 0,
 
     queue: [],
     queueHead: 0,
@@ -321,6 +337,11 @@ export function createState(level, levelIndex, levelCount) {
       objectiveProgress: [],
       status: 'Awaiting input.'
     },
+
+    scoreBreakdown: createDefaultScoreBreakdown(),
+    totalScore: 0,
+    rank: 'pending',
+    rewardPacket: null,
 
     hoverNodeId: null,
     effects: {
@@ -401,7 +422,11 @@ export function getSnapshot(state) {
     levelName: state.levelName,
     levelIndex: state.levelIndex,
     levelCount: state.levelCount,
+    chapter: state.chapter,
+    difficulty: state.difficulty,
     difficultyTag: state.difficultyTag,
+    teachingGoal: state.teachingGoal,
+    parScore: state.parScore,
     phase: state.phase,
     result: state.result,
     turnIndex: state.turnIndex,
@@ -415,6 +440,10 @@ export function getSnapshot(state) {
     virusCount: getVirusCount(state),
     explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
+    totalScore: state.totalScore,
+    rank: state.rank,
+    objectivesCompleted: state.objectivesCompleted,
+    objectivesTotal: state.objectivesTotal,
     hoverInfo: buildHoverInfo(state),
     nextObjectiveText: getNextObjectiveText(state),
     revision: state.revision
@@ -428,7 +457,11 @@ export function getRunSummary(state) {
     levelName: state.levelName,
     levelIndex: state.levelIndex,
     levelCount: state.levelCount,
+    chapter: state.chapter,
+    difficulty: state.difficulty,
     difficultyTag: state.difficultyTag,
+    teachingGoal: state.teachingGoal,
+    parScore: state.parScore,
     phase: state.phase,
     result: state.result,
     turnIndex: state.turnIndex,
@@ -442,7 +475,13 @@ export function getRunSummary(state) {
     virusCount: getVirusCount(state),
     explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
+    totalScore: state.totalScore,
+    rank: state.rank,
+    scoreBreakdown: { ...state.scoreBreakdown },
+    objectivesCompleted: state.objectivesCompleted,
+    objectivesTotal: state.objectivesTotal,
     nextObjectiveText: getNextObjectiveText(state),
+    rewardPacket: state.rewardPacket ? { ...state.rewardPacket } : null,
     objectives: state.objectives.map((objective) => ({ ...objective })),
     lastAction: { ...state.lastAction },
     lastTurn: {

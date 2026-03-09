@@ -5,6 +5,12 @@ export const CONFIG = Object.freeze({
     BACKGROUND: '#08131d',
     BORDER: '#20445c'
   },
+  UI: {
+    MOBILE_BREAKPOINT: 760
+  },
+  INPUT: {
+    TOUCH_RADIUS_BONUS: 12
+  },
   NODES: {
     RADIUS: 21,
     CLICK_RADIUS: 26,
@@ -47,6 +53,15 @@ export const CONFIG = Object.freeze({
     CORRUPTION_ABSORB_FACTOR: 0.5,
     CLEANSE_THRESHOLD: 4
   },
+  SCORING: {
+    CLEAR_BONUS: 1000,
+    EFFICIENCY_PER_UNUSED_MOVE: 175,
+    OVERLOAD_HEADROOM_BONUS: 45,
+    CLEAN_NETWORK_BONUS: 250,
+    FAILURE_FLOOR: 100,
+    STRONG_OVERLOAD_RATIO: 0.5,
+    PERFECT_UNUSED_MOVES: 2
+  },
   FEEDBACK: {
     PACKET_SPEED: 0.18,
     PACKET_RADIUS: 4,
@@ -72,6 +87,10 @@ export const CONFIG = Object.freeze({
   SOUND: {
     MASTER_GAIN: 0.18,
     FLOW_DEBOUNCE_MS: 60
+  },
+  SAVE: {
+    KEY: 'signal_district_chainlab_save',
+    VERSION: 1
   },
   TELEMETRY: {
     MAX_LOG_ENTRIES: 5000

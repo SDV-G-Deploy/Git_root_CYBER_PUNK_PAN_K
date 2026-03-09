@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -48,16 +48,34 @@
     </section>
 
     <section class="summary" aria-live="polite">
-      <span id="summaryResult">Result: in_progress</span>
-      <span id="summaryScore">Core charge: 0</span>
-      <span id="summaryDepth">Objectives: 0/0</span>
-      <span id="summaryAccuracy">Moves: 0/0 | Overload: 0/0 | Exploded: 0</span>
+      <span id="summaryResult">State: Booting | Rank: Pending</span>
+      <span id="summaryScore">Score: 0 | Par: 0</span>
+      <span id="summaryDepth">Objectives: 0/0 | Core charge: 0</span>
+      <span id="summaryAccuracy">Moves left: 0/0 | Overload: 0/0 | Exploded: 0</span>
     </section>
 
     <section id="outcomePanel" class="outcome hidden" aria-live="polite">
       <div class="outcome-copy">
         <strong id="outcomeText">Run status</strong>
         <p id="outcomeReason" class="outcome-reason">Charge the core before the network collapses.</p>
+      </div>
+      <div class="outcome-breakdown">
+        <div class="outcome-grid">
+          <span id="outcomeRank">Rank: Pending</span>
+          <span id="outcomeScoreTotal">Total score: 0</span>
+          <span id="outcomeObjectives">Objectives: 0/0</span>
+          <span id="outcomeMoves">Moves used: 0 | Moves left: 0</span>
+          <span id="outcomeOverload">Overload: 0/0</span>
+          <span id="outcomeExploded">Exploded nodes: 0</span>
+        </div>
+        <p id="outcomeRankReason" class="outcome-rank-reason">Complete the objectives to lock in a final score and rank.</p>
+        <ul id="outcomeBonusList" class="outcome-bonus-list">
+          <li>Clear bonus: 0</li>
+          <li>Efficiency bonus: 0</li>
+          <li>Overload control bonus: 0</li>
+          <li>Clean network bonus: 0</li>
+          <li>Failure floor: 0</li>
+        </ul>
       </div>
       <div class="outcome-actions">
         <button id="summaryRetryButton" type="button">Retry</button>
@@ -102,7 +120,7 @@
       <pre id="telemetryReportOutput" class="telemetry-report hidden"></pre>
     </section>
 
-    <p class="hint">Click Power or Firewall nodes. Neon glow means interactive. White pulses show activation. Orange flash means overload.</p>
+    <p class="hint">Click Power or Firewall nodes. Neon glow means interactive. White pulses show activation. Orange flash means overload. Final score depends on clear, efficiency, overload control, and network cleanliness.</p>
   </main>
 
   <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">

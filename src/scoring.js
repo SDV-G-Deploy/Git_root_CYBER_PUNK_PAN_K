@@ -1,5 +1,20 @@
-import { NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
-import { createObjectiveText, getInfectedCount, getNodeById } from './gameState.js';
+﻿import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
+import {
+  createObjectiveText,
+  getExplodedCount,
+  getInfectedCount,
+  getNodeById
+} from './gameState.js';
+
+export function createEmptyScoreBreakdown() {
+  return {
+    clearBonus: 0,
+    efficiencyBonus: 0,
+    overloadControlBonus: 0,
+    cleanNetworkBonus: 0,
+    failureFloor: 0
+  };
+}
 
 function evaluatePowerCore(state, objective) {
   const node = getNodeById(state, objective.nodeId);
@@ -94,25 +109,106 @@ export function evaluateLoseCondition(state) {
   };
 }
 
+function getObjectiveCounts(state) {
+  const objectivesTotal = Array.isArray(state.objectives) ? state.objectives.length : 0;
+  let objectivesCompleted = 0;
+
+  for (let i = 0; i < objectivesTotal; i += 1) {
+    if (state.objectives[i].done) {
+      objectivesCompleted += 1;
+    }
+  }
+
+  return {
+    objectivesCompleted,
+    objectivesTotal
+  };
+}
+
+function getRank(state, infectedCount, explodedCount) {
+  if (state.phase !== 'end') {
+    return 'pending';
+  }
+
+  if (state.result !== 'win') {
+    return 'failed';
+  }
+
+  if (
+    explodedCount === 0 &&
+    infectedCount === 0 &&
+    state.movesRemaining >= CONFIG.SCORING.PERFECT_UNUSED_MOVES
+  ) {
+    return 'perfect';
+  }
+
+  const overloadRatio = state.overloadLimit > 0
+    ? state.overload / state.overloadLimit
+    : 1;
+
+  if (
+    state.movesRemaining >= 1 ||
+    overloadRatio <= CONFIG.SCORING.STRONG_OVERLOAD_RATIO
+  ) {
+    return 'strong';
+  }
+
+  return 'clear';
+}
+
+export function buildScoreSummary(state) {
+  const breakdown = createEmptyScoreBreakdown();
+  const infectedCount = getInfectedCount(state);
+  const explodedCount = getExplodedCount(state);
+  const overloadHeadroom = Math.max(0, state.overloadLimit - state.overload);
+  const objectiveCounts = getObjectiveCounts(state);
+
+  if (state.phase === 'end' && state.result === 'win') {
+    breakdown.clearBonus = CONFIG.SCORING.CLEAR_BONUS;
+    breakdown.efficiencyBonus = Math.max(0, state.movesRemaining) * CONFIG.SCORING.EFFICIENCY_PER_UNUSED_MOVE;
+    breakdown.overloadControlBonus = overloadHeadroom * CONFIG.SCORING.OVERLOAD_HEADROOM_BONUS;
+    breakdown.cleanNetworkBonus = infectedCount === 0 ? CONFIG.SCORING.CLEAN_NETWORK_BONUS : 0;
+  } else if (state.phase === 'end' && state.result !== 'win') {
+    breakdown.failureFloor = CONFIG.SCORING.FAILURE_FLOOR;
+  }
+
+  const totalScore = Math.max(
+    0,
+    breakdown.clearBonus +
+      breakdown.efficiencyBonus +
+      breakdown.overloadControlBonus +
+      breakdown.cleanNetworkBonus +
+      breakdown.failureFloor
+  );
+
+  return {
+    scoreBreakdown: breakdown,
+    totalScore,
+    rank: getRank(state, infectedCount, explodedCount),
+    objectivesCompleted: objectiveCounts.objectivesCompleted,
+    objectivesTotal: objectiveCounts.objectivesTotal
+  };
+}
+
 export function makeOutcomeStatus(result, reason) {
   if (result === 'win') {
-    return 'Protocol stabilized. Core is online.';
+    return 'Success: the core is charged and the district is stable.';
   }
 
   if (reason === 'energy_overload') {
-    return 'Failure: overload reached critical threshold.';
+    return 'Failure: overload hit the district limit before the objective was complete.';
   }
 
   if (reason === 'network_collapse') {
-    return 'Failure: infection collapsed the district network.';
+    return 'Failure: infection spread too far and the network collapsed.';
   }
 
   if (reason === 'out_of_moves') {
-    return 'Failure: move budget exhausted.';
+    return 'Failure: move budget exhausted before the objectives were complete.';
   }
 
   if (reason === 'simulation_overflow') {
-    return 'Failure: propagation overflow safeguard triggered.';
+    return 'Failure: propagation overflow safeguard triggered during resolution.';
   }
 
   return 'Operation in progress.';
