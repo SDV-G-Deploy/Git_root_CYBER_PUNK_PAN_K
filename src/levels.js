@@ -503,26 +503,26 @@ const LEVELS = [
     chapter: 'District Core',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Balance two power feeds while keeping the virus-adjacent relay lane from becoming the default answer.',
+    teachingGoal: 'Split power across a gate lane and a virus-pressured relay lane before collapse catches up.',
     parScore: 1080,
-    movesLimit: 9,
+    movesLimit: 6,
     overloadLimit: 10,
     collapseLimit: 5,
     nodes: [
       { id: 'P1', type: 'power', x: 100, y: 180, injectPower: 5 },
       { id: 'P2', type: 'power', x: 100, y: 380, injectPower: 5 },
-      { id: 'F1', type: 'firewall', x: 280, y: 280, firewallOpen: false, firewallModes: [['E3', 'E4'], ['E5', 'E6']], activeMode: 0, injectPower: 2 },
-      { id: 'O1', type: 'overload', x: 500, y: 170, emitPower: 5, overloadThreshold: 5, threshold: 2 },
-      { id: 'R1', type: 'relay', x: 500, y: 390, emitPower: 3 },
-      { id: 'V1', type: 'virus', x: 650, y: 390, spreadRate: 1 },
-      { id: 'C1', type: 'core', x: 830, y: 280, targetCharge: 12 }
+      { id: 'F1', type: 'firewall', x: 300, y: 180, firewallOpen: false, firewallModes: [['E3'], ['E4']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 320, y: 380, emitPower: 3 },
+      { id: 'O1', type: 'overload', x: 520, y: 180, emitPower: 5, overloadThreshold: 5, threshold: 2 },
+      { id: 'V1', type: 'virus', x: 530, y: 380, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 840, y: 280, targetCharge: 12 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
-      { id: 'E2', from: 'P2', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'P2', to: 'R1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E3', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E7', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
     ],
@@ -596,6 +596,120 @@ const LEVELS = [
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 14 }
+    ]
+  },
+  {
+    id: 'L21',
+    name: 'Twin Injectors',
+    chapter: 'Boot Sector',
+    difficulty: 'light',
+    difficultyTag: 'light',
+    teachingGoal: 'Use two power taps in sequence before committing to the relay lane.',
+    parScore: 1210,
+    movesLimit: 6,
+    overloadLimit: 7,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 120, y: 200, injectPower: 4 },
+      { id: 'P2', type: 'power', x: 120, y: 350, injectPower: 4 },
+      { id: 'R1', type: 'relay', x: 360, y: 270, threshold: 3, emitPower: 3 },
+      { id: 'C1', type: 'core', x: 700, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'P2', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
+    ]
+  },
+  {
+    id: 'L22',
+    name: 'Switchback Gate',
+    chapter: 'Firewall Ring',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Rotate one firewall lane to choose timing between a quick and stable branch.',
+    parScore: 1180,
+    movesLimit: 7,
+    overloadLimit: 7,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 120, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 300, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 500, y: 180, threshold: 2, emitPower: 2 },
+      { id: 'R2', type: 'relay', x: 500, y: 360, threshold: 3, emitPower: 3 },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 7 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 7 }
+    ]
+  },
+  {
+    id: 'L23',
+    name: 'Median Filter',
+    chapter: 'Quarantine Loop',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Route through the cleaner lane before virus pressure narrows your options.',
+    parScore: 1150,
+    movesLimit: 8,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 100, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 280, y: 270, firewallOpen: false, firewallModes: [['E2', 'E4'], ['E3', 'E5']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 470, y: 170, emitPower: 3 },
+      { id: 'R2', type: 'relay', x: 470, y: 370, emitPower: 3 },
+      { id: 'V1', type: 'virus', x: 650, y: 370, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 6 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R2', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'V1', to: 'R2', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 6 }
+    ]
+  },
+  {
+    id: 'L24',
+    name: 'Purge Junction',
+    chapter: 'Quarantine Loop',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Clean a corrupted relay first, then route both branches to finish the core.',
+    parScore: 1120,
+    movesLimit: 8,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 110, y: 270, injectPower: 5 },
+      { id: 'R1', type: 'relay', x: 340, y: 180, emitPower: 3, threshold: 3, corrupted: true },
+      { id: 'R2', type: 'relay', x: 340, y: 360, emitPower: 3, threshold: 3 },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 10 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'R1', capacity: 5, attenuation: 0, enabled: true },
+      { id: 'E2', from: 'P1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
+      { type: 'clean_corruption' }
     ]
   }
 ];
