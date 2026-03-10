@@ -109,3 +109,29 @@
   - `L9/L11`,
   - `L13/L14`,
   - `L17/L18/L19`.
+
+## Continuation Pass #2
+
+### Scope
+- Targeted remaining repetition clusters:
+  - `L9/L11`
+  - `L13/L14`
+
+### Changes made
+- `L9 Virus Wake` rebuilt into a compact 5-node intro-virus scenario:
+  - one relay lane instead of mirrored two-relay fork,
+  - direct firewall-to-core branch retained,
+  - keeps early virus teaching intent with clearer lane commitment.
+- `L14 Split Feed` now requires activation quality, not only raw charge:
+  - objective set changed to `power_core + activate_all`.
+
+### Validation
+- `24/24` levels solvable, `0` cutoffs.
+- Pack remains honest and full: `10/10` slots.
+
+### Repetition impact
+- Strong pair `L9-L11` no longer appears in top near-duplicate list.
+- `L13-L14` reduced from highest similarity bucket to lower bucket.
+- Remaining strongest clusters now:
+  - `L5/L22`
+  - `L17/L18/L19`

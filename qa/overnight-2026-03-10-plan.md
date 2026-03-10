@@ -94,3 +94,11 @@
   - `build-pack`: 10/10 slots filled,
   - slot semantics unchanged.
 - No protected systems touched (daily/seed/classifier/slot contracts unchanged).
+
+## Continuation pass #2 summary
+- Updated `L9` topology to remove mirrored-virus fork overlap with `L11`.
+- Updated `L14` objective profile (`activate_all`) to reduce same-pattern completion behavior vs `L13`.
+- Regression checks passed:
+  - validate: 24/24 solvable,
+  - pack: 10/10 slots,
+  - contracts unchanged.

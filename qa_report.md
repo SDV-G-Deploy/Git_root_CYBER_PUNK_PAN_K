@@ -4,7 +4,7 @@ Generated levels checked: 24
 Solvable: 24
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 10172
+Total states explored: 10146
 
 ## Gameplay Rules Summary
 
@@ -60,7 +60,7 @@ Total states explored: 10172
 | L6 | Solvable | light | Hard | 5 | 18 | 2 | none |
 | L7 | Solvable | medium | Hard | 6 | 1648 | 3 | none |
 | L8 | Solvable | medium | Hard | 6 | 21 | 2 | none |
-| L9 | Solvable | medium | Hard | 5 | 5 | 2 | tight_move_budget |
+| L9 | Solvable | medium | Hard | 5 | 9 | 2 | tight_move_budget |
 | L10 | Solvable | medium | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path |
 | L11 | Solvable | medium | Hard | 5 | 15 | 2 | none |
 | L12 | Solvable | hard | Medium | 6 | 116 | 2 | none |
@@ -268,16 +268,16 @@ Total states explored: 10172
 ### L9 Virus Wake
 
 - Chapter: Quarantine Loop
-- Teaching goal: Use the firewall to favor the safe lane before the infected branch becomes a liability.
+- Teaching goal: Intro virus pressure: pick a lane before corruption spreads through the relay.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (9.45)
-- Minimal winning path: F1 -> P1 -> P1 -> P1 -> P1
+- Estimated difficulty: Hard (9.13)
+- Minimal winning path: F1 -> F1 -> P1 -> P1 -> P1
 - Minimal moves: 5 / 6
-- Solution count (capped): 5
+- Solution count (capped): 9
 - Average branching factor: 2
-- Explored states: 88
-- Dead states: 36
+- Explored states: 62
+- Dead states: 22
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
@@ -286,9 +286,9 @@ Total states explored: 10172
   - F1: keeps a win alive; minMoves=5; path=F1
   - P1: keeps a win alive; minMoves=6; path=P1
 - Dead state examples:
-  - moves=2, overload=0, infected=1, path=F1 -> F1
   - moves=2, overload=0, infected=1, path=P1 -> P1
-  - moves=3, overload=0, infected=1, path=F1 -> F1 -> F1
+  - moves=3, overload=0, infected=1, path=P1 -> F1 -> P1
+  - moves=3, overload=0, infected=1, path=P1 -> P1 -> F1
 
 ### L10 Clean Sweep
 

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-03-10T02:27:46.696Z",
+  "generatedAt": "2026-03-10T08:39:37.693Z",
   "summary": {
     "levelCount": 24,
     "solvableCount": 24,
     "unsolvedCount": 0,
     "searchCutoffCount": 0,
-    "totalStatesExplored": 10172,
+    "totalStatesExplored": 10146,
     "issueCounts": {
       "single_opening_solution": 7,
       "single_solution_path": 7,
@@ -1371,22 +1371,22 @@
       "levelName": "Virus Wake",
       "authoredDifficulty": "medium",
       "chapter": "Quarantine Loop",
-      "teachingGoal": "Use the firewall to favor the safe lane before the infected branch becomes a liability.",
+      "teachingGoal": "Intro virus pressure: pick a lane before corruption spreads through the relay.",
       "movesLimit": 6,
       "overloadLimit": 7,
       "collapseLimit": 4,
-      "totalStates": 88,
-      "expandedStates": 51,
-      "generatedTransitions": 102,
-      "repeatedStates": 15,
+      "totalStates": 62,
+      "expandedStates": 42,
+      "generatedTransitions": 84,
+      "repeatedStates": 23,
       "overflowStates": 0,
       "winningStateCount": 3,
-      "terminalLossStateCount": 34,
+      "terminalLossStateCount": 17,
       "averageBranchingFactor": 2,
       "solvable": true,
       "minMoves": 5,
       "minimalMoves": 5,
-      "solutionCount": 5,
+      "solutionCount": 9,
       "solutionPath": [
         {
           "type": "activate_node",
@@ -1395,8 +1395,8 @@
         },
         {
           "type": "activate_node",
-          "nodeId": "P1",
-          "nodeType": "power"
+          "nodeId": "F1",
+          "nodeType": "firewall"
         },
         {
           "type": "activate_node",
@@ -1417,8 +1417,13 @@
       "solverProof": {
         "solvable": true,
         "minMoves": 5,
-        "solutionCount": 5,
+        "solutionCount": 9,
         "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
           {
             "type": "activate_node",
             "nodeId": "F1",
@@ -1438,19 +1443,14 @@
             "type": "activate_node",
             "nodeId": "P1",
             "nodeType": "power"
-          },
-          {
-            "type": "activate_node",
-            "nodeId": "P1",
-            "nodeType": "power"
           }
         ]
       },
-      "deadStateCount": 36,
+      "deadStateCount": 22,
       "searchCutoff": false,
       "minimalWinningPath": [
         "F1",
-        "P1",
+        "F1",
         "P1",
         "P1",
         "P1"
@@ -1459,7 +1459,7 @@
       "bestObjectiveCount": 1,
       "bestProgressPath": [
         "F1",
-        "P1",
+        "F1",
         "P1",
         "P1",
         "P1"
@@ -1479,7 +1479,7 @@
           "nodeType": "firewall",
           "solvable": true,
           "minMovesToWin": 5,
-          "solutionCount": 4,
+          "solutionCount": 8,
           "endState": "in_progress",
           "endReason": null,
           "path": [
@@ -1505,15 +1505,6 @@
           "overload": 0,
           "infectedCount": 1,
           "path": [
-            "F1",
-            "F1"
-          ]
-        },
-        {
-          "movesUsed": 2,
-          "overload": 0,
-          "infectedCount": 1,
-          "path": [
             "P1",
             "P1"
           ]
@@ -1523,14 +1514,24 @@
           "overload": 0,
           "infectedCount": 1,
           "path": [
+            "P1",
             "F1",
-            "F1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
             "F1"
           ]
         }
       ],
       "lossReasonCounts": {
-        "out_of_moves": 34
+        "out_of_moves": 17
       },
       "clickableNodes": [
         {
@@ -1548,7 +1549,7 @@
       ],
       "nonInteractableClickables": [],
       "difficultyEstimate": "Hard",
-      "difficultyScore": 9.45,
+      "difficultyScore": 9.13,
       "issues": [
         "tight_move_budget"
       ]
@@ -2261,7 +2262,7 @@
         "P1"
       ],
       "maxCoreCharge": 12,
-      "bestObjectiveCount": 1,
+      "bestObjectiveCount": 2,
       "bestProgressPath": [
         "P1",
         "P1",
@@ -2272,7 +2273,7 @@
         "overload": 12,
         "infectedCount": 0,
         "coreCharge": 12,
-        "objectivesCompleted": 1,
+        "objectivesCompleted": 2,
         "result": "win",
         "endReason": "objectives_complete"
       },

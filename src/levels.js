@@ -224,7 +224,7 @@ const LEVELS = [
     chapter: 'Quarantine Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Use the firewall to favor the safe lane before the infected branch becomes a liability.',
+    teachingGoal: 'Intro virus pressure: pick a lane before corruption spreads through the relay.',
     parScore: 1240,
     movesLimit: 6,
     overloadLimit: 7,
@@ -232,18 +232,16 @@ const LEVELS = [
     nodes: [
       { id: 'P1', type: 'power', x: 120, y: 280, injectPower: 5 },
       { id: 'F1', type: 'firewall', x: 300, y: 280, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
-      { id: 'R1', type: 'relay', x: 500, y: 180, emitPower: 3 },
-      { id: 'R2', type: 'relay', x: 500, y: 380, emitPower: 3 },
+      { id: 'R1', type: 'relay', x: 500, y: 280, emitPower: 3 },
       { id: 'V1', type: 'virus', x: 650, y: 380, spreadRate: 1 },
       { id: 'C1', type: 'core', x: 800, y: 280, targetCharge: 7 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E6', from: 'V1', to: 'R2', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E5', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 7 }
@@ -400,7 +398,8 @@ const LEVELS = [
       { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 }
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
+      { type: 'activate_all' }
     ]
   },
   {
