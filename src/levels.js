@@ -844,6 +844,296 @@ const LEVELS = [
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
     ]
+  },
+  {
+    id: 'L29',
+    name: 'Purity Switch',
+    chapter: 'Purifier Loop',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Use a firewall gate to decide when purifier support outranks raw relay throughput.',
+    parScore: 1040,
+    movesLimit: 9,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 250, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 450, y: 180, emitPower: 3, threshold: 3, corrupted: true },
+      { id: 'U1', type: 'purifier', x: 450, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 620, y: 180, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 840, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'U1', to: 'R1', capacity: 1, attenuation: 2, enabled: true },
+      { id: 'E7', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L30',
+    name: 'Patch Window',
+    chapter: 'Purifier Loop',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Choose between overload burst and purifier cleanse windows while finishing the core objective.',
+    parScore: 1020,
+    movesLimit: 8,
+    overloadLimit: 9,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 230, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 90, y: 340, injectPower: 4 },
+      { id: 'F1', type: 'firewall', x: 250, y: 270, firewallOpen: false, firewallModes: [['E3'], ['E4']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 460, y: 180, emitPower: 5, threshold: 2, overloadThreshold: 4, corrupted: true },
+      { id: 'U1', type: 'purifier', x: 460, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 640, y: 180, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 860, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'P2', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'clean_corruption' },
+      { type: 'activate_all' }
+    ]
+  },
+  {
+    id: 'L31',
+    name: 'Sterile Lattice',
+    chapter: 'Purifier Loop',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Rotate firewall modes to keep purifier support online while cleansing and routing through relay chains.',
+    parScore: 1000,
+    movesLimit: 10,
+    overloadLimit: 9,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 250, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3'], ['E2', 'E3']], activeMode: 0, injectPower: 2 },
+      { id: 'U1', type: 'purifier', x: 430, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'R1', type: 'relay', x: 430, y: 180, emitPower: 3, threshold: 3, corrupted: true },
+      { id: 'R2', type: 'relay', x: 620, y: 270, emitPower: 3, threshold: 3 },
+      { id: 'V1', type: 'virus', x: 620, y: 140, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 850, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'U1', to: 'R2', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'U1', to: 'R1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E9', from: 'U1', to: 'C1', capacity: 1, attenuation: 2, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L32',
+    name: 'Quarantine Bypass',
+    chapter: 'District Core',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Alternate firewall routes to keep overload under control while purifier support preserves full activation.',
+    parScore: 980,
+    movesLimit: 9,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 80, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 230, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 420, y: 170, emitPower: 5, threshold: 2, overloadThreshold: 4 },
+      { id: 'U1', type: 'purifier', x: 420, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'R1', type: 'relay', x: 620, y: 270, emitPower: 3, threshold: 3 },
+      { id: 'V1', type: 'virus', x: 620, y: 140, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 850, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'O1', to: 'R1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'U1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'U1', to: 'C1', capacity: 1, attenuation: 2, enabled: true },
+      { id: 'E8', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E9', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'activate_all' }
+    ]
+  },
+  {
+    id: 'L33',
+    name: 'Containment Broker',
+    chapter: 'District Core',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Coordinate dual sources so purifier upkeep and core throughput do not fight each other.',
+    parScore: 960,
+    movesLimit: 10,
+    overloadLimit: 9,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 80, y: 220, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 80, y: 340, injectPower: 4 },
+      { id: 'F1', type: 'firewall', x: 240, y: 270, firewallOpen: false, firewallModes: [['E3'], ['E4'], ['E3', 'E4']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 450, y: 170, emitPower: 5, threshold: 2, overloadThreshold: 4 },
+      { id: 'R1', type: 'relay', x: 450, y: 360, emitPower: 3, threshold: 3 },
+      { id: 'U1', type: 'purifier', x: 620, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 620, y: 170, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 860, y: 270, targetCharge: 9 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'P2', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'R1', to: 'U1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E9', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E10', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 9 },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L34',
+    name: 'Vector Balance',
+    chapter: 'District Core',
+    difficulty: 'challenge',
+    difficultyTag: 'challenge',
+    teachingGoal: 'Balance route activation and full sanitation in the same run under two-lane pressure.',
+    parScore: 940,
+    movesLimit: 11,
+    overloadLimit: 9,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 80, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 240, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 430, y: 160, emitPower: 3, threshold: 3 },
+      { id: 'R2', type: 'relay', x: 430, y: 380, emitPower: 3, threshold: 3 },
+      { id: 'U1', type: 'purifier', x: 620, y: 380, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 620, y: 160, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 860, y: 270, targetCharge: 9 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R2', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E8', from: 'U1', to: 'R1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E9', from: 'R2', to: 'C1', capacity: 1, attenuation: 2, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 9 },
+      { type: 'activate_all' },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L35',
+    name: 'Sanitation Circuit',
+    chapter: 'District Core',
+    difficulty: 'challenge',
+    difficultyTag: 'challenge',
+    teachingGoal: 'Chain two firewall decisions so purifier cleanup and overload lanes stay synchronized.',
+    parScore: 920,
+    movesLimit: 9,
+    overloadLimit: 10,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 70, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 220, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'F2', type: 'firewall', x: 430, y: 270, firewallOpen: false, firewallModes: [['E4'], ['E5']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 620, y: 170, emitPower: 5, threshold: 2, overloadThreshold: 4 },
+      { id: 'U1', type: 'purifier', x: 620, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 780, y: 170, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 900, y: 270, targetCharge: 10 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'F2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F2', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'F2', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E9', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
+      { type: 'clean_corruption' },
+      { type: 'activate_all' }
+    ]
+  },
+  {
+    id: 'L36',
+    name: 'Protocol Apex',
+    chapter: 'District Core',
+    difficulty: 'boss',
+    difficultyTag: 'boss',
+    teachingGoal: 'Final gauntlet: firewall routing must balance overload burst with purifier-backed sanitation.',
+    parScore: 900,
+    movesLimit: 9,
+    overloadLimit: 10,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 70, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 70, y: 360, injectPower: 3 },
+      { id: 'F1', type: 'firewall', x: 230, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E4'], ['E2', 'E4']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 430, y: 170, emitPower: 5, threshold: 2, overloadThreshold: 4 },
+      { id: 'U1', type: 'purifier', x: 430, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'R1', type: 'relay', x: 640, y: 360, emitPower: 3, threshold: 3 },
+      { id: 'V1', type: 'virus', x: 640, y: 170, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 880, y: 270, targetCharge: 10 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'U1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E8', from: 'U1', to: 'O1', capacity: 1, attenuation: 2, enabled: true },
+      { id: 'E9', from: 'P2', to: 'U1', capacity: 2, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
+      { type: 'clean_corruption' }
+    ]
   }
 ];
 
@@ -879,3 +1169,5 @@ export function clampLevelIndex(index, levels) {
 
   return Math.min(levels.length - 1, Math.max(0, Number(index) || 0));
 }
+
+

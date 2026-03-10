@@ -1,4 +1,4 @@
-﻿# AGENTS.md
+# AGENTS.md
 
 ## Scope
 This file applies only to the CyberPunkPuzzleWars project folder.
@@ -11,6 +11,16 @@ Always read these files first:
 
 Use repository state as source of truth if docs are stale.
 If docs are stale, update them before finalizing a meaningful pass.
+
+## Active Runtime Map
+Current playable runtime path is:
+- `index.html` -> `src/bootstrap.js` -> `src/engine.js`
+
+Primary live gameplay/content files are under `src/`.
+
+## Legacy File Safety
+Root-level legacy files exist (`game.js`, `main.js`, `levels.js`) and are not the active runtime path.
+Do not edit them for gameplay changes unless a task explicitly targets legacy migration.
 
 ## Working Directory Rule
 Work only inside the local CyberPunkPuzzleWars repository folder.
@@ -47,9 +57,11 @@ Do not touch these unless explicitly requested:
 Before reporting completion, run relevant existing checks.
 
 Current known commands:
-- `powershell -ExecutionPolicy Bypass -File scripts\build-pack.ps1`
 - `powershell -ExecutionPolicy Bypass -File scripts\validate-levels.ps1`
+- `powershell -ExecutionPolicy Bypass -File scripts\build-pack.ps1`
+- `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1`
 
+For campaign/level passes, run all three.
 If validation cannot be run, say so explicitly.
 
 ## Project Memory Maintenance (Mandatory)

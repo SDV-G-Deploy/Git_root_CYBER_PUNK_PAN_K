@@ -3,11 +3,16 @@
 Last updated: 2026-03-10
 
 ## Repository State Snapshot
-- Current local HEAD at start of this pass: `2d7be28` on `main`
+- Current local HEAD at start of this pass: `8fe2e69` on `main`
 - Purifier recovery merge remains in history: `acb8cbd` (includes `0faa562`)
 
 ## Project Summary
-CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under pressure from infection, overload, firewall routing constraints, and objective logic.
+CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under pressure from infection, overload, firewall routing constraints, and multi-objective level logic.
+
+## Active Runtime and Structure
+- Active playable entry path: `index.html` -> `src/bootstrap.js` -> `src/engine.js`
+- Live gameplay/content logic is in `src/`
+- Root-level `game.js`, `main.js`, `levels.js` are legacy files and not the active runtime path
 
 ## Core Implemented Mechanics
 - Power nodes inject energy.
@@ -33,26 +38,50 @@ Purifier is implemented as a passive support node:
 - Effect occurs at end of turn after virus spread.
 - Can fully cleanse adjacent infection when corruption progress reaches 0.
 
-## Purifier-Era Levels
-- `L25` Purifier Wake
-- `L26` Sanitize or Rush
-- `L27` Sterile Route
-- `L28` Sanitation Gate
+## Campaign Content State
+- Total authored levels: **36** (`L1`-`L36`)
+- Chapter distribution:
+  - Boot Sector: 5
+  - Firewall Ring: 5
+  - Quarantine Loop: 6
+  - Overload Channel: 4
+  - Purifier Loop: 6
+  - District Core: 10
+- Objective distribution:
+  - `power_core`: 36
+  - `activate_all`: 7
+  - `clean_corruption`: 11
 
-## Latest Integration State
-- `L25` now tagged as medium (`difficulty` + `difficultyTag`) to match practical medium-slot fit.
-- `L26` and `L27` remain mechanically unchanged in this pass.
-- Purifier mechanic behavior is unchanged.
+## Latest Campaign Expansion (Night Pass)
+Added new late-campaign levels on existing mechanics only:
+- `L29` Purity Switch
+- `L30` Patch Window
+- `L31` Sterile Lattice
+- `L32` Quarantine Bypass
+- `L33` Containment Broker
+- `L34` Vector Balance
+- `L35` Sanitation Circuit
+- `L36` Protocol Apex
+
+Design focus: stronger purifier-era and mixed-priority families (firewall routing + overload risk + virus pressure + sanitation goals).
+
+## QA and Reliability State
+- Added runtime smoke script: `tools/qa/runtime-smoke.mjs`
+- Wrapper command: `scripts/runtime-smoke.ps1`
+- Smoke checks verify core lifecycle flow (level start/switch/retry/next, hints, and telemetry run_end integrity).
 
 ## Current Validation Status
-Latest verified state after purifier integration pass:
+Latest verified state after this pass:
 - `validate-levels`: pass
-- solvability: 28/28 solvable, 0 unsolved, 0 search cutoffs
-- purifier-era issue flags for `L25`/`L26`/`L27`: none
-- `build-pack`: pass (28 candidates, 10 accepted, 18 deferred, 0 rejected)
-- selected purifier presence in actual pack lineup:
-  - `L25` selected as medium slot `#5`
-  - `L28` selected as hard slot `#8`
+  - solvability: **36/36**
+  - unsolved: 0
+  - search cutoffs: 0
+- `build-pack`: pass
+  - candidates: 36
+  - accepted: 10
+  - deferred: 26
+  - rejected: 0
+- `runtime-smoke`: pass
 
 ## Protected Systems
 Do not touch unless explicitly requested:
@@ -62,11 +91,11 @@ Do not touch unless explicitly requested:
 - Campaign systems
 
 ## Known Limitations
-- Some earlier non-purifier levels are still tight or single-solution-leaning.
-- `L26` and `L27` are still deferred by slot selection in current pack output.
-- Balance tuning remains separate from purifier mechanic correctness.
+- Early tutorial cluster (`L1`, `L2`, `L4`, `L10`, `L13`, `L14`, `L24`) still contains single-path style levels by design/history.
+- Some late levels remain high-pressure (`tight_move_budget` on `L29`, `L34`).
+- Current structured pack template still selects a subset of campaign levels, so most new late levels remain deferred in slot assignment.
 
 ## Recommended Next Steps
-1. Human-guided decision: keep `L25` as medium-tag purifier onboarding, or retune placement intent if campaign pacing prefers later purifier exposure.
-2. If more purifier presence is desired, run a separate narrow pass for `L26`/`L27` slot fit only (no heuristic/semantic changes).
-3. Keep purifier mechanic unchanged unless explicitly requested.
+1. Run a narrow early-campaign softening pass (`L1`-`L4`) to reduce repeated single-path feel without removing onboarding clarity.
+2. Run telemetry-calibrated difficulty pass for `L29`-`L36` after real play sessions, then retag only where evidence supports it.
+3. Keep purifier/runtime rules unchanged; continue improving campaign quality through content-level tuning.

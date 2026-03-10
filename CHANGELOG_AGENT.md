@@ -88,3 +88,41 @@
   - medium slot `#5`: `L25`
   - hard slot `#8`: `L28`
 - Protected systems not touched.
+## 2026-03-10 - Night Pass: Campaign Expansion + Runtime QA Hardening
+
+### Changed
+- Expanded authored campaign from `28` to `36` levels.
+- Added late-campaign content levels:
+  - `L29` Purity Switch
+  - `L30` Patch Window
+  - `L31` Sterile Lattice
+  - `L32` Quarantine Bypass
+  - `L33` Containment Broker
+  - `L34` Vector Balance
+  - `L35` Sanitation Circuit
+  - `L36` Protocol Apex
+- Iteratively tuned new levels to remove unsolved/degenerate candidates under current validator/pack contracts.
+- Added runtime smoke QA utility and script wrapper.
+- Updated repo-memory and agent workflow docs to reflect active runtime path and new validation command.
+
+### Files Changed in This Pass
+- `src/levels.js`
+- `tools/qa/runtime-smoke.mjs`
+- `scripts/runtime-smoke.ps1`
+- `qa/level-validation.json`
+- `qa/pack-build-report.json`
+- `qa_report.md`
+- `AGENTS.md`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `validate-levels`: pass (`36/36` solvable, `0` unsolved, `0` cutoffs)
+- `build-pack`: pass (`36` candidates, `10` accepted, `26` deferred, `0` rejected)
+- `runtime-smoke`: pass (lifecycle/hint/telemetry sanity checks)
+
+### Notes
+- No gameplay-rule changes were made to purifier core behavior.
+- No new mechanics were introduced.
+- Protected systems were not touched.

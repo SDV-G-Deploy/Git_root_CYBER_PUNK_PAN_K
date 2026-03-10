@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-03-10T18:17:03.833Z",
-  "candidateCount": 28,
+  "generatedAt": "2026-03-10T19:27:49.188Z",
+  "candidateCount": 36,
   "acceptedCount": 10,
-  "deferredCount": 18,
+  "deferredCount": 26,
   "rejectedCount": 0,
   "rejectionCounts": {},
   "acceptedDifficultyCounts": {
     "easy": 1,
     "medium": 5,
-    "hard": 3,
-    "extreme": 1
+    "hard": 2,
+    "extreme": 2
   },
   "acceptedSlotCounts": {
     "boss": 1,
@@ -346,13 +346,13 @@
       "slotId": "slot9",
       "slotRole": "challenge",
       "slotLabel": "Challenge Puzzle",
-      "levelId": "L19",
-      "levelName": "Zero Infection",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "hard",
-      "topologyScale": 10.5,
-      "complexityScore": 20.23,
-      "slotScore": 175.85
+      "levelId": "L34",
+      "levelName": "Vector Balance",
+      "authoredDifficultyTag": "challenge",
+      "predictedActualDifficultyClass": "extreme",
+      "topologyScale": 11.5,
+      "complexityScore": 23.42,
+      "slotScore": 185.26
     },
     {
       "slotIndex": 10,
@@ -395,9 +395,9 @@
       "slotIndex": 9,
       "role": "challenge",
       "label": "Challenge Puzzle",
-      "selectedLevelId": "L19",
-      "selectedLevelName": "Zero Infection",
-      "slotScore": 175.85,
+      "selectedLevelId": "L34",
+      "selectedLevelName": "Vector Balance",
+      "slotScore": 185.26,
       "constraintSummary": null
     },
     {
@@ -510,22 +510,22 @@
       "topologyFingerprint": "topo_9bb0827e"
     },
     {
-      "levelId": "L19",
-      "levelName": "Zero Infection",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 70,
-      "minMoves": 6,
-      "solutionCount": 592,
-      "averageBranchingFactor": 3,
-      "complexityScore": 20.23,
-      "topologyScale": 10.5,
+      "levelId": "L34",
+      "levelName": "Vector Balance",
+      "authoredDifficultyTag": "challenge",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 88,
+      "minMoves": 10,
+      "solutionCount": 56,
+      "averageBranchingFactor": 2,
+      "complexityScore": 23.42,
+      "topologyScale": 11.5,
       "slotId": "slot9",
       "slotRole": "challenge",
       "slotIndex": 9,
-      "slotScore": 175.85,
+      "slotScore": 185.26,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_c771455d"
+      "topologyFingerprint": "topo_933bb666"
     },
     {
       "levelId": "L16",
@@ -956,6 +956,26 @@
       "topologyFingerprint": "topo_826ba26c"
     },
     {
+      "levelId": "L19",
+      "levelName": "Zero Infection",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 592,
+      "averageBranchingFactor": 3,
+      "complexityScore": 20.23,
+      "topologyScale": 10.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_c771455d"
+    },
+    {
       "levelId": "L24",
       "levelName": "Purge Junction",
       "authoredDifficultyTag": "medium",
@@ -1014,13 +1034,153 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_58f06d54"
+    },
+    {
+      "levelId": "L29",
+      "levelName": "Purity Switch",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 88,
+      "minMoves": 8,
+      "solutionCount": 24,
+      "averageBranchingFactor": 2,
+      "complexityScore": 19.66,
+      "topologyScale": 9.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_8905ce4c"
+    },
+    {
+      "levelId": "L30",
+      "levelName": "Patch Window",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 5,
+      "solutionCount": 1016,
+      "averageBranchingFactor": 3,
+      "complexityScore": 18.74,
+      "topologyScale": 11,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_6117d8f8"
+    },
+    {
+      "levelId": "L31",
+      "levelName": "Sterile Lattice",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 7,
+      "solutionCount": 308,
+      "averageBranchingFactor": 2,
+      "complexityScore": 19.22,
+      "topologyScale": 11.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_21e5914e"
+    },
+    {
+      "levelId": "L32",
+      "levelName": "Quarantine Bypass",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 7,
+      "solutionCount": 6,
+      "averageBranchingFactor": 2,
+      "complexityScore": 20.22,
+      "topologyScale": 11.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_71314e88"
+    },
+    {
+      "levelId": "L33",
+      "levelName": "Containment Broker",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 4,
+      "solutionCount": 39,
+      "averageBranchingFactor": 3,
+      "complexityScore": 20.72,
+      "topologyScale": 13,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_4e695e50"
+    },
+    {
+      "levelId": "L35",
+      "levelName": "Sanitation Circuit",
+      "authoredDifficultyTag": "challenge",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 7,
+      "solutionCount": 1005,
+      "averageBranchingFactor": 3,
+      "complexityScore": 21.65,
+      "topologyScale": 11.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_adad3eb8"
+    },
+    {
+      "levelId": "L36",
+      "levelName": "Protocol Apex",
+      "authoredDifficultyTag": "boss",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 7,
+      "solutionCount": 1422,
+      "averageBranchingFactor": 3,
+      "complexityScore": 22.33,
+      "topologyScale": 12.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_90c9ed0e"
     }
   ],
   "rejectedEntries": [],
   "topologyFingerprints": [
     "topo_4d4055d2",
     "topo_9bb0827e",
-    "topo_c771455d",
+    "topo_933bb666",
     "topo_2d212b04",
     "topo_407d0214",
     "topo_8b02e8f2",

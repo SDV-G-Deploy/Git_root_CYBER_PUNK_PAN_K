@@ -52,3 +52,15 @@
 ## Next Recommended Focus
 - If desired, address remaining non-purifier tight/single-solution hotspots in a separate scoped pass.
 - Keep scope narrow and avoid introducing new mechanics without explicit instruction.
+## 2026-03-10 - Night Autonomous Campaign Strengthening Pass
+- Performed full project/rules discovery against active runtime (`index.html -> src/bootstrap.js -> src/engine.js`) and current repo-memory files.
+- Confirmed root-level `game.js`/`main.js`/`levels.js` are legacy and not the active runtime path.
+- Expanded campaign content from 28 to 36 levels by adding `L29`-`L36` in `src/levels.js`.
+- New levels focused on purifier-era and mixed-priority patterns (firewall routing, overload tension, virus pressure, sanitation objectives).
+- Reworked newly added levels iteratively until solver-clean state was reached (`36/36` solvable, `0` unsolved, `0` cutoffs).
+- Pack build remains stable and honest (`10` accepted, `26` deferred, `0` rejected); new challenge slot now includes `L34 Vector Balance`.
+- Added runtime QA hardening script:
+  - `tools/qa/runtime-smoke.mjs`
+  - `scripts/runtime-smoke.ps1`
+- Runtime smoke verifies level lifecycle transitions, hint reset behavior, and telemetry run_end integrity (no duplicate run_end detected in smoke run).
+- Protected systems were not touched (Splitter, Fuse/Stabilizer, Delay, daily/seed semantics, classifier/slot semantics, generator heuristics).

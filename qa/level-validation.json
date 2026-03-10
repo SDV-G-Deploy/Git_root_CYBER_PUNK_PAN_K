@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-03-10T18:16:58.190Z",
+  "generatedAt": "2026-03-10T19:27:45.251Z",
   "summary": {
-    "levelCount": 28,
-    "solvableCount": 28,
+    "levelCount": 36,
+    "solvableCount": 36,
     "unsolvedCount": 0,
     "searchCutoffCount": 0,
-    "totalStatesExplored": 11346,
+    "totalStatesExplored": 39001,
     "issueCounts": {
-      "single_opening_solution": 7,
+      "single_opening_solution": 9,
       "single_solution_path": 7,
-      "tight_move_budget": 5,
+      "tight_move_budget": 7,
       "zero_margin_move_budget": 1
     },
     "difficultyCounts": {
       "Easy": 5,
       "Medium": 10,
-      "Hard": 13,
+      "Hard": 21,
       "Unsolvable": 0
     }
   },
@@ -4979,6 +4979,1770 @@
       "nonInteractableClickables": [],
       "difficultyEstimate": "Hard",
       "difficultyScore": 9.84,
+      "issues": []
+    },
+    {
+      "levelId": "L29",
+      "levelName": "Purity Switch",
+      "authoredDifficulty": "medium",
+      "chapter": "Purifier Loop",
+      "teachingGoal": "Use a firewall gate to decide when purifier support outranks raw relay throughput.",
+      "movesLimit": 9,
+      "overloadLimit": 8,
+      "collapseLimit": 4,
+      "totalStates": 246,
+      "expandedStates": 150,
+      "generatedTransitions": 300,
+      "repeatedStates": 55,
+      "overflowStates": 0,
+      "winningStateCount": 16,
+      "terminalLossStateCount": 80,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 8,
+      "minimalMoves": 8,
+      "solutionCount": 24,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 8,
+        "solutionCount": 24,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 99,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "P1",
+        "P1",
+        "F1",
+        "P1"
+      ],
+      "maxCoreCharge": 10,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F1",
+        "P1",
+        "P1",
+        "F1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 9,
+        "overload": 0,
+        "infectedCount": 0,
+        "coreCharge": 9,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 8,
+          "solutionCount": 21,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 9,
+          "solutionCount": 3,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 2,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "out_of_moves": 80
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 12.41,
+      "issues": [
+        "tight_move_budget"
+      ]
+    },
+    {
+      "levelId": "L30",
+      "levelName": "Patch Window",
+      "authoredDifficulty": "medium",
+      "chapter": "Purifier Loop",
+      "teachingGoal": "Choose between overload burst and purifier cleanse windows while finishing the core objective.",
+      "movesLimit": 8,
+      "overloadLimit": 9,
+      "collapseLimit": 4,
+      "totalStates": 2421,
+      "expandedStates": 1029,
+      "generatedTransitions": 3087,
+      "repeatedStates": 667,
+      "overflowStates": 0,
+      "winningStateCount": 340,
+      "terminalLossStateCount": 1052,
+      "averageBranchingFactor": 3,
+      "solvable": true,
+      "minMoves": 5,
+      "minimalMoves": 5,
+      "solutionCount": 1016,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P2",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P2",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 1016,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P2",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P2",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 445,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "P2",
+        "P2",
+        "F1",
+        "F1",
+        "F1"
+      ],
+      "maxCoreCharge": 17,
+      "bestObjectiveCount": 3,
+      "bestProgressPath": [
+        "P2",
+        "P2",
+        "P2",
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 8,
+        "overload": 10,
+        "infectedCount": 0,
+        "coreCharge": 16,
+        "objectivesCompleted": 3,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 6,
+          "solutionCount": 406,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 6,
+          "solutionCount": 262,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        },
+        {
+          "action": "P2",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 5,
+          "solutionCount": 348,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P2"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1",
+            "P2",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "energy_overload": 76,
+        "out_of_moves": 976
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "P2",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1",
+        "P2"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 9.1,
+      "issues": []
+    },
+    {
+      "levelId": "L31",
+      "levelName": "Sterile Lattice",
+      "authoredDifficulty": "hard",
+      "chapter": "Purifier Loop",
+      "teachingGoal": "Rotate firewall modes to keep purifier support online while cleansing and routing through relay chains.",
+      "movesLimit": 10,
+      "overloadLimit": 9,
+      "collapseLimit": 4,
+      "totalStates": 485,
+      "expandedStates": 252,
+      "generatedTransitions": 504,
+      "repeatedStates": 20,
+      "overflowStates": 0,
+      "winningStateCount": 126,
+      "terminalLossStateCount": 107,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 7,
+      "minimalMoves": 7,
+      "solutionCount": 308,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 7,
+        "solutionCount": 308,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 106,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "F1",
+        "F1"
+      ],
+      "maxCoreCharge": 8,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "F1",
+        "F1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 7,
+        "overload": 0,
+        "infectedCount": 0,
+        "coreCharge": 8,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 7,
+          "solutionCount": 160,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 8,
+          "solutionCount": 148,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 5,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "P1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 5,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "out_of_moves": 107
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 10.31,
+      "issues": []
+    },
+    {
+      "levelId": "L32",
+      "levelName": "Quarantine Bypass",
+      "authoredDifficulty": "hard",
+      "chapter": "District Core",
+      "teachingGoal": "Alternate firewall routes to keep overload under control while purifier support preserves full activation.",
+      "movesLimit": 9,
+      "overloadLimit": 8,
+      "collapseLimit": 4,
+      "totalStates": 471,
+      "expandedStates": 245,
+      "generatedTransitions": 490,
+      "repeatedStates": 20,
+      "overflowStates": 0,
+      "winningStateCount": 6,
+      "terminalLossStateCount": 220,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 7,
+      "minimalMoves": 7,
+      "solutionCount": 6,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 7,
+        "solutionCount": 6,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 220,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "P1",
+        "F1",
+        "P1"
+      ],
+      "maxCoreCharge": 16,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "F1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 9,
+        "overload": 8,
+        "infectedCount": 0,
+        "coreCharge": 16,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 7,
+          "solutionCount": 6,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": false,
+          "minMovesToWin": null,
+          "solutionCount": 0,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 1,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 2,
+          "overload": 2,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "F1"
+          ]
+        },
+        {
+          "movesUsed": 2,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "energy_overload": 89,
+        "out_of_moves": 131
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 12.3,
+      "issues": [
+        "single_opening_solution"
+      ]
+    },
+    {
+      "levelId": "L33",
+      "levelName": "Containment Broker",
+      "authoredDifficulty": "hard",
+      "chapter": "District Core",
+      "teachingGoal": "Coordinate dual sources so purifier upkeep and core throughput do not fight each other.",
+      "movesLimit": 10,
+      "overloadLimit": 9,
+      "collapseLimit": 4,
+      "totalStates": 5324,
+      "expandedStates": 3249,
+      "generatedTransitions": 9747,
+      "repeatedStates": 4424,
+      "overflowStates": 0,
+      "winningStateCount": 31,
+      "terminalLossStateCount": 2044,
+      "averageBranchingFactor": 3,
+      "solvable": true,
+      "minMoves": 4,
+      "minimalMoves": 4,
+      "solutionCount": 39,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P2",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P2",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 39,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P2",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P2",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 3226,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "P2",
+        "P2",
+        "F1",
+        "F1"
+      ],
+      "maxCoreCharge": 12,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "P2",
+        "P2",
+        "P2",
+        "F1",
+        "F1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 5,
+        "overload": 4,
+        "infectedCount": 0,
+        "coreCharge": 12,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": false,
+          "minMovesToWin": null,
+          "solutionCount": 0,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": false,
+          "minMovesToWin": null,
+          "solutionCount": 0,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        },
+        {
+          "action": "P2",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 4,
+          "solutionCount": 39,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P2"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 1,
+          "overload": 2,
+          "infectedCount": 0,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "movesUsed": 1,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 2,
+          "overload": 2,
+          "infectedCount": 2,
+          "path": [
+            "F1",
+            "F1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "out_of_moves": 2044
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "P2",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1",
+        "P2"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 11.64,
+      "issues": [
+        "single_opening_solution"
+      ]
+    },
+    {
+      "levelId": "L34",
+      "levelName": "Vector Balance",
+      "authoredDifficulty": "challenge",
+      "chapter": "District Core",
+      "teachingGoal": "Balance route activation and full sanitation in the same run under two-lane pressure.",
+      "movesLimit": 11,
+      "overloadLimit": 9,
+      "collapseLimit": 4,
+      "totalStates": 1254,
+      "expandedStates": 749,
+      "generatedTransitions": 1498,
+      "repeatedStates": 245,
+      "overflowStates": 0,
+      "winningStateCount": 34,
+      "terminalLossStateCount": 471,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 10,
+      "minimalMoves": 10,
+      "solutionCount": 56,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 10,
+        "solutionCount": 56,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 649,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F1",
+        "F1",
+        "F1",
+        "F1",
+        "F1",
+        "F1"
+      ],
+      "maxCoreCharge": 24,
+      "bestObjectiveCount": 3,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F1",
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 11,
+        "overload": 0,
+        "infectedCount": 0,
+        "coreCharge": 22,
+        "objectivesCompleted": 3,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 10,
+          "solutionCount": 42,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 11,
+          "solutionCount": 14,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 2,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "F1",
+            "F1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "out_of_moves": 471
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 15.11,
+      "issues": [
+        "tight_move_budget"
+      ]
+    },
+    {
+      "levelId": "L35",
+      "levelName": "Sanitation Circuit",
+      "authoredDifficulty": "challenge",
+      "chapter": "District Core",
+      "teachingGoal": "Chain two firewall decisions so purifier cleanup and overload lanes stay synchronized.",
+      "movesLimit": 9,
+      "overloadLimit": 10,
+      "collapseLimit": 4,
+      "totalStates": 10927,
+      "expandedStates": 4508,
+      "generatedTransitions": 13524,
+      "repeatedStates": 2598,
+      "overflowStates": 0,
+      "winningStateCount": 455,
+      "terminalLossStateCount": 5964,
+      "averageBranchingFactor": 3,
+      "solvable": true,
+      "minMoves": 7,
+      "minimalMoves": 7,
+      "solutionCount": 1005,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F2",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F2",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F2",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 7,
+        "solutionCount": 1005,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F2",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F2",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F2",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 3553,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "P1",
+        "F2",
+        "F2",
+        "F1",
+        "F2"
+      ],
+      "maxCoreCharge": 17,
+      "bestObjectiveCount": 3,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "F2",
+        "F2",
+        "F1",
+        "F1",
+        "F2"
+      ],
+      "bestProgressState": {
+        "movesUsed": 9,
+        "overload": 10,
+        "infectedCount": 0,
+        "coreCharge": 16,
+        "objectivesCompleted": 3,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 7,
+          "solutionCount": 421,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "F2",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 7,
+          "solutionCount": 353,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F2"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 8,
+          "solutionCount": 231,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "F1",
+            "F1",
+            "F2"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "F1",
+            "F1",
+            "F1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "energy_overload": 633,
+        "out_of_moves": 5331
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        },
+        {
+          "id": "F2",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "F2",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 11.95,
+      "issues": []
+    },
+    {
+      "levelId": "L36",
+      "levelName": "Protocol Apex",
+      "authoredDifficulty": "boss",
+      "chapter": "District Core",
+      "teachingGoal": "Final gauntlet: firewall routing must balance overload burst with purifier-backed sanitation.",
+      "movesLimit": 9,
+      "overloadLimit": 10,
+      "collapseLimit": 4,
+      "totalStates": 6527,
+      "expandedStates": 3103,
+      "generatedTransitions": 9309,
+      "repeatedStates": 2783,
+      "overflowStates": 0,
+      "winningStateCount": 385,
+      "terminalLossStateCount": 3039,
+      "averageBranchingFactor": 3,
+      "solvable": true,
+      "minMoves": 7,
+      "minimalMoves": 7,
+      "solutionCount": 1422,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 7,
+        "solutionCount": 1422,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 2248,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "P1",
+        "P1"
+      ],
+      "maxCoreCharge": 10,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "P1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 7,
+        "overload": 10,
+        "infectedCount": 0,
+        "coreCharge": 10,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 7,
+          "solutionCount": 989,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 8,
+          "solutionCount": 145,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        },
+        {
+          "action": "P2",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 8,
+          "solutionCount": 288,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P2"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 2,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "F1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "energy_overload": 23,
+        "out_of_moves": 3016
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "P2",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1",
+        "P2"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Hard",
+      "difficultyScore": 12.07,
       "issues": []
     }
   ]
