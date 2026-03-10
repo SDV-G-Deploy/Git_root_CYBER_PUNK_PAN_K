@@ -1,6 +1,7 @@
 import { CONFIG, NODE_TYPES } from './config.js';
 import {
   bumpRevision,
+  createDefaultHintState,
   createState,
   getInfectedCount,
   getNodeById,
@@ -19,6 +20,7 @@ import {
 } from './scoring.js';
 import { prepareTurn, resolvePropagation, seedActionPacket } from './energySystem.js';
 import { renderState } from './render.js';
+import { buildHintForState } from './hints.js';
 
 function onRunEndStub() {
   return null;
@@ -119,6 +121,14 @@ export function createChainLabEngine() {
     if (state) {
       bumpRevision(state);
     }
+  }
+
+  function resetHintState(state) {
+    if (!state) {
+      return;
+    }
+
+    state.hint = createDefaultHintState();
   }
 
   function updateScoreState(state) {
@@ -375,6 +385,7 @@ export function createChainLabEngine() {
       reason: ''
     };
 
+    resetHintState(state);
     prepareTurn(state);
 
     let injectPower = 0;
@@ -585,6 +596,60 @@ export function createChainLabEngine() {
     return activateNode(node.id);
   }
 
+  function requestHint() {
+    const state = getState();
+    if (!state || state.phase === 'end') {
+      return null;
+    }
+
+    const maxTier = Number.isFinite(CONFIG.HINT?.MAX_TIER) ? CONFIG.HINT.MAX_TIER : 3;
+    const currentTier = state.hint && Number.isFinite(state.hint.tierShown)
+      ? state.hint.tierShown
+      : 0;
+    const nextTier = Math.max(1, Math.min(maxTier, currentTier + 1));
+
+    emitTelemetry('hint_requested', {
+      levelId: state.levelId,
+      turnIndex: state.turnIndex,
+      requestedTier: nextTier,
+      currentTier
+    });
+
+    const hintPayload = buildHintForState(state, nextTier);
+    const requests = state.hint && Number.isFinite(state.hint.requests)
+      ? state.hint.requests + 1
+      : 1;
+
+    state.hint = {
+      ...createDefaultHintState(),
+      tierShown: hintPayload.tier,
+      requests,
+      kind: hintPayload.kind,
+      message: hintPayload.message,
+      targetNodeId: hintPayload.targetNodeId,
+      secondaryNodeId: hintPayload.secondaryNodeId,
+      updatedTurnIndex: state.turnIndex
+    };
+
+    emitTelemetry('hint_tier_shown', {
+      levelId: state.levelId,
+      turnIndex: state.turnIndex,
+      tier: state.hint.tierShown,
+      hintKind: state.hint.kind,
+      targetNodeId: state.hint.targetNodeId,
+      secondaryNodeId: state.hint.secondaryNodeId
+    });
+
+    emitUxEvent('hint_shown', {
+      tier: state.hint.tierShown,
+      targetNodeId: state.hint.targetNodeId,
+      secondaryNodeId: state.hint.secondaryNodeId
+    });
+
+    bump();
+    return { ...state.hint };
+  }
+
   function executeCommand(command) {
     if (!command || typeof command !== 'object') {
       return;
@@ -605,6 +670,9 @@ export function createChainLabEngine() {
         break;
       case 'set_level':
         startLevel(command.levelIndex, 'abandoned_level_switch');
+        break;
+      case 'request_hint':
+        requestHint();
         break;
       case 'next_level':
         if (runtime.levelIndex < runtime.levels.length - 1) {
@@ -753,6 +821,7 @@ export function createChainLabEngine() {
     getModifiers,
     setAim,
     fireShot,
+    requestHint,
     tick,
     update,
     render,

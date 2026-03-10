@@ -16,6 +16,18 @@ function createDefaultScoreBreakdown() {
   };
 }
 
+export function createDefaultHintState() {
+  return {
+    tierShown: 0,
+    requests: 0,
+    kind: 'none',
+    message: 'Stuck? Press Hint for a tactical nudge.',
+    targetNodeId: null,
+    secondaryNodeId: null,
+    updatedTurnIndex: 0
+  };
+}
+
 function defaultThresholdForType(type) {
   if (type === NODE_TYPES.RELAY) {
     return CONFIG.TURN.RELAY_THRESHOLD;
@@ -342,6 +354,7 @@ export function createState(level, levelIndex, levelCount) {
     totalScore: 0,
     rank: 'pending',
     rewardPacket: null,
+    hint: createDefaultHintState(),
 
     hoverNodeId: null,
     effects: {
@@ -446,6 +459,7 @@ export function getSnapshot(state) {
     objectivesTotal: state.objectivesTotal,
     hoverInfo: buildHoverInfo(state),
     nextObjectiveText: getNextObjectiveText(state),
+    hint: state.hint ? { ...state.hint } : createDefaultHintState(),
     revision: state.revision
   };
 }

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -21,6 +21,7 @@
       <select id="levelSelect" aria-label="Select level"></select>
       <button id="soundToggleButton" type="button">Sound: On</button>
       <button id="helpButton" type="button">How to play</button>
+      <button id="hintButton" type="button">Hint</button>
       <button id="retryButton" type="button">Retry</button>
     </header>
 
@@ -33,6 +34,14 @@
         <p id="coachBody">Click a Power node to inject energy into the grid.</p>
       </div>
       <p id="coachMeta" class="coach-meta">Hover nodes to inspect their role before you commit a move.</p>
+    </section>
+
+    <section class="hint-panel" aria-live="polite">
+      <div class="hint-head">
+        <strong id="hintTierLabel">Hint tier: 0/3</strong>
+        <span id="hintTargetLabel">Focus: none</span>
+      </div>
+      <p id="hintMessage" class="hint-message">Stuck? Press Hint for a tactical nudge.</p>
     </section>
 
     <section class="legend" aria-label="Node legend">
@@ -157,3 +166,4 @@
   <script type="module" src="src/bootstrap.js"></script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-﻿function getEl(documentRef, id) {
+function getEl(documentRef, id) {
   return documentRef.getElementById(id);
 }
 
@@ -127,6 +127,18 @@ function buildLevelOptionLabel(level) {
   return `${prefix} ${level.id} ${level.name}${score}`;
 }
 
+function buildHintTargetText(hint) {
+  if (!hint || !hint.targetNodeId) {
+    return 'none';
+  }
+
+  if (hint.secondaryNodeId) {
+    return `${hint.targetNodeId} -> ${hint.secondaryNodeId}`;
+  }
+
+  return hint.targetNodeId;
+}
+
 function getCoachCopy(snapshot, summary) {
   if (snapshot && snapshot.hoverInfo) {
     return {
@@ -212,10 +224,14 @@ export function createUI(documentRef) {
     levelSelect: getEl(documentRef, 'levelSelect'),
     helpButton: getEl(documentRef, 'helpButton'),
     retryButton: getEl(documentRef, 'retryButton'),
+    hintButton: getEl(documentRef, 'hintButton'),
     soundToggleButton: getEl(documentRef, 'soundToggleButton'),
     coachTitle: getEl(documentRef, 'coachTitle'),
     coachBody: getEl(documentRef, 'coachBody'),
     coachMeta: getEl(documentRef, 'coachMeta'),
+    hintTierLabel: getEl(documentRef, 'hintTierLabel'),
+    hintTargetLabel: getEl(documentRef, 'hintTargetLabel'),
+    hintMessage: getEl(documentRef, 'hintMessage'),
     outcomePanel: getEl(documentRef, 'outcomePanel'),
     outcomeText: getEl(documentRef, 'outcomeText'),
     outcomeReason: getEl(documentRef, 'outcomeReason'),
@@ -442,6 +458,38 @@ export function createUI(documentRef) {
     setText(textCache, 'coach-meta', refs.coachMeta, coach.meta);
   }
 
+  function syncHint(snapshot) {
+    if (!snapshot) {
+      return;
+    }
+
+    const hint = snapshot.hint || null;
+    const maxTier = 3;
+    const tierShown = hint && Number.isFinite(hint.tierShown) ? Math.max(0, hint.tierShown) : 0;
+    const nextTier = Math.min(maxTier, Math.max(1, tierShown + 1));
+
+    setText(textCache, 'hint-tier', refs.hintTierLabel, `Hint tier: ${tierShown}/${maxTier}`);
+    setText(textCache, 'hint-target', refs.hintTargetLabel, `Focus: ${buildHintTargetText(hint)}`);
+    setText(
+      textCache,
+      'hint-message',
+      refs.hintMessage,
+      hint && typeof hint.message === 'string' && hint.message.trim().length > 0
+        ? hint.message
+        : 'Stuck? Press Hint for a tactical nudge.'
+    );
+
+    if (refs.hintButton) {
+      refs.hintButton.disabled = snapshot.phase === 'end';
+      setText(
+        textCache,
+        'hint-button',
+        refs.hintButton,
+        snapshot.phase === 'end' ? 'Hint' : `Hint (${nextTier}/3)`
+      );
+    }
+  }
+
   function sync({ snapshot, summary, trace }) {
     if (snapshot) {
       setText(textCache, 'hud-turn', refs.scoreLabel, `Turn: ${snapshot.turnIndex}`);
@@ -495,6 +543,7 @@ export function createUI(documentRef) {
       syncChain(summary, trace || []);
     }
 
+    syncHint(snapshot);
     syncCoach(snapshot, summary);
   }
 
@@ -523,3 +572,4 @@ export function createUI(documentRef) {
     setSoundEnabled
   };
 }
+

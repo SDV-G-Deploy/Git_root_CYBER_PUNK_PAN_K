@@ -12,6 +12,7 @@ export const legacyChainLabApi = {
   getModifiers: (...args) => engine.getModifiers(...args),
   setAim: (...args) => engine.setAim(...args),
   fireShot: (...args) => engine.fireShot(...args),
+  requestHint: (...args) => engine.requestHint(...args),
   tick: (...args) => engine.tick(...args),
   update: (...args) => engine.update(...args),
   render: (...args) => engine.render(...args),

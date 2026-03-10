@@ -390,6 +390,13 @@ function bootstrap() {
     });
   }
 
+  if (ui.refs.hintButton) {
+    ui.refs.hintButton.addEventListener('click', () => {
+      unlockAudio();
+      enqueueCommand({ type: 'request_hint' });
+    });
+  }
+
   if (ui.refs.summaryRetryButton) {
     ui.refs.summaryRetryButton.addEventListener('click', () => {
       unlockAudio();

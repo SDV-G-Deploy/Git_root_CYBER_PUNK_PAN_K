@@ -62,6 +62,9 @@ export const CONFIG = Object.freeze({
     STRONG_OVERLOAD_RATIO: 0.5,
     PERFECT_UNUSED_MOVES: 2
   },
+  HINT: {
+    MAX_TIER: 3
+  },
   FEEDBACK: {
     PACKET_SPEED: 0.18,
     PACKET_RADIUS: 4,

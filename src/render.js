@@ -420,6 +420,62 @@ function drawPackets(ctx, state, nodeMap) {
   }
 }
 
+function getHintTierColor(tier) {
+  if (tier >= 3) {
+    return '#ff9f6a';
+  }
+
+  if (tier === 2) {
+    return '#ffd166';
+  }
+
+  return '#7fe9ff';
+}
+
+function drawHintMarker(ctx, node, color, radius, alpha, dashed) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.shadowBlur = 14;
+  ctx.shadowColor = color;
+  if (dashed) {
+    ctx.setLineDash([5, 4]);
+  }
+  ctx.beginPath();
+  ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawHintFocus(ctx, state, nodeMap) {
+  const hint = state.hint;
+  if (!hint || !hint.targetNodeId || state.phase === 'end') {
+    return;
+  }
+
+  const target = nodeMap.get(hint.targetNodeId);
+  if (!target) {
+    return;
+  }
+
+  const tier = clamp(Number(hint.tierShown) || 1, 1, 3);
+  const pulse = 0.5 + Math.sin(state.effects.time * 6) * 0.5;
+  const color = getHintTierColor(tier);
+  const primaryRadius = target.radius + 10 + tier * 2 + pulse * 3;
+
+  drawHintMarker(ctx, target, color, primaryRadius, 0.55, false);
+  drawHintMarker(ctx, target, color, primaryRadius + 6, 0.22, true);
+
+  if (hint.secondaryNodeId) {
+    const secondary = nodeMap.get(hint.secondaryNodeId);
+    if (secondary) {
+      const secondaryRadius = secondary.radius + 8 + pulse * 2;
+      drawHintMarker(ctx, secondary, '#bfe9ff', secondaryRadius, 0.24, true);
+    }
+  }
+}
+
 function drawDangerFlash(ctx, state) {
   if (state.effects.dangerFlashTtl <= 0) {
     return;
@@ -456,6 +512,7 @@ export function renderState(ctx, state) {
   drawEdges(ctx, state, nodeMap);
   drawPackets(ctx, state, nodeMap);
   drawNodes(ctx, state);
+  drawHintFocus(ctx, state, nodeMap);
   drawDangerFlash(ctx, state);
   ctx.restore();
 }
