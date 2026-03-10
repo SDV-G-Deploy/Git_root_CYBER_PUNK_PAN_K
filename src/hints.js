@@ -100,6 +100,42 @@ function findClosedFirewallId(state) {
   return null;
 }
 
+function findDormantPurifierId(state) {
+  if (!state || !Array.isArray(state.nodes)) {
+    return null;
+  }
+
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const node = state.nodes[i];
+    if (
+      node.baseType !== NODE_TYPES.PURIFIER ||
+      node.exploded ||
+      node.corrupted ||
+      node.charge >= node.threshold
+    ) {
+      continue;
+    }
+
+    const neighbors = state.neighborsByNode.get(node.id);
+    if (!neighbors || neighbors.size === 0) {
+      continue;
+    }
+
+    for (const neighborId of neighbors) {
+      const neighbor = getNodeById(state, neighborId);
+      if (!neighbor || neighbor.exploded) {
+        continue;
+      }
+
+      if (neighbor.corrupted || neighbor.baseType === NODE_TYPES.VIRUS || (neighbor.corruptionProgress || 0) > 0) {
+        return node.id;
+      }
+    }
+  }
+
+  return null;
+}
+
 function captureMetrics(state) {
   return {
     coreCharge: getCoreCharge(state),
@@ -312,6 +348,7 @@ function buildDirectionalHint(state) {
   const clickable = collectClickableNodeIds(state);
   const coreNodeId = findPrimaryCoreNodeId(state);
   const closedFirewallId = findClosedFirewallId(state);
+  const dormantPurifierId = findDormantPurifierId(state);
 
   if (state.phase === 'end') {
     return {
@@ -360,6 +397,16 @@ function buildDirectionalHint(state) {
       message: 'A closed firewall is likely blocking progress. Re-open or rotate that gate.',
       targetNodeId: closedFirewallId,
       secondaryNodeId: null
+    };
+  }
+
+  if (dormantPurifierId) {
+    return {
+      tier: 1,
+      kind: 'directional',
+      message: 'A nearby purifier is idle. Route energy through it to suppress infection pressure.',
+      targetNodeId: dormantPurifierId,
+      secondaryNodeId: coreNodeId || null
     };
   }
 

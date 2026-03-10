@@ -219,6 +219,87 @@ function spreadCorruption(state) {
   state.lastTurn.corruptionNew = newlyCorrupted;
 }
 
+function applyPurifierEffects(state, hooks) {
+  const purifiedNodes = [];
+  const purifierActive = [];
+
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const source = state.nodes[i];
+    if (
+      source.baseType !== NODE_TYPES.PURIFIER ||
+      source.exploded ||
+      source.corrupted ||
+      source.charge < source.threshold
+    ) {
+      continue;
+    }
+
+    const cleansePower = Math.max(0, Number(source.purifierStrength) || 0);
+    if (cleansePower <= 0) {
+      continue;
+    }
+
+    const neighbors = state.neighborsByNode.get(source.id);
+    if (!neighbors || neighbors.size === 0) {
+      continue;
+    }
+
+    purifierActive.push(source.id);
+
+    neighbors.forEach((neighborId) => {
+      const node = getNodeById(state, neighborId);
+      if (!node || node.exploded || node.baseType === NODE_TYPES.VIRUS) {
+        return;
+      }
+
+      const hadCorruption = node.corrupted;
+      const rawBeforeProgress = Number(node.corruptionProgress) || 0;
+      const beforeProgress = hadCorruption && rawBeforeProgress <= 0
+        ? CONFIG.TURN.CORRUPTION_THRESHOLD
+        : rawBeforeProgress;
+
+      if (!hadCorruption && beforeProgress <= 0) {
+        return;
+      }
+
+      const nextProgress = Math.max(0, beforeProgress - cleansePower);
+      node.corruptionProgress = nextProgress;
+
+      let cleansed = false;
+      if (hadCorruption && nextProgress <= 0) {
+        node.corrupted = false;
+        node.cleanseAccumulated = 0;
+        cleansed = true;
+
+        if (state.lastTurn.cleansedNodes.indexOf(node.id) < 0) {
+          state.lastTurn.cleansedNodes.push(node.id);
+        }
+      }
+
+      if (hadCorruption !== node.corrupted || beforeProgress !== node.corruptionProgress) {
+        if (purifiedNodes.indexOf(node.id) < 0) {
+          purifiedNodes.push(node.id);
+        }
+
+        if (hooks.onNodePurified) {
+          hooks.onNodePurified({
+            purifierId: source.id,
+            nodeId: node.id,
+            cleansed,
+            corruptionBefore: beforeProgress,
+            corruptionAfter: node.corruptionProgress
+          });
+        }
+      }
+
+      updateActiveState(node);
+    });
+  }
+
+  state.lastTurn.purifiedNodes = purifiedNodes;
+  state.lastTurn.purifierActive = purifierActive;
+}
+
 function applyDecayPhase(state) {
   for (let i = 0; i < state.nodes.length; i += 1) {
     const node = state.nodes[i];
@@ -236,6 +317,8 @@ export function prepareTurn(state) {
     overloadDelta: 0,
     corruptionNew: [],
     cleansedNodes: [],
+    purifiedNodes: [],
+    purifierActive: [],
     explodedNodes: [],
     objectiveProgress: [],
     status: 'Resolving network propagation...'
@@ -278,6 +361,7 @@ export function resolvePropagation(state, hooks) {
   }
 
   spreadCorruption(state);
+  applyPurifierEffects(state, hooks || {});
   applyDecayPhase(state);
 
   return {

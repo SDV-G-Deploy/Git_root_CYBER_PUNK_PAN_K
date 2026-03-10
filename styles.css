@@ -10,6 +10,7 @@
   --power: #4cd2ff;
   --relay: #7ad46f;
   --firewall: #ba9cff;
+  --purifier: #75f2c8;
   --virus: #ff5e7e;
   --overload: #ffb06a;
   --core: #ffd166;
@@ -230,6 +231,10 @@ body {
 
 .legend-item.firewall strong {
   color: var(--firewall);
+}
+
+.legend-item.purifier strong {
+  color: var(--purifier);
 }
 
 .legend-item.virus strong {

@@ -30,6 +30,10 @@ function getNodeColor(node) {
     return CONFIG.NODES.COLORS.firewall;
   }
 
+  if (node.baseType === NODE_TYPES.PURIFIER) {
+    return CONFIG.NODES.COLORS.purifier;
+  }
+
   if (node.baseType === NODE_TYPES.OVERLOAD) {
     return CONFIG.NODES.COLORS.overload;
   }
@@ -221,6 +225,8 @@ function drawNodeTypeTag(ctx, node) {
     tag = 'R';
   } else if (node.baseType === NODE_TYPES.FIREWALL) {
     tag = 'F';
+  } else if (node.baseType === NODE_TYPES.PURIFIER) {
+    tag = 'U';
   } else if (node.baseType === NODE_TYPES.VIRUS) {
     tag = 'V';
   } else if (node.baseType === NODE_TYPES.OVERLOAD) {
@@ -413,6 +419,25 @@ function drawNodes(ctx, state) {
         : 'LOCKED';
       ctx.fillStyle = '#dacbff';
       ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.baseType === NODE_TYPES.PURIFIER) {
+      const purifierLabel = node.active
+        ? `PURIFY ${node.purifierStrength}`
+        : `PRIME ${node.charge}/${node.threshold}`;
+      ctx.fillStyle = node.active ? '#c9ffe8' : '#9fbfb2';
+      ctx.fillText(purifierLabel, node.x, node.y - node.radius - 11);
+
+      if (node.active) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(142, 255, 214, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius + 5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     if (node.baseType === NODE_TYPES.OVERLOAD) {

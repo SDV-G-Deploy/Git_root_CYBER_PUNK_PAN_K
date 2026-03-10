@@ -176,7 +176,7 @@ function getCoachCopy(snapshot, summary) {
     if (summary.lastAction.reason === 'node_not_clickable') {
       return {
         title: 'That node is passive',
-        body: 'Relay, Overload, Virus, and Core nodes react automatically.',
+        body: 'Relay, Purifier, Overload, Virus, and Core nodes react automatically.',
         meta: 'Use Power to inject energy and Firewall to route it.'
       };
     }
@@ -195,6 +195,14 @@ function getCoachCopy(snapshot, summary) {
       title: 'Overload Detected',
       body: 'Too much energy passed through an overload node in one turn.',
       meta: 'Split the route, reduce feed, or open another firewall branch.'
+    };
+  }
+
+  if (summary.lastTurn && summary.lastTurn.purifiedNodes && summary.lastTurn.purifiedNodes.length > 0) {
+    return {
+      title: 'Purifier Pulse',
+      body: 'Powered purifier nodes reduced local corruption pressure this turn.',
+      meta: `Purified: ${summary.lastTurn.purifiedNodes.join(', ')} | Keep purifier lanes energized to stabilize routes.`
     };
   }
 
