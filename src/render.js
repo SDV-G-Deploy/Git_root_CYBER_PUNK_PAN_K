@@ -272,6 +272,62 @@ function drawNodePulses(ctx, state, node) {
   ctx.restore();
 }
 
+function collectVirusThreatenedNodeIds(state, nodeMap) {
+  const threatened = new Set();
+
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const source = state.nodes[i];
+    if (source.baseType !== NODE_TYPES.VIRUS || source.exploded) {
+      continue;
+    }
+
+    const neighbors = state.neighborsByNode.get(source.id);
+    if (!neighbors) {
+      continue;
+    }
+
+    neighbors.forEach((neighborId) => {
+      const target = nodeMap.get(neighborId);
+      if (!target || target.exploded || target.baseType === NODE_TYPES.VIRUS || target.corrupted) {
+        return;
+      }
+
+      threatened.add(target.id);
+    });
+  }
+
+  return threatened;
+}
+
+function drawVirusThreatRings(ctx, state, nodeMap) {
+  const threatened = collectVirusThreatenedNodeIds(state, nodeMap);
+  if (threatened.size === 0) {
+    return;
+  }
+
+  const pulse = 0.5 + Math.sin(state.effects.time * 5.5) * 0.5;
+
+  threatened.forEach((nodeId) => {
+    const node = nodeMap.get(nodeId);
+    if (!node) {
+      return;
+    }
+
+    const radius = node.radius + 9 + pulse * 3;
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = '#ff7d98';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#ff7d98';
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
 function drawNodeBursts(ctx, state, node) {
   const bursts = getNodeBursts(state, node.id);
   for (let i = 0; i < bursts.length; i += 1) {
@@ -476,6 +532,39 @@ function drawHintFocus(ctx, state, nodeMap) {
   }
 }
 
+function drawMissMarkers(ctx, state) {
+  const markers = state.effects.missMarkers;
+  if (!Array.isArray(markers) || markers.length === 0) {
+    return;
+  }
+
+  for (let i = 0; i < markers.length; i += 1) {
+    const marker = markers[i];
+    const progress = clamp(marker.t, 0, 1);
+    const alpha = (1 - progress) * 0.7;
+    const size = CONFIG.FEEDBACK.MISS_MARKER_SIZE * (0.85 + progress * 0.35);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#ff8aa1';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff8aa1';
+    ctx.beginPath();
+    ctx.moveTo(marker.x - size * 0.5, marker.y - size * 0.5);
+    ctx.lineTo(marker.x + size * 0.5, marker.y + size * 0.5);
+    ctx.moveTo(marker.x + size * 0.5, marker.y - size * 0.5);
+    ctx.lineTo(marker.x - size * 0.5, marker.y + size * 0.5);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.setLineDash([4, 5]);
+    ctx.arc(marker.x, marker.y, size * 0.8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function drawDangerFlash(ctx, state) {
   if (state.effects.dangerFlashTtl <= 0) {
     return;
@@ -510,9 +599,11 @@ export function renderState(ctx, state) {
   drawArena(ctx, state);
   drawEdgeBursts(ctx, state, nodeMap);
   drawEdges(ctx, state, nodeMap);
+  drawVirusThreatRings(ctx, state, nodeMap);
   drawPackets(ctx, state, nodeMap);
   drawNodes(ctx, state);
   drawHintFocus(ctx, state, nodeMap);
+  drawMissMarkers(ctx, state);
   drawDangerFlash(ctx, state);
   ctx.restore();
 }

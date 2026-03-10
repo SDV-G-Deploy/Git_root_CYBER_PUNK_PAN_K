@@ -58,6 +58,7 @@ export function updatePackets(state, dt) {
   updateTimedCollection(state.effects.pulses, dt);
   updateTimedCollection(state.effects.edgeBursts, dt);
   updateTimedCollection(state.effects.nodeBursts, dt);
+  updateTimedCollection(state.effects.missMarkers, dt);
 
   state.effects.flashTtl = Math.max(0, state.effects.flashTtl - dt);
   state.effects.dangerFlashTtl = Math.max(0, state.effects.dangerFlashTtl - dt);

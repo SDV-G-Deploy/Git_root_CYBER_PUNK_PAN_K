@@ -85,7 +85,9 @@ export const CONFIG = Object.freeze({
     MAX_PULSES: 18,
     MAX_EDGE_BURSTS: 24,
     MAX_NODE_BURSTS: 24,
-    TRACE_MAX: 24
+    TRACE_MAX: 24,
+    MISS_MARKER_TTL: 0.5,
+    MISS_MARKER_SIZE: 16
   },
   SOUND: {
     MASTER_GAIN: 0.18,

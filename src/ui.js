@@ -505,7 +505,7 @@ export function createUI(documentRef) {
         textCache,
         'hud-infected',
         refs.chainStatusLabel,
-        `Infected: ${snapshot.infectedCount}/${snapshot.collapseLimit} | Virus: ${snapshot.virusCount}`
+        `Infected: ${snapshot.infectedCount}/${snapshot.collapseLimit} | Threatened: ${snapshot.virusThreatCount || 0} | Virus: ${snapshot.virusCount}`
       );
 
       if (refs.levelSelect) {

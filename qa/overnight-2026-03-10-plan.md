@@ -38,3 +38,15 @@
 - Lifecycle guard check:
   - duplicate `run_end` count remained `0` in stress sequence (hint + reset + level switch).
 - No additional code fix needed in Phase 1.
+## Phase 2 implemented improvements
+- Improvement A (virus readability):
+  - added live `virusThreatCount` in snapshot,
+  - HUD now shows `Threatened` count,
+  - board now renders dashed threat rings around nodes that are adjacent to active virus nodes and currently at infection risk.
+- Improvement B (invalid action readability):
+  - added miss/passive-click marker VFX (pink cross/ring) on failed clicks,
+  - marker is transient and lightweight, no rule changes.
+- Validation:
+  - normal play flow preserved,
+  - hint flow still works,
+  - no duplicate `run_end` observed in targeted checks.

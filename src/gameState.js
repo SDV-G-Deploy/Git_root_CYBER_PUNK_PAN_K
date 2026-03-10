@@ -363,6 +363,7 @@ export function createState(level, levelIndex, levelCount) {
       pulses: [],
       edgeBursts: [],
       nodeBursts: [],
+      missMarkers: [],
       flashTtl: 0,
       dangerFlashTtl: 0,
       shakeTtl: 0,
@@ -396,6 +397,33 @@ export function getVirusCount(state) {
     }
   }
   return count;
+}
+
+export function getVirusThreatCount(state) {
+  const threatened = new Set();
+
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const source = state.nodes[i];
+    if (source.baseType !== NODE_TYPES.VIRUS || source.exploded) {
+      continue;
+    }
+
+    const neighbors = state.neighborsByNode.get(source.id);
+    if (!neighbors) {
+      continue;
+    }
+
+    neighbors.forEach((neighborId) => {
+      const node = getNodeById(state, neighborId);
+      if (!node || node.exploded || node.baseType === NODE_TYPES.VIRUS || node.corrupted) {
+        return;
+      }
+
+      threatened.add(node.id);
+    });
+  }
+
+  return threatened.size;
 }
 
 export function getExplodedCount(state) {
@@ -451,6 +479,7 @@ export function getSnapshot(state) {
     collapseLimit: state.collapseLimit,
     infectedCount: getInfectedCount(state),
     virusCount: getVirusCount(state),
+    virusThreatCount: getVirusThreatCount(state),
     explodedCount: getExplodedCount(state),
     coreCharge: getCoreCharge(state),
     totalScore: state.totalScore,

@@ -209,6 +209,22 @@ export function createChainLabEngine() {
     trimEffectList(state.effects.nodeBursts, CONFIG.FEEDBACK.MAX_NODE_BURSTS);
   }
 
+  function pushMissMarker(x, y, reason) {
+    const state = getState();
+    if (!state || !Number.isFinite(x) || !Number.isFinite(y)) {
+      return;
+    }
+
+    state.effects.missMarkers.push({
+      x,
+      y,
+      reason: reason || 'invalid_click',
+      t: 0,
+      ttl: CONFIG.FEEDBACK.MISS_MARKER_TTL
+    });
+    trimEffectList(state.effects.missMarkers, CONFIG.FEEDBACK.TRACE_MAX);
+  }
+
   function pushEdgeBurst(edgeId, energy) {
     const state = getState();
     if (!edgeId) {
@@ -589,8 +605,13 @@ export function createChainLabEngine() {
         valid: false,
         reason: 'no_target'
       };
+      pushMissMarker(targetX, targetY, 'no_target');
       bump();
       return false;
+    }
+
+    if (!isClickableNode(node) || node.exploded) {
+      pushMissMarker(node.x, node.y, 'node_not_clickable');
     }
 
     return activateNode(node.id);
@@ -704,6 +725,7 @@ export function createChainLabEngine() {
       state.effects.pulses.length > 0 ||
       state.effects.edgeBursts.length > 0 ||
       state.effects.nodeBursts.length > 0 ||
+      state.effects.missMarkers.length > 0 ||
       state.effects.flashTtl > 0 ||
       state.effects.dangerFlashTtl > 0 ||
       state.effects.shakeTtl > 0 ||
