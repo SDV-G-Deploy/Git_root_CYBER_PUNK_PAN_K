@@ -17,6 +17,11 @@ function describeNodeTypes() {
       interaction: `Default threshold ${CONFIG.TURN.FIREWALL_THRESHOLD}, click inject ${CONFIG.TURN.FIREWALL_CLICK_INJECT}, emit ${CONFIG.TURN.FIREWALL_EMIT_POWER}. Corrupted firewalls remain clickable but cannot auto-emit until cleansed.`,
       purpose: 'Player-controlled routing and branch selection.'
     },
+    [NODE_TYPES.PURIFIER]: {
+      behavior: 'Passive support node. When charged above threshold, it reduces corruption on adjacent nodes at end of turn.',
+      interaction: `Default threshold ${CONFIG.TURN.PURIFIER_THRESHOLD}, emit ${CONFIG.TURN.PURIFIER_EMIT_POWER}, cleanse power ${CONFIG.TURN.PURIFIER_CLEANSE_POWER}. It is not directly clickable.`,
+      purpose: 'Adds tactical counterplay to infection by rewarding purifier route support.'
+    },
     [NODE_TYPES.VIRUS]: {
       behavior: 'Passive hazard. Spreads corruption to neighbors at the end of each turn.',
       interaction: `Default spread ${CONFIG.TURN.VIRUS_SPREAD_PER_TURN} per turn. Cannot be directly clicked.`,

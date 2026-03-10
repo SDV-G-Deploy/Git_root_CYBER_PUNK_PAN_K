@@ -481,6 +481,13 @@ export function createChainLabEngine() {
           turnIndex: state.turnIndex,
           nodeId: explodedNode.id
         });
+      },
+      onNodePurified: (payload) => {
+        const pulseColor = payload.cleansed ? '#8dffd9' : '#66e7c8';
+        pushNodePulse(payload.nodeId, 'purify', pulseColor);
+        pushNodeBurst(payload.nodeId, pulseColor, payload.cleansed ? 'purify_cleanse' : 'purify_stabilize');
+        pushNodeBurst(payload.purifierId, '#78f0cb', 'purify_source');
+        emitUxEvent('purifier_pulse', payload);
       }
     });
 

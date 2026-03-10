@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-03-10T09:59:53.451Z",
-  "candidateCount": 24,
+  "generatedAt": "2026-03-10T11:20:17.144Z",
+  "candidateCount": 28,
   "acceptedCount": 10,
-  "deferredCount": 14,
+  "deferredCount": 18,
   "rejectedCount": 0,
   "rejectionCounts": {},
   "acceptedDifficultyCounts": {
     "easy": 2,
-    "medium": 5,
-    "hard": 2,
+    "medium": 4,
+    "hard": 3,
     "extreme": 1
   },
   "acceptedSlotCounts": {
@@ -333,13 +333,13 @@
       "slotId": "slot8",
       "slotRole": "hard",
       "slotLabel": "Hard Puzzle B",
-      "levelId": "L15",
-      "levelName": "Heat Sink",
+      "levelId": "L28",
+      "levelName": "Sanitation Gate",
       "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "medium",
-      "topologyScale": 7.5,
-      "complexityScore": 13.34,
-      "slotScore": 98.06
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 11,
+      "complexityScore": 18.22,
+      "slotScore": 104.23
     },
     {
       "slotIndex": 9,
@@ -415,9 +415,9 @@
       "slotIndex": 8,
       "role": "hard",
       "label": "Hard Puzzle B",
-      "selectedLevelId": "L15",
-      "selectedLevelName": "Heat Sink",
-      "slotScore": 98.06,
+      "selectedLevelId": "L28",
+      "selectedLevelName": "Sanitation Gate",
+      "slotScore": 104.23,
       "constraintSummary": null
     },
     {
@@ -546,22 +546,22 @@
       "topologyFingerprint": "topo_2d212b04"
     },
     {
-      "levelId": "L15",
-      "levelName": "Heat Sink",
+      "levelId": "L28",
+      "levelName": "Sanitation Gate",
       "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 54,
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 72,
       "averageBranchingFactor": 2,
-      "complexityScore": 13.34,
-      "topologyScale": 7.5,
+      "complexityScore": 18.22,
+      "topologyScale": 11,
       "slotId": "slot8",
       "slotRole": "hard",
       "slotIndex": 8,
-      "slotScore": 98.06,
+      "slotScore": 104.23,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_3d462328"
+      "topologyFingerprint": "topo_407d0214"
     },
     {
       "levelId": "L22",
@@ -876,6 +876,26 @@
       "topologyFingerprint": "topo_0e5c2522"
     },
     {
+      "levelId": "L15",
+      "levelName": "Heat Sink",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 54,
+      "averageBranchingFactor": 2,
+      "complexityScore": 13.34,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_3d462328"
+    },
+    {
       "levelId": "L17",
       "levelName": "Dual Feed",
       "authoredDifficultyTag": "hard",
@@ -934,6 +954,66 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_06421cbf"
+    },
+    {
+      "levelId": "L25",
+      "levelName": "Purifier Wake",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 51,
+      "minMoves": 4,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 11.1,
+      "topologyScale": 8,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_cc0e6405"
+    },
+    {
+      "levelId": "L26",
+      "levelName": "Sanitize or Rush",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 78,
+      "minMoves": 7,
+      "solutionCount": 12,
+      "averageBranchingFactor": 2,
+      "complexityScore": 18.89,
+      "topologyScale": 9.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_98d63f83"
+    },
+    {
+      "levelId": "L27",
+      "levelName": "Sterile Route",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 98,
+      "minMoves": 8,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 16.05,
+      "topologyScale": 9.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_dcfbe354"
     }
   ],
   "rejectedEntries": [],
@@ -942,7 +1022,7 @@
     "topo_9bb0827e",
     "topo_c771455d",
     "topo_2d212b04",
-    "topo_3d462328",
+    "topo_407d0214",
     "topo_8b02e8f2",
     "topo_e7430aa9",
     "topo_8d543b60",

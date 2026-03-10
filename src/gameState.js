@@ -37,6 +37,10 @@ function defaultThresholdForType(type) {
     return CONFIG.TURN.FIREWALL_THRESHOLD;
   }
 
+  if (type === NODE_TYPES.PURIFIER) {
+    return CONFIG.TURN.PURIFIER_THRESHOLD;
+  }
+
   if (type === NODE_TYPES.OVERLOAD) {
     return CONFIG.TURN.RELAY_THRESHOLD;
   }
@@ -55,6 +59,10 @@ function defaultEmitForType(type, injectPower) {
 
   if (type === NODE_TYPES.FIREWALL) {
     return CONFIG.TURN.FIREWALL_EMIT_POWER;
+  }
+
+  if (type === NODE_TYPES.PURIFIER) {
+    return CONFIG.TURN.PURIFIER_EMIT_POWER;
   }
 
   if (type === NODE_TYPES.OVERLOAD) {
@@ -105,6 +113,9 @@ function makeRuntimeNode(node) {
         : node.type === NODE_TYPES.POWER || node.type === NODE_TYPES.FIREWALL
     ),
     spreadRate: Number.isFinite(node.spreadRate) ? node.spreadRate : CONFIG.TURN.VIRUS_SPREAD_PER_TURN,
+    purifierStrength: Number.isFinite(node.purifierStrength)
+      ? node.purifierStrength
+      : CONFIG.TURN.PURIFIER_CLEANSE_POWER,
     overloadThreshold: Number.isFinite(node.overloadThreshold)
       ? node.overloadThreshold
       : CONFIG.TURN.OVERLOAD_NODE_THRESHOLD,
@@ -203,6 +214,10 @@ function getNodeTypeLabel(type) {
     return 'Firewall Node';
   }
 
+  if (type === NODE_TYPES.PURIFIER) {
+    return 'Purifier Node';
+  }
+
   if (type === NODE_TYPES.VIRUS) {
     return 'Virus Node';
   }
@@ -269,6 +284,9 @@ function buildHoverInfo(state) {
   } else if (node.baseType === NODE_TYPES.RELAY) {
     actionText = 'Relay nodes auto-forward once charged enough.';
     detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower}.`;
+  } else if (node.baseType === NODE_TYPES.PURIFIER) {
+    actionText = 'Purifier auto-cleans adjacent infection when it stays powered.';
+    detailText = `${chargeText} | Needs ${node.threshold}, cleanse ${node.purifierStrength}/turn.`;
   } else if (node.baseType === NODE_TYPES.VIRUS) {
     actionText = 'Hazard node. It infects nearby nodes at the end of each turn.';
     detailText = `Spread ${node.spreadRate} per turn | ${stateText}`;
@@ -345,6 +363,8 @@ export function createState(level, levelIndex, levelCount) {
       overloadDelta: 0,
       corruptionNew: [],
       cleansedNodes: [],
+      purifiedNodes: [],
+      purifierActive: [],
       explodedNodes: [],
       objectiveProgress: [],
       status: 'Awaiting input.'
@@ -533,6 +553,8 @@ export function getRunSummary(state) {
       activatedNodes: state.lastTurn.activatedNodes.slice(),
       corruptionNew: state.lastTurn.corruptionNew.slice(),
       cleansedNodes: state.lastTurn.cleansedNodes.slice(),
+      purifiedNodes: state.lastTurn.purifiedNodes.slice(),
+      purifierActive: state.lastTurn.purifierActive.slice(),
       explodedNodes: state.lastTurn.explodedNodes.slice(),
       objectiveProgress: state.lastTurn.objectiveProgress.slice()
     },

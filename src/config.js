@@ -18,6 +18,7 @@ export const CONFIG = Object.freeze({
       power: '#4cd2ff',
       relay: '#7ad46f',
       firewall: '#ba9cff',
+      purifier: '#75f2c8',
       virus: '#ff5e7e',
       overload: '#ffb06a',
       core: '#ffd166',
@@ -44,6 +45,9 @@ export const CONFIG = Object.freeze({
     FIREWALL_THRESHOLD: 2,
     FIREWALL_EMIT_POWER: 3,
     FIREWALL_CLICK_INJECT: 2,
+    PURIFIER_THRESHOLD: 2,
+    PURIFIER_EMIT_POWER: 2,
+    PURIFIER_CLEANSE_POWER: 1,
     OVERLOAD_NODE_THRESHOLD: 5,
     OVERLOAD_NODE_EMIT_POWER: 4,
     OVERLOAD_EXPLOSION_PENALTY: 2,
@@ -114,6 +118,7 @@ export const NODE_TYPES = Object.freeze({
   POWER: 'power',
   RELAY: 'relay',
   FIREWALL: 'firewall',
+  PURIFIER: 'purifier',
   VIRUS: 'virus',
   OVERLOAD: 'overload',
   CORE: 'core',
@@ -122,4 +127,6 @@ export const NODE_TYPES = Object.freeze({
 
 export const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';
 export const TUTORIAL_SEEN_KEY = 'signal_district_chainlab_tutorial_seen';
+
+
 
