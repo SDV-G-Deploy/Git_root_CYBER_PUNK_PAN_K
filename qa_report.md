@@ -4,7 +4,7 @@ Generated levels checked: 24
 Solvable: 24
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 10174
+Total states explored: 10172
 
 ## Gameplay Rules Summary
 
@@ -57,7 +57,7 @@ Total states explored: 10174
 | L3 | Solvable | intro | Medium | 4 | 5 | 2 | tight_move_budget |
 | L4 | Solvable | light | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
 | L5 | Solvable | light | Hard | 5 | 37 | 2 | none |
-| L6 | Solvable | light | Hard | 5 | 37 | 2 | none |
+| L6 | Solvable | light | Hard | 5 | 18 | 2 | none |
 | L7 | Solvable | medium | Hard | 6 | 1648 | 3 | none |
 | L8 | Solvable | medium | Hard | 6 | 21 | 2 | none |
 | L9 | Solvable | medium | Hard | 5 | 5 | 2 | tight_move_budget |
@@ -74,7 +74,7 @@ Total states explored: 10174
 | L20 | Solvable | hard | Hard | 9 | 1472 | 3 | tight_move_budget |
 | L21 | Solvable | light | Medium | 4 | 16 | 2 | none |
 | L22 | Solvable | medium | Medium | 5 | 33 | 2 | none |
-| L23 | Solvable | medium | Medium | 4 | 40 | 2 | none |
+| L23 | Solvable | medium | Medium | 4 | 42 | 2 | none |
 | L24 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
 
 ## Level Details
@@ -192,16 +192,16 @@ Total states explored: 10174
 ### L6 Branch Lock
 
 - Chapter: Firewall Ring
-- Teaching goal: Use the gate to choose between a short path and a longer but steadier branch.
+- Teaching goal: Use the gate to decide between a short direct route and a slower relay lane.
 - Status: Solvable
 - Authored difficulty: light
-- Estimated difficulty: Hard (8.56)
-- Minimal winning path: F1 -> P1 -> P1 -> P1 -> P1
+- Estimated difficulty: Hard (8.62)
+- Minimal winning path: F1 -> F1 -> P1 -> P1 -> P1
 - Minimal moves: 5 / 7
-- Solution count (capped): 37
+- Solution count (capped): 18
 - Average branching factor: 2
-- Explored states: 188
-- Dead states: 49
+- Explored states: 156
+- Dead states: 42
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
@@ -211,8 +211,8 @@ Total states explored: 10174
   - P1: keeps a win alive; minMoves=6; path=P1
 - Dead state examples:
   - moves=3, overload=0, infected=0, path=P1 -> P1 -> P1
-  - moves=4, overload=0, infected=0, path=F1 -> F1 -> F1 -> F1
-  - moves=4, overload=0, infected=0, path=P1 -> F1 -> F1 -> F1
+  - moves=4, overload=0, infected=0, path=P1 -> P1 -> P1 -> F1
+  - moves=4, overload=0, infected=0, path=P1 -> P1 -> P1 -> P1
 
 ### L7 Gate Cascade
 
@@ -603,16 +603,16 @@ Total states explored: 10174
 ### L23 Median Filter
 
 - Chapter: Quarantine Loop
-- Teaching goal: Route through the cleaner lane before virus pressure narrows your options.
+- Teaching goal: Alternate between safe relay output and risky overload burst under virus pressure.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Medium (7.26)
+- Estimated difficulty: Medium (7.19)
 - Minimal winning path: F1 -> P1 -> P1 -> P1
 - Minimal moves: 4 / 8
-- Solution count (capped): 40
+- Solution count (capped): 42
 - Average branching factor: 2
-- Explored states: 167
-- Dead states: 35
+- Explored states: 197
+- Dead states: 39
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
@@ -621,9 +621,9 @@ Total states explored: 10174
   - F1: keeps a win alive; minMoves=4; path=F1
   - P1: keeps a win alive; minMoves=5; path=P1
 - Dead state examples:
-  - moves=5, overload=0, infected=1, path=F1 -> F1 -> F1 -> F1 -> P1
-  - moves=5, overload=0, infected=1, path=F1 -> F1 -> P1 -> P1 -> P1
+  - moves=5, overload=0, infected=1, path=P1 -> F1 -> F1 -> F1 -> F1
   - moves=5, overload=0, infected=1, path=P1 -> F1 -> F1 -> P1 -> P1
+  - moves=5, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1 -> P1
 
 ### L24 Purge Junction
 

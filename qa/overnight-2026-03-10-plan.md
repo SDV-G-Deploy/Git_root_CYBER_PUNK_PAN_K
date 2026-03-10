@@ -84,3 +84,13 @@
   - `L5/L6/L22` (same firewall-branch archetype family),
   - `L9/L11/L23` (same virus-firewall archetype family),
   - `L17/L18/L19` (same late mixed archetype family, but now less direct duplication than baseline).
+
+## Continuation pass summary
+- Completed targeted de-repetition patch for level families:
+  - `L5/L6/L22` (changed `L6` topology/objective),
+  - `L9/L11/L23` (changed `L23` topology to include overload branch).
+- Regression checks passed:
+  - `validate-levels`: 24/24 solvable,
+  - `build-pack`: 10/10 slots filled,
+  - slot semantics unchanged.
+- No protected systems touched (daily/seed/classifier/slot contracts unchanged).

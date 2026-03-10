@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T01:03:52.349Z",
+  "generatedAt": "2026-03-10T02:27:46.698Z",
   "candidateCount": 24,
   "acceptedCount": 10,
   "deferredCount": 13,
@@ -283,25 +283,25 @@
       "slotId": "slot4",
       "slotRole": "medium",
       "slotLabel": "Medium Puzzle A",
-      "levelId": "L22",
-      "levelName": "Switchback Gate",
+      "levelId": "L23",
+      "levelName": "Median Filter",
       "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "medium",
-      "topologyScale": 7.5,
-      "complexityScore": 14.69,
-      "slotScore": 105.66
+      "topologyScale": 9,
+      "complexityScore": 14.49,
+      "slotScore": 105.71
     },
     {
       "slotIndex": 5,
       "slotId": "slot5",
       "slotRole": "medium",
       "slotLabel": "Medium Puzzle B",
-      "levelId": "L23",
-      "levelName": "Median Filter",
+      "levelId": "L22",
+      "levelName": "Switchback Gate",
       "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "medium",
-      "topologyScale": 9,
-      "complexityScore": 14.54,
+      "topologyScale": 7.5,
+      "complexityScore": 14.69,
       "slotScore": 105.66
     },
     {
@@ -427,9 +427,9 @@
       "slotIndex": 4,
       "role": "medium",
       "label": "Medium Puzzle A",
-      "selectedLevelId": "L22",
-      "selectedLevelName": "Switchback Gate",
-      "slotScore": 105.66,
+      "selectedLevelId": "L23",
+      "selectedLevelName": "Median Filter",
+      "slotScore": 105.71,
       "constraintSummary": null
     },
     {
@@ -437,8 +437,8 @@
       "slotIndex": 5,
       "role": "medium",
       "label": "Medium Puzzle B",
-      "selectedLevelId": "L23",
-      "selectedLevelName": "Median Filter",
+      "selectedLevelId": "L22",
+      "selectedLevelName": "Switchback Gate",
       "slotScore": 105.66,
       "constraintSummary": null
     },
@@ -566,6 +566,24 @@
       "topologyFingerprint": "topo_dcad37c4"
     },
     {
+      "levelId": "L23",
+      "levelName": "Median Filter",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 42,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.49,
+      "topologyScale": 9,
+      "slotId": "slot4",
+      "slotRole": "medium",
+      "slotIndex": 4,
+      "slotScore": 105.71,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_e7430aa9"
+    },
+    {
       "levelId": "L22",
       "levelName": "Switchback Gate",
       "authoredDifficultyTag": "medium",
@@ -576,30 +594,12 @@
       "averageBranchingFactor": 2,
       "complexityScore": 14.69,
       "topologyScale": 7.5,
-      "slotId": "slot4",
-      "slotRole": "medium",
-      "slotIndex": 4,
-      "slotScore": 105.66,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_a44b7bcf"
-    },
-    {
-      "levelId": "L23",
-      "levelName": "Median Filter",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 40,
-      "averageBranchingFactor": 2,
-      "complexityScore": 14.54,
-      "topologyScale": 9,
       "slotId": "slot5",
       "slotRole": "medium",
       "slotIndex": 5,
       "slotScore": 105.66,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_46e6707d"
+      "topologyFingerprint": "topo_a44b7bcf"
     },
     {
       "levelId": "L13",
@@ -724,10 +724,10 @@
       "predictedActualDifficultyClass": "hard",
       "predictedActualDifficultyScore": 70,
       "minMoves": 5,
-      "solutionCount": 37,
+      "solutionCount": 18,
       "averageBranchingFactor": 2,
-      "complexityScore": 14.79,
-      "topologyScale": 7.5,
+      "complexityScore": 13.88,
+      "topologyScale": 6,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -735,7 +735,7 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_baa7ee9a"
+      "topologyFingerprint": "topo_241ed59d"
     },
     {
       "levelId": "L7",
@@ -946,8 +946,8 @@
     "topo_2d212b04",
     "topo_3d462328",
     "topo_dcad37c4",
+    "topo_e7430aa9",
     "topo_a44b7bcf",
-    "topo_46e6707d",
     "topo_8d543b60",
     "topo_ed53586a",
     "topo_8e9e8072"

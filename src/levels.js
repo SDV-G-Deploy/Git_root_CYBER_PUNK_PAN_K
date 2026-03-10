@@ -135,27 +135,26 @@ const LEVELS = [
     chapter: 'Firewall Ring',
     difficulty: 'light',
     difficultyTag: 'light',
-    teachingGoal: 'Use the gate to choose between a short path and a longer but steadier branch.',
+    teachingGoal: 'Use the gate to decide between a short direct route and a slower relay lane.',
     parScore: 1300,
     movesLimit: 7,
     overloadLimit: 7,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 110, y: 280, injectPower: 5 },
-      { id: 'F1', type: 'firewall', x: 280, y: 280, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
-      { id: 'R1', type: 'relay', x: 470, y: 170, emitPower: 3 },
-      { id: 'R2', type: 'relay', x: 470, y: 390, emitPower: 3 },
+      { id: 'F1', type: 'firewall', x: 300, y: 280, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 500, y: 380, emitPower: 3 },
       { id: 'C1', type: 'core', x: 760, y: 280, targetCharge: 8 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
-      { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E2', from: 'F1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E3', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'activate_all' }
     ]
   },
   {
@@ -659,26 +658,26 @@ const LEVELS = [
     chapter: 'Quarantine Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Route through the cleaner lane before virus pressure narrows your options.',
+    teachingGoal: 'Alternate between safe relay output and risky overload burst under virus pressure.',
     parScore: 1150,
     movesLimit: 8,
     overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 100, y: 270, injectPower: 5 },
-      { id: 'F1', type: 'firewall', x: 280, y: 270, firewallOpen: false, firewallModes: [['E2', 'E4'], ['E3', 'E5']], activeMode: 0, injectPower: 2 },
-      { id: 'R1', type: 'relay', x: 470, y: 170, emitPower: 3 },
-      { id: 'R2', type: 'relay', x: 470, y: 370, emitPower: 3 },
+      { id: 'F1', type: 'firewall', x: 280, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E4']], activeMode: 0, injectPower: 2 },
+      { id: 'R1', type: 'relay', x: 500, y: 170, emitPower: 3 },
+      { id: 'O1', type: 'overload', x: 500, y: 370, emitPower: 5, overloadThreshold: 4, threshold: 2 },
       { id: 'V1', type: 'virus', x: 650, y: 370, spreadRate: 1 },
       { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 6 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'R2', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
-      { id: 'E6', from: 'V1', to: 'R2', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 6 }

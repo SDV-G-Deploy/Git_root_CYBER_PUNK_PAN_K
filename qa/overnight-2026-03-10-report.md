@@ -75,3 +75,37 @@
   - keep mechanics,
   - vary objective mix and branch commitments,
   - target medium-depth decisions without inflating raw solution count.
+
+## Continuation Pass (post-report)
+
+### Scope
+- Focused content de-repetition pass only (no engine refactor).
+- Targeted archetype families:
+  - `L5/L6/L22` (firewall branch training overlap)
+  - `L9/L11/L23` (virus+firewall overlap)
+
+### Changes made
+- `L6 Branch Lock` redesigned into a direct-vs-relay gate decision:
+  - reduced node count (`5 -> 4`),
+  - added `activate_all` objective,
+  - reduced branch mirroring with `L5`/`L22`.
+- `L23 Median Filter` redesigned into relay-vs-overload choice under virus pressure:
+  - replaced second relay with overload node,
+  - kept medium fit (`actual=medium`) with `targetCharge=6`,
+  - preserved pack compatibility for medium slot.
+
+### Validation
+- Level validation: `24/24` solvable, `0` cutoffs.
+- Pack rebuild: still `10/10` slots filled.
+- Updated medium slots now include both revised content levels:
+  - `#4 -> L23`
+  - `#5 -> L22`
+
+### Repetition impact
+- Prior highest-cluster pair `L6/L22` removed from top near-duplicate list.
+- Virus family overlap reduced for `L23` (`L9/L23` and `L11/L23` down to lower-score similarity bucket).
+- Remaining strong clusters are now concentrated in:
+  - `L5/L22`,
+  - `L9/L11`,
+  - `L13/L14`,
+  - `L17/L18/L19`.
