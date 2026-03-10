@@ -4,7 +4,7 @@ Generated levels checked: 28
 Solvable: 28
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 10952
+Total states explored: 11346
 
 ## Gameplay Rules Summary
 
@@ -77,9 +77,9 @@ Total states explored: 10952
 | L22 | Solvable | medium | Medium | 4 | 54 | 2 | none |
 | L23 | Solvable | medium | Medium | 4 | 42 | 2 | none |
 | L24 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
-| L25 | Solvable | light | Medium | 4 | 1 | 1 | single_opening_solution, single_solution_path |
-| L26 | Solvable | medium | Hard | 7 | 12 | 2 | single_opening_solution, tight_move_budget |
-| L27 | Solvable | medium | Hard | 8 | 1 | 1 | single_opening_solution, single_solution_path, zero_margin_move_budget |
+| L25 | Solvable | light | Medium | 4 | 39 | 2 | none |
+| L26 | Solvable | medium | Hard | 7 | 54 | 2 | none |
+| L27 | Solvable | medium | Hard | 8 | 45 | 2 | none |
 | L28 | Solvable | hard | Hard | 6 | 72 | 2 | none |
 
 ## Level Details
@@ -656,19 +656,20 @@ Total states explored: 10952
 - Teaching goal: Route energy through the purifier lane to stabilize an infected relay while charging the core.
 - Status: Solvable
 - Authored difficulty: light
-- Estimated difficulty: Medium (6.5)
+- Estimated difficulty: Medium (6)
 - Minimal winning path: P1 -> P1 -> P1 -> P1
 - Minimal moves: 4 / 7
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 5
+- Solution count (capped): 39
+- Average branching factor: 2
+- Explored states: 58
 - Dead states: 0
 - Overflow paths: 0
-- Clickable nodes at start: P1
+- Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path
+- Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=4; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
 
 ### L26 Sanitize or Rush
 
@@ -676,24 +677,24 @@ Total states explored: 10952
 - Teaching goal: Choose between direct core feed and purifier support to control virus pressure.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (12.26)
+- Estimated difficulty: Hard (11.14)
 - Minimal winning path: F1 -> P1 -> F1 -> P1 -> F1 -> P1 -> P1
-- Minimal moves: 7 / 8
-- Solution count (capped): 12
+- Minimal moves: 7 / 9
+- Solution count (capped): 54
 - Average branching factor: 2
-- Explored states: 239
-- Dead states: 110
+- Explored states: 370
+- Dead states: 132
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
-- Issues: single_opening_solution, tight_move_budget
+- Issues: none
 - Root branch analysis:
   - F1: keeps a win alive; minMoves=7; path=F1
-  - P1: dead branch; minMoves=n/a; path=P1
+  - P1: keeps a win alive; minMoves=9; path=P1
 - Dead state examples:
-  - moves=1, overload=0, infected=0, path=P1
-  - moves=2, overload=0, infected=1, path=P1 -> F1
   - moves=2, overload=0, infected=1, path=P1 -> P1
+  - moves=3, overload=0, infected=1, path=P1 -> F1 -> P1
+  - moves=3, overload=0, infected=1, path=P1 -> P1 -> F1
 
 ### L27 Sterile Route
 
@@ -701,19 +702,24 @@ Total states explored: 10952
 - Teaching goal: Keep purifier support online to finish charge while clearing all infection.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (10.5)
+- Estimated difficulty: Hard (13.34)
 - Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1 -> P1 -> P1 -> P1
-- Minimal moves: 8 / 8
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 9
-- Dead states: 0
+- Minimal moves: 8 / 10
+- Solution count (capped): 45
+- Average branching factor: 2
+- Explored states: 219
+- Dead states: 122
 - Overflow paths: 0
-- Clickable nodes at start: P1
+- Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path, zero_margin_move_budget
+- Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=8; path=P1
+  - P2: keeps a win alive; minMoves=9; path=P2
+- Dead state examples:
+  - moves=3, overload=0, infected=1, path=P2 -> P2 -> P2
+  - moves=4, overload=0, infected=0, path=P1 -> P2 -> P2 -> P2
+  - moves=4, overload=0, infected=0, path=P2 -> P1 -> P2 -> P2
 
 ### L28 Sanitation Gate
 
@@ -752,7 +758,7 @@ Estimated difficulty distribution is Easy 5, Medium 10, Hard 13, Unsolvable 0. T
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L2 (1 solution), L4 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution), L25 (1 solution), L27 (1 solution). Tight move budgets remain in L1 (3/4), L2 (5/5), L3 (4/5), L9 (5/6), L18 (5/6), L20 (9/10), L26 (7/8), L27 (8/8). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L2 (1 solution), L4 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution). Tight move budgets remain in L1 (3/4), L2 (5/5), L3 (4/5), L9 (5/6), L18 (5/6), L20 (9/10). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 

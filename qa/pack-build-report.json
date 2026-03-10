@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T11:20:17.144Z",
+  "generatedAt": "2026-03-10T16:22:04.187Z",
   "candidateCount": 28,
   "acceptedCount": 10,
   "deferredCount": 18,
@@ -959,13 +959,13 @@
       "levelId": "L25",
       "levelName": "Purifier Wake",
       "authoredDifficultyTag": "easy",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 51,
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
       "minMoves": 4,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 11.1,
-      "topologyScale": 8,
+      "solutionCount": 39,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.05,
+      "topologyScale": 9.5,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -973,18 +973,18 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_cc0e6405"
+      "topologyFingerprint": "topo_bb99e57c"
     },
     {
       "levelId": "L26",
       "levelName": "Sanitize or Rush",
       "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "extreme",
-      "predictedActualDifficultyScore": 78,
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
       "minMoves": 7,
-      "solutionCount": 12,
+      "solutionCount": 54,
       "averageBranchingFactor": 2,
-      "complexityScore": 18.89,
+      "complexityScore": 18.48,
       "topologyScale": 9.5,
       "slotId": null,
       "slotRole": null,
@@ -1000,12 +1000,12 @@
       "levelName": "Sterile Route",
       "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "extreme",
-      "predictedActualDifficultyScore": 98,
+      "predictedActualDifficultyScore": 80,
       "minMoves": 8,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 16.05,
-      "topologyScale": 9.5,
+      "solutionCount": 45,
+      "averageBranchingFactor": 2,
+      "complexityScore": 21.23,
+      "topologyScale": 11,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -1013,7 +1013,7 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_dcfbe354"
+      "topologyFingerprint": "topo_58f06d54"
     }
   ],
   "rejectedEntries": [],

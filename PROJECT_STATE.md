@@ -1,11 +1,10 @@
-﻿# PROJECT_STATE.md
+# PROJECT_STATE.md
 
 Last updated: 2026-03-10
 
 ## Repository State Snapshot
-- Current mainline commit: `acb8cbd`
-- `acb8cbd` merges branch `rescue/purifier-recovery-2026-03-10`
-- Purifier recovery commit present in history: `0faa562`
+- Current mainline commit before this balance pass: `07f570b`
+- Purifier recovery merge remains in history: `acb8cbd` (includes `0faa562`)
 
 ## Project Summary
 CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under pressure from infection, overload, firewall routing constraints, and objective logic.
@@ -42,18 +41,19 @@ Purifier is implemented as a passive support node:
   - `L27` Sterile Route
   - `L28` Sanitation Gate
 
-## Current Verified UI and QA Support
-- Purifier legend and coach feedback exist.
-- Purifier visual pulse and render support exist.
-- Hint support for idle purifier exists.
-- QA rule model includes purifier.
-- Pack build and validation pipeline recognize purifier content.
+## Latest Balance Pass (L25-L27)
+- `L25`: added optional secondary power tap (`P2`) and edge `E7: P2 -> U1`.
+- `L26`: increased `movesLimit` from 8 to 9.
+- `L27`: increased `movesLimit` from 8 to 10, added weaker optional secondary tap (`P2`) and edge `E8: P2 -> U1`.
+- Purifier core behavior and teaching goals were preserved.
 
 ## Current Validation Status
-Latest verified state:
+Latest verified state after this pass:
 - `validate-levels`: pass
 - solvability: 28/28 solvable, 0 unsolved, 0 search cutoffs
+- purifier-era issue flags for `L25`/`L26`/`L27`: none
 - `build-pack`: pass (28 candidates, 10 accepted, 18 deferred, 0 rejected)
+- selected pack slot lineup unchanged (still includes `L28` as slot #8 hard)
 
 ## Protected Systems
 Do not touch unless explicitly requested:
@@ -63,11 +63,11 @@ Do not touch unless explicitly requested:
 - Campaign systems
 
 ## Known Limitations
-- Some levels are still tight or single-solution-leaning.
-- Validator flags zero-margin move budgets in some purifier-era levels.
+- Some earlier non-purifier levels are still tight or single-solution-leaning.
+- `L25`-`L27` remain deferred by pack template selection (not a solvability failure).
 - Balance tuning remains separate from purifier mechanic correctness.
 
 ## Recommended Next Steps
-1. Optional narrow balance pass for `L25`-`L27` only.
-2. Reduce brittle single-solution pressure without changing purifier mechanic.
-3. Avoid expanding scope into new systems.
+1. If needed, run a separate narrow balance pass for remaining high-friction non-purifier levels (for example early tutorial bottlenecks).
+2. Keep purifier mechanic unchanged unless explicitly requested.
+3. Avoid scope expansion into protected systems.

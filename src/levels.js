@@ -725,6 +725,7 @@ const LEVELS = [
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 110, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 110, y: 360, injectPower: 4 },
       { id: 'R1', type: 'relay', x: 340, y: 190, emitPower: 3, threshold: 3, corrupted: true },
       { id: 'U1', type: 'purifier', x: 340, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
       { id: 'V1', type: 'virus', x: 520, y: 190, spreadRate: 1 },
@@ -736,7 +737,8 @@ const LEVELS = [
       { id: 'E3', from: 'P1', to: 'U1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E4', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E5', from: 'U1', to: 'R1', capacity: 1, attenuation: 4, enabled: true },
-      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E7', from: 'P2', to: 'U1', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
@@ -750,7 +752,7 @@ const LEVELS = [
     difficultyTag: 'medium',
     teachingGoal: 'Choose between direct core feed and purifier support to control virus pressure.',
     parScore: 1080,
-    movesLimit: 8,
+    movesLimit: 9,
     overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
@@ -782,11 +784,12 @@ const LEVELS = [
     difficultyTag: 'medium',
     teachingGoal: 'Keep purifier support online to finish charge while clearing all infection.',
     parScore: 1060,
-    movesLimit: 8,
+    movesLimit: 10,
     overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 100, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 110, y: 360, injectPower: 2 },
       { id: 'U1', type: 'purifier', x: 300, y: 300, emitPower: 2, threshold: 2, purifierStrength: 1 },
       { id: 'R1', type: 'relay', x: 470, y: 180, emitPower: 3, threshold: 3, corrupted: true },
       { id: 'R2', type: 'relay', x: 620, y: 300, emitPower: 3, threshold: 3 },
@@ -800,7 +803,8 @@ const LEVELS = [
       { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E5', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
-      { id: 'E7', from: 'U1', to: 'R2', capacity: 1, attenuation: 4, enabled: true }
+      { id: 'E7', from: 'U1', to: 'R2', capacity: 1, attenuation: 4, enabled: true },
+      { id: 'E8', from: 'P2', to: 'U1', capacity: 1, attenuation: 2, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },

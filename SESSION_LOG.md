@@ -1,4 +1,4 @@
-﻿# SESSION_LOG.md
+# SESSION_LOG.md
 
 ## 2026-03-10 - Purifier Recovery and Verification
 - A Codex session was interrupted by a Windows Update reboot during the final git phase.
@@ -23,7 +23,18 @@
   - `SESSION_LOG.md`
   - `CHANGELOG_AGENT.md`
 
+## 2026-03-10 - Narrow Balance Pass (L25-L27)
+- Scope kept to purifier-era levels only.
+- Applied changes:
+  - `L25`: added optional power node `P2` and edge `E7 (P2 -> U1)`.
+  - `L26`: increased move budget from 8 to 9.
+  - `L27`: increased move budget from 8 to 10, added weaker optional `P2` and edge `E8 (P2 -> U1)`.
+- Results:
+  - validation and solvability checks pass (28/28)
+  - `L25`/`L26`/`L27` no longer carry single-opening/single-solution/zero-margin flags
+  - pack build passes and selected slot composition remains unchanged
+- Protected systems were not touched.
+
 ## Next Recommended Focus
-- Optional narrow balance pass for `L25`-`L27` only.
-- Keep scope narrow.
-- Do not introduce new mechanics without explicit instruction.
+- If desired, address remaining non-purifier tight/single-solution hotspots in a separate scoped pass.
+- Keep scope narrow and avoid introducing new mechanics without explicit instruction.
