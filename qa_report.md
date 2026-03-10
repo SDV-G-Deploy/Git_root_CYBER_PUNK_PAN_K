@@ -1,10 +1,10 @@
 # Chain Lab QA Report
 
-Generated levels checked: 20
-Solvable: 20
+Generated levels checked: 24
+Solvable: 24
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 9816
+Total states explored: 10174
 
 ## Gameplay Rules Summary
 
@@ -69,9 +69,13 @@ Total states explored: 9816
 | L15 | Solvable | hard | Medium | 4 | 54 | 2 | none |
 | L16 | Solvable | hard | Hard | 5 | 2511 | 3 | none |
 | L17 | Solvable | hard | Medium | 4 | 2767 | 3 | none |
-| L18 | Solvable | hard | Medium | 4 | 2767 | 3 | none |
+| L18 | Solvable | hard | Medium | 4 | 270 | 3 | none |
 | L19 | Solvable | hard | Medium | 4 | 7183 | 3 | none |
 | L20 | Solvable | hard | Hard | 9 | 1472 | 3 | tight_move_budget |
+| L21 | Solvable | light | Medium | 4 | 16 | 2 | none |
+| L22 | Solvable | medium | Medium | 5 | 33 | 2 | none |
+| L23 | Solvable | medium | Medium | 4 | 40 | 2 | none |
+| L24 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
 
 ## Level Details
 
@@ -475,16 +479,16 @@ Total states explored: 9816
 ### L18 Crossfire District
 
 - Chapter: District Core
-- Teaching goal: Balance two power feeds while keeping the virus-adjacent relay lane from becoming the default answer.
+- Teaching goal: Split power across a gate lane and a virus-pressured relay lane before collapse catches up.
 - Status: Solvable
 - Authored difficulty: hard
-- Estimated difficulty: Medium (7.82)
+- Estimated difficulty: Medium (7.8)
 - Minimal winning path: F1 -> P1 -> P1 -> P1
-- Minimal moves: 4 / 9
-- Solution count (capped): 2767
+- Minimal moves: 4 / 6
+- Solution count (capped): 270
 - Average branching factor: 3
-- Explored states: 714
-- Dead states: 98
+- Explored states: 707
+- Dead states: 94
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1, P2
 - Non-interactable clickables: none
@@ -494,9 +498,9 @@ Total states explored: 9816
   - P1: keeps a win alive; minMoves=5; path=P1
   - P2: keeps a win alive; minMoves=5; path=P2
 - Dead state examples:
-  - moves=6, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1 -> P1 -> P1
-  - moves=6, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1 -> P1 -> P2
-  - moves=6, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1 -> P2 -> P2
+  - moves=3, overload=0, infected=1, path=P1 -> P1 -> P1
+  - moves=3, overload=0, infected=0, path=P1 -> P1 -> P2
+  - moves=3, overload=0, infected=1, path=P1 -> P2 -> P1
 
 ### L19 Zero Infection
 
@@ -550,27 +554,118 @@ Total states explored: 9816
   - moves=2, overload=0, infected=1, path=P1 -> P2
   - moves=2, overload=0, infected=2, path=P2 -> P2
 
+### L21 Twin Injectors
+
+- Chapter: Boot Sector
+- Teaching goal: Use two power taps in sequence before committing to the relay lane.
+- Status: Solvable
+- Authored difficulty: light
+- Estimated difficulty: Medium (6)
+- Minimal winning path: P1 -> P1 -> P1 -> P1
+- Minimal moves: 4 / 6
+- Solution count (capped): 16
+- Average branching factor: 2
+- Explored states: 15
+- Dead states: 0
+- Overflow paths: 0
+- Clickable nodes at start: P1, P2
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=4; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
+
+### L22 Switchback Gate
+
+- Chapter: Firewall Ring
+- Teaching goal: Rotate one firewall lane to choose timing between a quick and stable branch.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Medium (8.41)
+- Minimal winning path: F1 -> F1 -> P1 -> P1 -> P1
+- Minimal moves: 5 / 7
+- Solution count (capped): 33
+- Average branching factor: 2
+- Explored states: 179
+- Dead states: 42
+- Overflow paths: 0
+- Clickable nodes at start: F1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - F1: keeps a win alive; minMoves=5; path=F1
+  - P1: keeps a win alive; minMoves=6; path=P1
+- Dead state examples:
+  - moves=3, overload=0, infected=0, path=P1 -> P1 -> P1
+  - moves=4, overload=0, infected=0, path=P1 -> F1 -> F1 -> F1
+  - moves=4, overload=0, infected=0, path=P1 -> P1 -> F1 -> P1
+
+### L23 Median Filter
+
+- Chapter: Quarantine Loop
+- Teaching goal: Route through the cleaner lane before virus pressure narrows your options.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Medium (7.26)
+- Minimal winning path: F1 -> P1 -> P1 -> P1
+- Minimal moves: 4 / 8
+- Solution count (capped): 40
+- Average branching factor: 2
+- Explored states: 167
+- Dead states: 35
+- Overflow paths: 0
+- Clickable nodes at start: F1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - F1: keeps a win alive; minMoves=4; path=F1
+  - P1: keeps a win alive; minMoves=5; path=P1
+- Dead state examples:
+  - moves=5, overload=0, infected=1, path=F1 -> F1 -> F1 -> F1 -> P1
+  - moves=5, overload=0, infected=1, path=F1 -> F1 -> P1 -> P1 -> P1
+  - moves=5, overload=0, infected=1, path=P1 -> F1 -> F1 -> P1 -> P1
+
+### L24 Purge Junction
+
+- Chapter: Quarantine Loop
+- Teaching goal: Clean a corrupted relay first, then route both branches to finish the core.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Easy (5.5)
+- Minimal winning path: P1 -> P1 -> P1
+- Minimal moves: 3 / 8
+- Solution count (capped): 1
+- Average branching factor: 1
+- Explored states: 4
+- Dead states: 0
+- Overflow paths: 0
+- Clickable nodes at start: P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution, single_solution_path
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=3; path=P1
+
 ## Findings
 
 ### Overall Solvability
 
-All 20 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
+All 24 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
 
 ### Difficulty Curve
 
-Estimated difficulty distribution is Easy 4, Medium 8, Hard 8, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L18 (hard -> Medium), L19 (hard -> Medium).
+Estimated difficulty distribution is Easy 5, Medium 11, Hard 8, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L18 (hard -> Medium), L19 (hard -> Medium).
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L2 (1 solution), L4 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution). Tight move budgets remain in L1 (3/4), L2 (5/5), L3 (4/5), L9 (5/6), L20 (9/10). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L2 (1 solution), L4 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution). Tight move budgets remain in L1 (3/4), L2 (5/5), L3 (4/5), L9 (5/6), L20 (9/10). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 
-Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L7, L8, L9, L11 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L4, L12, L15, L17, L18, L19. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
+Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L7, L8, L9, L11, L21 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L18, L19. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
 
 ### Rebalancing Recommendations
 
-Give `L2` one extra move or lower the core target by 1 so the second tutorial level does not require an exact five-click script. Either retag L2, L3, L5, L6, L7, L8, L9, L11 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L4, L12, L15, L17, L18, L19 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Give `L2` one extra move or lower the core target by 1 so the second tutorial level does not require an exact five-click script. Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L18, L19 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 

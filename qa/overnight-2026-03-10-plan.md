@@ -50,3 +50,37 @@
   - normal play flow preserved,
   - hint flow still works,
   - no duplicate `run_end` observed in targeted checks.
+## Phase 3 content batch (completed)
+- Curated existing `L18` to reduce late-game near-duplicate overlap with `L17`:
+  - changed topology (split source lane + dedicated virus-pressured relay lane),
+  - reduced `movesLimit` from `9` to `6` to lower random-click drift.
+- Added 4 new handcrafted levels targeting early/easy and early-medium variety:
+  - `L21 Twin Injectors` (dual-source commit pattern),
+  - `L22 Switchback Gate` (single-gate route timing),
+  - `L23 Median Filter` (virus-aware lane selection),
+  - `L24 Purge Junction` (clean-corruption objective in a compact layout).
+- Validation after batch:
+  - `24/24` levels solvable,
+  - `0` search cutoffs,
+  - no protected-system changes.
+
+## Phase 4 pack rebuild + diagnostics (completed)
+- Rebuilt pack with unchanged slot contracts and difficulty semantics.
+- Result: `10/10` slots filled (no hidden difficulty downgrades).
+- New slot map:
+  - `#1 warmup -> L1`
+  - `#2 easy -> L4`
+  - `#3 easy -> L21`
+  - `#4 medium -> L22`
+  - `#5 medium -> L23`
+  - `#6 medium -> L13`
+  - `#7 hard -> L15`
+  - `#8 hard -> L12`
+  - `#9 challenge -> L16`
+  - `#10 boss -> L20`
+- Remaining rejection signal:
+  - `solution_count_extremely_high: 1` (unchanged type of degeneracy warning, now isolated).
+- Practical repetition watchlist (for next content pass):
+  - `L5/L6/L22` (same firewall-branch archetype family),
+  - `L9/L11/L23` (same virus-firewall archetype family),
+  - `L17/L18/L19` (same late mixed archetype family, but now less direct duplication than baseline).
