@@ -14,6 +14,7 @@
         <span id="scoreLabel">Turn: 0</span>
         <span id="shotsLabel">Moves: 0/0</span>
         <span id="targetLabel">Overload: 0/0</span>
+        <span id="objectiveLabel">Objective Type: pending</span>
         <span id="levelLabel">Level: L01</span>
         <span id="chainStatusLabel">Infected: 0/0 | Virus: 0</span>
       </div>
@@ -30,8 +31,8 @@
     <section class="coach-panel" aria-live="polite">
       <div class="coach-copy">
         <span class="coach-eyebrow">Operator Feed</span>
-        <strong id="coachTitle">Charge the core</strong>
-        <p id="coachBody">Click a Power node to inject energy into the grid.</p>
+        <strong id="coachTitle">Primary Objective</strong>
+        <p id="coachBody">Complete the active level objectives.</p>
       </div>
       <p id="coachMeta" class="coach-meta">Hover nodes to inspect their role before you commit a move.</p>
     </section>
@@ -67,7 +68,7 @@
     <section id="outcomePanel" class="outcome hidden" aria-live="polite">
       <div class="outcome-copy">
         <strong id="outcomeText">Run status</strong>
-        <p id="outcomeReason" class="outcome-reason">Charge the core before the network collapses.</p>
+        <p id="outcomeReason" class="outcome-reason">Complete the objectives before the network collapses.</p>
       </div>
       <div class="outcome-breakdown">
         <div class="outcome-grid">
@@ -137,28 +138,30 @@
     <div class="tutorial-card">
       <p class="tutorial-kicker">Signal District onboarding</p>
       <h2 id="tutorialTitle">Stabilize the district with one clean route at a time.</h2>
-      <p class="tutorial-lede">Your goal is simple: route neon energy into the Core before infection spreads too far or overload nodes explode and break the network.</p>
-      <div class="tutorial-grid">
-        <article class="tutorial-block">
-          <h3>Goal</h3>
-          <p>Charge the Core to its target value. Each level shows the objective in the Operator Feed.</p>
-        </article>
-        <article class="tutorial-block">
-          <h3>Input</h3>
-          <p>Click Power nodes to inject energy. Click Firewall nodes to open or switch routes.</p>
-        </article>
-        <article class="tutorial-block">
-          <h3>Danger</h3>
-          <p>Virus nodes spread infection each turn. Overload nodes can explode if one route gets too much energy.</p>
-        </article>
+      <div class="tutorial-content">
+        <p class="tutorial-lede">Each level has explicit objectives. Some runs focus on charging a core, while others also require network activation or infection cleanup.</p>
+        <div class="tutorial-grid">
+          <article class="tutorial-block">
+            <h3>Goal</h3>
+            <p>Follow the Objective line in Operator Feed. Win only when all listed objectives are complete.</p>
+          </article>
+          <article class="tutorial-block">
+            <h3>Input</h3>
+            <p>Click Power nodes to inject energy. Click Firewall nodes to open or switch routes.</p>
+          </article>
+          <article class="tutorial-block">
+            <h3>Purifier + Danger</h3>
+            <p>Purifiers auto-clean nearby infection when powered. Virus spreads each turn, and overload nodes can explode if overfed.</p>
+          </article>
+        </div>
+        <ol class="tutorial-list">
+          <li>Hover any node to inspect what it does before clicking.</li>
+          <li>Follow the bright particles and edge glow to read the chain reaction.</li>
+          <li>Route energy through Purifier nodes to suppress nearby infection pressure.</li>
+          <li>If the screen flashes orange, an overload just blew a route apart.</li>
+        </ol>
+        <p class="tutorial-tip">Tip: if a branch looks hot, open another firewall path and split the feed before committing the next move.</p>
       </div>
-      <ol class="tutorial-list">
-        <li>Hover any node to inspect what it does before clicking.</li>
-        <li>Follow the bright particles and edge glow to read the chain reaction.</li>
-        <li>Route energy through Purifier nodes to suppress nearby infection pressure.</li>
-        <li>If the screen flashes orange, an overload just blew a route apart.</li>
-      </ol>
-      <p class="tutorial-tip">Tip: if a branch looks hot, open another firewall path and split the feed before committing the next move.</p>
       <div class="tutorial-actions">
         <button id="tutorialStartButton" type="button">Enter Lab</button>
       </div>

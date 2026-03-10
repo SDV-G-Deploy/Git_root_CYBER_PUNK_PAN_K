@@ -139,6 +139,38 @@ function buildHintTargetText(hint) {
   return hint.targetNodeId;
 }
 
+function formatObjectiveTypeLabel(type) {
+  if (type === 'power_core') {
+    return 'Charge Core';
+  }
+
+  if (type === 'activate_all') {
+    return 'Activate Network';
+  }
+
+  if (type === 'clean_corruption') {
+    return 'Clear Infection';
+  }
+
+  return 'Unknown';
+}
+
+function buildObjectiveTypeText(summary) {
+  if (!summary || !Array.isArray(summary.objectives) || summary.objectives.length === 0) {
+    return 'Objective Type: pending';
+  }
+
+  const labels = [];
+  for (let i = 0; i < summary.objectives.length; i += 1) {
+    const label = formatObjectiveTypeLabel(summary.objectives[i].type);
+    if (labels.indexOf(label) < 0) {
+      labels.push(label);
+    }
+  }
+
+  return `Objective Type: ${labels.join(' + ')}`;
+}
+
 function getCoachCopy(snapshot, summary) {
   if (snapshot && snapshot.hoverInfo) {
     return {
@@ -151,7 +183,7 @@ function getCoachCopy(snapshot, summary) {
   if (!summary) {
     return {
       title: 'Signal Brief',
-      body: 'Charge the core to stabilize the district grid.',
+      body: 'Complete the active level objectives to stabilize the district grid.',
       meta: 'Hover nodes to inspect their role before committing a move.'
     };
   }
@@ -185,7 +217,7 @@ function getCoachCopy(snapshot, summary) {
   if (summary.turnIndex === 0) {
     return {
       title: 'Primary Objective',
-      body: summary.nextObjectiveText || 'Charge the core.',
+      body: summary.nextObjectiveText || 'Complete the listed objectives.',
       meta: summary.teachingGoal || 'Open with a Power node. Firewalls let you redirect the flow.'
     };
   }
@@ -210,13 +242,13 @@ function getCoachCopy(snapshot, summary) {
     return {
       title: 'Virus Spread',
       body: 'Infection advanced into adjacent nodes after the turn resolved.',
-      meta: 'Push energy faster toward the core or avoid feeding infected branches.'
+      meta: 'Push energy toward objectives quickly, or avoid feeding infected branches.'
     };
   }
 
   return {
     title: 'Next Move',
-    body: summary.nextObjectiveText || 'Charge the core.',
+    body: summary.nextObjectiveText || 'Complete the listed objectives.',
     meta: `Par ${summary.parScore} | Hover nodes to inspect them. Neon pulses show where energy just traveled.`
   };
 }
@@ -227,6 +259,7 @@ export function createUI(documentRef) {
     scoreLabel: getEl(documentRef, 'scoreLabel'),
     shotsLabel: getEl(documentRef, 'shotsLabel'),
     targetLabel: getEl(documentRef, 'targetLabel'),
+    objectiveLabel: getEl(documentRef, 'objectiveLabel'),
     levelLabel: getEl(documentRef, 'levelLabel'),
     chainStatusLabel: getEl(documentRef, 'chainStatusLabel'),
     levelSelect: getEl(documentRef, 'levelSelect'),
@@ -524,6 +557,12 @@ export function createUI(documentRef) {
     if (summary) {
       setText(
         textCache,
+        'hud-objective-type',
+        refs.objectiveLabel,
+        buildObjectiveTypeText(summary)
+      );
+      setText(
+        textCache,
         'summary-result',
         refs.summaryResult,
         `State: ${formatStateLabel(summary)} | Rank: ${formatRankLabel(summary.rank)}`
@@ -538,7 +577,7 @@ export function createUI(documentRef) {
         textCache,
         'summary-objectives',
         refs.summaryDepth,
-        `Objectives: ${summary.objectivesCompleted}/${summary.objectivesTotal} | Core charge: ${summary.coreCharge}`
+        `Objectives: ${summary.objectivesCompleted}/${summary.objectivesTotal} | Next: ${summary.nextObjectiveText}`
       );
       setText(
         textCache,

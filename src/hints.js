@@ -414,7 +414,7 @@ function buildDirectionalHint(state) {
     return {
       tier: 1,
       kind: 'directional',
-      message: 'Moves are running low. Focus on the shortest route into the core objective.',
+      message: 'Moves are running low. Focus on the shortest route that advances remaining objectives.',
       targetNodeId: coreNodeId || clickable[0],
       secondaryNodeId: null
     };
@@ -423,7 +423,7 @@ function buildDirectionalHint(state) {
   return {
     tier: 1,
     kind: 'directional',
-    message: 'Order matters: prime a route, then feed energy toward the objective node.',
+    message: 'Order matters: prime a route, then feed energy toward the active objectives.',
     targetNodeId: coreNodeId || clickable[0],
     secondaryNodeId: null
   };
