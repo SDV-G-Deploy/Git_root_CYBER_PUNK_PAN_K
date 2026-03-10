@@ -26,3 +26,15 @@
 - No daily/seed format changes.
 - No slot-threshold semantic changes.
 - Fill deficits via better content, not weaker contracts.
+## Phase 1 validation snapshot
+- Hint escalation verified: `1 -> 2 -> 3`, then caps at tier 3.
+- Hint reset verified on:
+  - retry/reset level,
+  - level switch,
+  - new run after valid move.
+- Hint telemetry events verified:
+  - `hint_requested`,
+  - `hint_tier_shown`.
+- Lifecycle guard check:
+  - duplicate `run_end` count remained `0` in stress sequence (hint + reset + level switch).
+- No additional code fix needed in Phase 1.
