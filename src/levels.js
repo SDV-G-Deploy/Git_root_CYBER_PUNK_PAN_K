@@ -525,7 +525,8 @@ const LEVELS = [
       { id: 'E7', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 12 },
+      { type: 'clean_corruption' }
     ]
   },
   {
@@ -534,31 +535,31 @@ const LEVELS = [
     chapter: 'District Core',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Clean and activate your second source only if you need the extra burst; the virus lane is present but no longer mandatory.',
+    teachingGoal: 'Stabilize the corrupted source, then route through a clean relay lane before virus pressure compounds.',
     parScore: 1060,
-    movesLimit: 10,
+    movesLimit: 8,
     overloadLimit: 11,
     collapseLimit: 5,
     nodes: [
       { id: 'P1', type: 'power', x: 90, y: 180, injectPower: 5, corrupted: true },
       { id: 'P2', type: 'power', x: 90, y: 380, injectPower: 5 },
       { id: 'F1', type: 'firewall', x: 260, y: 280, firewallOpen: false, firewallModes: [['E3', 'E4'], ['E5', 'E6']], activeMode: 0, injectPower: 2 },
-      { id: 'O1', type: 'overload', x: 490, y: 170, emitPower: 5, overloadThreshold: 5, threshold: 2 },
-      { id: 'R1', type: 'relay', x: 490, y: 390, emitPower: 3 },
+      { id: 'R1', type: 'relay', x: 490, y: 170, emitPower: 3 },
+      { id: 'R2', type: 'relay', x: 490, y: 390, emitPower: 3 },
       { id: 'V1', type: 'virus', x: 650, y: 390, spreadRate: 1 },
-      { id: 'C1', type: 'core', x: 840, y: 280, targetCharge: 12 }
+      { id: 'C1', type: 'core', x: 840, y: 280, targetCharge: 10 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'P2', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E7', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E3', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'V1', to: 'R2', capacity: 1, attenuation: 0, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 10 }
     ]
   },
   {
@@ -628,27 +629,28 @@ const LEVELS = [
     chapter: 'Firewall Ring',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Rotate one firewall lane to choose timing between a quick and stable branch.',
+    teachingGoal: 'Switch between safe relay output and overload burst timing.',
     parScore: 1180,
-    movesLimit: 7,
-    overloadLimit: 7,
+    movesLimit: 8,
+    overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 120, y: 270, injectPower: 5 },
-      { id: 'F1', type: 'firewall', x: 300, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'F1', type: 'firewall', x: 300, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E4']], activeMode: 0, injectPower: 2 },
       { id: 'R1', type: 'relay', x: 500, y: 180, threshold: 2, emitPower: 2 },
-      { id: 'R2', type: 'relay', x: 500, y: 360, threshold: 3, emitPower: 3 },
-      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 7 }
+      { id: 'O1', type: 'overload', x: 500, y: 360, emitPower: 5, overloadThreshold: 4, threshold: 2 },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 6 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'F1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'F1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E3', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'F1', to: 'O1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'F1', to: 'C1', capacity: 1, attenuation: 1, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 7 }
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 6 }
     ]
   },
   {

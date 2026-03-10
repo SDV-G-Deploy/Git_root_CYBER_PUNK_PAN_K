@@ -102,3 +102,14 @@
   - validate: 24/24 solvable,
   - pack: 10/10 slots,
   - contracts unchanged.
+
+## Continuation pass #3 summary
+- Reauthored `L22` into firewall+overload medium archetype (distinct from `L5`).
+- Reauthored `L19` into two-relay late archetype and removed its prior degeneracy rejection status.
+- Updated `L18` objective mix to reduce same-family objective repetition.
+- Regression checks passed:
+  - validate: 24/24 solvable,
+  - pack: 10/10 slots,
+  - rejection count dropped to 0 in current build report.
+- Similarity diagnostics improved:
+  - no 14-score near-duplicate pairs remain.

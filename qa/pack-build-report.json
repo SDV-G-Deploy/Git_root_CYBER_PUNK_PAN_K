@@ -1,16 +1,14 @@
 {
-  "generatedAt": "2026-03-10T08:39:37.738Z",
+  "generatedAt": "2026-03-10T09:59:53.451Z",
   "candidateCount": 24,
   "acceptedCount": 10,
-  "deferredCount": 13,
-  "rejectedCount": 1,
-  "rejectionCounts": {
-    "solution_count_extremely_high": 1
-  },
+  "deferredCount": 14,
+  "rejectedCount": 0,
+  "rejectionCounts": {},
   "acceptedDifficultyCounts": {
     "easy": 2,
-    "medium": 6,
-    "hard": 1,
+    "medium": 5,
+    "hard": 2,
     "extreme": 1
   },
   "acceptedSlotCounts": {
@@ -283,6 +281,19 @@
       "slotId": "slot4",
       "slotRole": "medium",
       "slotLabel": "Medium Puzzle A",
+      "levelId": "L22",
+      "levelName": "Switchback Gate",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 8,
+      "complexityScore": 13.38,
+      "slotScore": 106.97
+    },
+    {
+      "slotIndex": 5,
+      "slotId": "slot5",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle B",
       "levelId": "L23",
       "levelName": "Median Filter",
       "authoredDifficultyTag": "medium",
@@ -290,19 +301,6 @@
       "topologyScale": 9,
       "complexityScore": 14.49,
       "slotScore": 105.71
-    },
-    {
-      "slotIndex": 5,
-      "slotId": "slot5",
-      "slotRole": "medium",
-      "slotLabel": "Medium Puzzle B",
-      "levelId": "L22",
-      "levelName": "Switchback Gate",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "medium",
-      "topologyScale": 7.5,
-      "complexityScore": 14.69,
-      "slotScore": 105.66
     },
     {
       "slotIndex": 6,
@@ -322,6 +320,19 @@
       "slotId": "slot7",
       "slotRole": "hard",
       "slotLabel": "Hard Puzzle A",
+      "levelId": "L16",
+      "levelName": "Pressure Valve",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 9,
+      "complexityScore": 17.21,
+      "slotScore": 107.04
+    },
+    {
+      "slotIndex": 8,
+      "slotId": "slot8",
+      "slotRole": "hard",
+      "slotLabel": "Hard Puzzle B",
       "levelId": "L15",
       "levelName": "Heat Sink",
       "authoredDifficultyTag": "hard",
@@ -331,30 +342,17 @@
       "slotScore": 98.06
     },
     {
-      "slotIndex": 8,
-      "slotId": "slot8",
-      "slotRole": "hard",
-      "slotLabel": "Hard Puzzle B",
-      "levelId": "L12",
-      "levelName": "Virus Pressure",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "medium",
-      "topologyScale": 11,
-      "complexityScore": 17.04,
-      "slotScore": 94.81
-    },
-    {
       "slotIndex": 9,
       "slotId": "slot9",
       "slotRole": "challenge",
       "slotLabel": "Challenge Puzzle",
-      "levelId": "L16",
-      "levelName": "Pressure Valve",
+      "levelId": "L19",
+      "levelName": "Zero Infection",
       "authoredDifficultyTag": "hard",
       "predictedActualDifficultyClass": "hard",
-      "topologyScale": 9,
-      "complexityScore": 17.21,
-      "slotScore": 166.05
+      "topologyScale": 10.5,
+      "complexityScore": 20.23,
+      "slotScore": 175.85
     },
     {
       "slotIndex": 10,
@@ -397,9 +395,9 @@
       "slotIndex": 9,
       "role": "challenge",
       "label": "Challenge Puzzle",
-      "selectedLevelId": "L16",
-      "selectedLevelName": "Pressure Valve",
-      "slotScore": 166.05,
+      "selectedLevelId": "L19",
+      "selectedLevelName": "Zero Infection",
+      "slotScore": 175.85,
       "constraintSummary": null
     },
     {
@@ -407,9 +405,9 @@
       "slotIndex": 7,
       "role": "hard",
       "label": "Hard Puzzle A",
-      "selectedLevelId": "L15",
-      "selectedLevelName": "Heat Sink",
-      "slotScore": 98.06,
+      "selectedLevelId": "L16",
+      "selectedLevelName": "Pressure Valve",
+      "slotScore": 107.04,
       "constraintSummary": null
     },
     {
@@ -417,9 +415,9 @@
       "slotIndex": 8,
       "role": "hard",
       "label": "Hard Puzzle B",
-      "selectedLevelId": "L12",
-      "selectedLevelName": "Virus Pressure",
-      "slotScore": 94.81,
+      "selectedLevelId": "L15",
+      "selectedLevelName": "Heat Sink",
+      "slotScore": 98.06,
       "constraintSummary": null
     },
     {
@@ -427,9 +425,9 @@
       "slotIndex": 4,
       "role": "medium",
       "label": "Medium Puzzle A",
-      "selectedLevelId": "L23",
-      "selectedLevelName": "Median Filter",
-      "slotScore": 105.71,
+      "selectedLevelId": "L22",
+      "selectedLevelName": "Switchback Gate",
+      "slotScore": 106.97,
       "constraintSummary": null
     },
     {
@@ -437,9 +435,9 @@
       "slotIndex": 5,
       "role": "medium",
       "label": "Medium Puzzle B",
-      "selectedLevelId": "L22",
-      "selectedLevelName": "Switchback Gate",
-      "slotScore": 105.66,
+      "selectedLevelId": "L23",
+      "selectedLevelName": "Median Filter",
+      "slotScore": 105.71,
       "constraintSummary": null
     },
     {
@@ -512,6 +510,24 @@
       "topologyFingerprint": "topo_9bb0827e"
     },
     {
+      "levelId": "L19",
+      "levelName": "Zero Infection",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 592,
+      "averageBranchingFactor": 3,
+      "complexityScore": 20.23,
+      "topologyScale": 10.5,
+      "slotId": "slot9",
+      "slotRole": "challenge",
+      "slotIndex": 9,
+      "slotScore": 175.85,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_c771455d"
+    },
+    {
       "levelId": "L16",
       "levelName": "Pressure Valve",
       "authoredDifficultyTag": "hard",
@@ -522,10 +538,10 @@
       "averageBranchingFactor": 3,
       "complexityScore": 17.21,
       "topologyScale": 9,
-      "slotId": "slot9",
-      "slotRole": "challenge",
-      "slotIndex": 9,
-      "slotScore": 166.05,
+      "slotId": "slot7",
+      "slotRole": "hard",
+      "slotIndex": 7,
+      "slotScore": 107.04,
       "rejectionReasons": [],
       "topologyFingerprint": "topo_2d212b04"
     },
@@ -540,30 +556,30 @@
       "averageBranchingFactor": 2,
       "complexityScore": 13.34,
       "topologyScale": 7.5,
-      "slotId": "slot7",
+      "slotId": "slot8",
       "slotRole": "hard",
-      "slotIndex": 7,
+      "slotIndex": 8,
       "slotScore": 98.06,
       "rejectionReasons": [],
       "topologyFingerprint": "topo_3d462328"
     },
     {
-      "levelId": "L12",
-      "levelName": "Virus Pressure",
-      "authoredDifficultyTag": "hard",
+      "levelId": "L22",
+      "levelName": "Switchback Gate",
+      "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "medium",
       "predictedActualDifficultyScore": 45,
-      "minMoves": 6,
-      "solutionCount": 116,
+      "minMoves": 4,
+      "solutionCount": 54,
       "averageBranchingFactor": 2,
-      "complexityScore": 17.04,
-      "topologyScale": 11,
-      "slotId": "slot8",
-      "slotRole": "hard",
-      "slotIndex": 8,
-      "slotScore": 94.81,
+      "complexityScore": 13.38,
+      "topologyScale": 8,
+      "slotId": "slot4",
+      "slotRole": "medium",
+      "slotIndex": 4,
+      "slotScore": 106.97,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_dcad37c4"
+      "topologyFingerprint": "topo_8b02e8f2"
     },
     {
       "levelId": "L23",
@@ -576,30 +592,12 @@
       "averageBranchingFactor": 2,
       "complexityScore": 14.49,
       "topologyScale": 9,
-      "slotId": "slot4",
-      "slotRole": "medium",
-      "slotIndex": 4,
-      "slotScore": 105.71,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_e7430aa9"
-    },
-    {
-      "levelId": "L22",
-      "levelName": "Switchback Gate",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 5,
-      "solutionCount": 33,
-      "averageBranchingFactor": 2,
-      "complexityScore": 14.69,
-      "topologyScale": 7.5,
       "slotId": "slot5",
       "slotRole": "medium",
       "slotIndex": 5,
-      "slotScore": 105.66,
+      "slotScore": 105.71,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_a44b7bcf"
+      "topologyFingerprint": "topo_e7430aa9"
     },
     {
       "levelId": "L13",
@@ -838,6 +836,26 @@
       "topologyFingerprint": "topo_ae7b7f08"
     },
     {
+      "levelId": "L12",
+      "levelName": "Virus Pressure",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 6,
+      "solutionCount": 116,
+      "averageBranchingFactor": 2,
+      "complexityScore": 17.04,
+      "topologyScale": 11,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_dcad37c4"
+    },
+    {
       "levelId": "L14",
       "levelName": "Split Feed",
       "authoredDifficultyTag": "medium",
@@ -881,12 +899,12 @@
       "levelId": "L18",
       "levelName": "Crossfire District",
       "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 270,
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 78,
+      "minMoves": 5,
+      "solutionCount": 84,
       "averageBranchingFactor": 3,
-      "complexityScore": 17.18,
+      "complexityScore": 18.5,
       "topologyScale": 10.5,
       "slotId": null,
       "slotRole": null,
@@ -918,36 +936,15 @@
       "topologyFingerprint": "topo_06421cbf"
     }
   ],
-  "rejectedEntries": [
-    {
-      "levelId": "L19",
-      "levelName": "Zero Infection",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 37,
-      "minMoves": 4,
-      "solutionCount": 7183,
-      "averageBranchingFactor": 3,
-      "complexityScore": 17.13,
-      "topologyScale": 10.5,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "solution_count_extremely_high"
-      ],
-      "topologyFingerprint": "topo_d52cb800"
-    }
-  ],
+  "rejectedEntries": [],
   "topologyFingerprints": [
     "topo_4d4055d2",
     "topo_9bb0827e",
+    "topo_c771455d",
     "topo_2d212b04",
     "topo_3d462328",
-    "topo_dcad37c4",
+    "topo_8b02e8f2",
     "topo_e7430aa9",
-    "topo_a44b7bcf",
     "topo_8d543b60",
     "topo_ed53586a",
     "topo_8e9e8072"

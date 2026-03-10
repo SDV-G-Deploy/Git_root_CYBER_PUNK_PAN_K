@@ -135,3 +135,33 @@
 - Remaining strongest clusters now:
   - `L5/L22`
   - `L17/L18/L19`
+
+## Continuation Pass #3
+
+### Scope
+- Final targeted pass on remaining strongest repetition clusters:
+  - `L5/L22`
+  - `L17/L18/L19`
+
+### Changes made
+- `L22 Switchback Gate` reauthored into a distinct firewall+overload medium puzzle:
+  - added overload branch,
+  - added weak direct lane for timing choice,
+  - preserved medium-slot fitness in pack assembly.
+- `L18 Crossfire District` objective profile expanded:
+  - now `power_core + clean_corruption`.
+- `L19 Zero Infection` reauthored from overload-lane variant into a two-relay late-game route:
+  - tighter move budget,
+  - lower random-click solution inflation,
+  - now valid challenge candidate instead of degeneracy-rejected outlier.
+
+### Validation
+- `24/24` levels solvable.
+- `0` search cutoffs.
+- Pack remains honest and full: `10/10` slots.
+- Rejection count in current pack build: `0`.
+
+### Repetition impact
+- Highest near-duplicate bucket reduced from `14` to `12`.
+- Previous strongest duplicate-family signal (`L17/L18/L19` at 14-level similarity) is reduced.
+- Current top similarity rows are now mid-range (`12`) and no longer include 14-level collisions.
