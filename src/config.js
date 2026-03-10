@@ -93,7 +93,9 @@ export const CONFIG = Object.freeze({
     VERSION: 1
   },
   TELEMETRY: {
-    MAX_LOG_ENTRIES: 5000
+    MAX_LOG_ENTRIES: 5000,
+    LIFECYCLE_VERSION: 2,
+    EPOCH: 'post_lifecycle_fix_2026_03_10'
   }
 });
 

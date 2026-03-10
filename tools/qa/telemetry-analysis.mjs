@@ -11,6 +11,24 @@ function roundNumber(value, digits = 2) {
   return Math.round(value * power) / power;
 }
 
+function normalizeLifecycleVersion(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return Math.max(0, Math.floor(parsed));
+}
+
+function normalizeTelemetryEpoch(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export function parseTelemetryRecords(raw) {
   if (!raw || typeof raw !== 'string') {
     return [];
@@ -57,6 +75,7 @@ export function parseTelemetryRecords(raw) {
 
 function buildRunMap(records) {
   const runs = new Map();
+  let duplicateRunEndEvents = 0;
 
   for (let index = 0; index < records.length; index += 1) {
     const entry = records[index];
@@ -66,6 +85,12 @@ function buildRunMap(records) {
 
     const runId = String(entry.runId || `unknown_${index}`);
     const payload = entry.payload && typeof entry.payload === 'object' ? entry.payload : {};
+    const entryLifecycleVersion = normalizeLifecycleVersion(
+      entry.lifecycleVersion ?? payload.lifecycleVersion
+    );
+    const entryTelemetryEpoch = normalizeTelemetryEpoch(
+      entry.telemetryEpoch ?? payload.telemetryEpoch
+    );
 
     if (!runs.has(runId)) {
       runs.set(runId, {
@@ -79,6 +104,9 @@ function buildRunMap(records) {
         reason: null,
         movesUsed: null,
         retryCount: 0,
+        lifecycleVersion: entryLifecycleVersion,
+        telemetryEpoch: entryTelemetryEpoch,
+        duplicateRunEndCount: 0,
         events: []
       });
     }
@@ -90,6 +118,16 @@ function buildRunMap(records) {
       run.levelId = payload.levelId;
     }
 
+    if (entryLifecycleVersion !== null) {
+      run.lifecycleVersion = run.lifecycleVersion === null
+        ? entryLifecycleVersion
+        : Math.max(run.lifecycleVersion, entryLifecycleVersion);
+    }
+
+    if (entryTelemetryEpoch) {
+      run.telemetryEpoch = entryTelemetryEpoch;
+    }
+
     if (entry.eventType === 'run_start') {
       run.hasStart = true;
       if (Number.isFinite(Number(entry.timestamp))) {
@@ -98,10 +136,17 @@ function buildRunMap(records) {
     }
 
     if (entry.eventType === 'run_end') {
+      if (run.hasEnd) {
+        run.duplicateRunEndCount += 1;
+        duplicateRunEndEvents += 1;
+        continue;
+      }
+
       run.hasEnd = true;
       if (Number.isFinite(Number(entry.timestamp))) {
         run.endAt = Number(entry.timestamp);
       }
+
       run.result = payload.result || run.result;
       run.reason = payload.reason || run.reason;
       if (Number.isFinite(Number(payload.movesUsed))) {
@@ -114,7 +159,10 @@ function buildRunMap(records) {
     }
   }
 
-  return runs;
+  return {
+    runs,
+    duplicateRunEndEvents
+  };
 }
 
 function createEmptyLevelStats(level, solverResult) {
@@ -146,37 +194,50 @@ function createEmptyLevelStats(level, solverResult) {
   };
 }
 
-export function buildTelemetryDifficultyReport(records, options) {
-  const levels = options?.levels || loadLevelsWithSolverProof(options?.solverOptions);
-  const solverResults = options?.solverResults || validateLevels(options?.solverOptions);
-  const levelById = new Map();
-  const levelStats = new Map();
-  const solverById = new Map();
-
-  for (let index = 0; index < solverResults.length; index += 1) {
-    solverById.set(solverResults[index].levelId, solverResults[index]);
+function getEpochKey(run) {
+  if (run.telemetryEpoch) {
+    return run.telemetryEpoch;
   }
 
+  if (Number.isFinite(run.lifecycleVersion)) {
+    return `lifecycle_v${run.lifecycleVersion}`;
+  }
+
+  return 'legacy_unversioned';
+}
+
+function computeEpochReport(epochKey, runsInEpoch, levels, solverById, options) {
+  const levelStats = new Map();
   for (let index = 0; index < levels.length; index += 1) {
     const level = levels[index];
-    levelById.set(level.id, level);
     levelStats.set(level.id, createEmptyLevelStats(level, solverById.get(level.id)));
   }
 
-  const runs = buildRunMap(records);
   let totalRetries = 0;
   let totalStartedRuns = 0;
   let totalClosedRuns = 0;
   let totalOpenRuns = 0;
   let totalAbandons = 0;
+  let duplicateRunEndEvents = 0;
+  let maxLifecycleVersion = null;
 
-  for (const run of runs.values()) {
+  for (let index = 0; index < runsInEpoch.length; index += 1) {
+    const run = runsInEpoch[index];
+    duplicateRunEndEvents += run.duplicateRunEndCount || 0;
+
+    if (Number.isFinite(run.lifecycleVersion)) {
+      maxLifecycleVersion = maxLifecycleVersion === null
+        ? run.lifecycleVersion
+        : Math.max(maxLifecycleVersion, run.lifecycleVersion);
+    }
+
     const levelId = run.levelId;
     if (!levelId || !levelStats.has(levelId)) {
       continue;
     }
 
     const stats = levelStats.get(levelId);
+
     if (run.hasStart) {
       stats.startedRuns += 1;
       totalStartedRuns += 1;
@@ -284,6 +345,8 @@ export function buildTelemetryDifficultyReport(records, options) {
     };
 
   const summary = {
+    epochKey,
+    maxLifecycleVersion,
     levelsObserved: levels.length,
     startedRunsObserved: totalStartedRuns,
     closedRunsObserved: totalClosedRuns,
@@ -291,6 +354,7 @@ export function buildTelemetryDifficultyReport(records, options) {
     attemptsObserved: observedAttempts,
     retriesObserved: totalRetries,
     abandonsObserved: totalAbandons,
+    duplicateRunEndEvents,
     closedRunRate: totalStartedRuns > 0 ? roundNumber(totalClosedRuns / totalStartedRuns, 4) : 0,
     avgRetryRate: averageRetryRate,
     avgAbandonRate: averageAbandonRate,
@@ -299,10 +363,89 @@ export function buildTelemetryDifficultyReport(records, options) {
   };
 
   return {
-    generatedAt: new Date().toISOString(),
+    epochKey,
     summary,
     solverBucketCalibration,
     perLevel
+  };
+}
+
+function pickEpochForCalibration(epochReports) {
+  if (!Array.isArray(epochReports) || epochReports.length === 0) {
+    return null;
+  }
+
+  const withClosedRuns = epochReports.filter((report) => report.summary.closedRunsObserved > 0);
+  if (withClosedRuns.length === 0) {
+    return epochReports[0];
+  }
+
+  const nonLegacy = withClosedRuns.filter((report) => report.epochKey !== 'legacy_unversioned');
+  const source = nonLegacy.length > 0 ? nonLegacy : withClosedRuns;
+
+  source.sort((left, right) => {
+    const lvLeft = Number.isFinite(left.summary.maxLifecycleVersion) ? left.summary.maxLifecycleVersion : -1;
+    const lvRight = Number.isFinite(right.summary.maxLifecycleVersion) ? right.summary.maxLifecycleVersion : -1;
+    if (lvRight !== lvLeft) {
+      return lvRight - lvLeft;
+    }
+
+    if (right.summary.closedRunsObserved !== left.summary.closedRunsObserved) {
+      return right.summary.closedRunsObserved - left.summary.closedRunsObserved;
+    }
+
+    return left.epochKey.localeCompare(right.epochKey);
+  });
+
+  return source[0];
+}
+
+export function buildTelemetryDifficultyReport(records, options) {
+  const levels = options?.levels || loadLevelsWithSolverProof(options?.solverOptions);
+  const solverResults = options?.solverResults || validateLevels(options?.solverOptions);
+  const solverById = new Map();
+
+  for (let index = 0; index < solverResults.length; index += 1) {
+    solverById.set(solverResults[index].levelId, solverResults[index]);
+  }
+
+  const runMap = buildRunMap(records);
+  const runs = Array.from(runMap.runs.values());
+  const runsByEpoch = new Map();
+
+  for (let index = 0; index < runs.length; index += 1) {
+    const run = runs[index];
+    const epochKey = getEpochKey(run);
+    if (!runsByEpoch.has(epochKey)) {
+      runsByEpoch.set(epochKey, []);
+    }
+
+    runsByEpoch.get(epochKey).push(run);
+  }
+
+  if (runsByEpoch.size === 0) {
+    runsByEpoch.set('legacy_unversioned', []);
+  }
+
+  const epochReports = [];
+  for (const [epochKey, epochRuns] of runsByEpoch.entries()) {
+    epochReports.push(computeEpochReport(epochKey, epochRuns, levels, solverById, options));
+  }
+
+  epochReports.sort((left, right) => left.epochKey.localeCompare(right.epochKey));
+  const selectedEpochReport = pickEpochForCalibration(epochReports) || epochReports[0];
+
+  return {
+    generatedAt: new Date().toISOString(),
+    selectedEpochKey: selectedEpochReport.epochKey,
+    summary: selectedEpochReport.summary,
+    solverBucketCalibration: selectedEpochReport.solverBucketCalibration,
+    perLevel: selectedEpochReport.perLevel,
+    epochs: epochReports.map((report) => ({
+      epochKey: report.epochKey,
+      summary: report.summary,
+      solverBucketCalibration: report.solverBucketCalibration
+    }))
   };
 }
 

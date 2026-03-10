@@ -1,6 +1,25 @@
-export function createTelemetryStore(maxEntries) {
+function sanitizeTelemetryMetadata(metadata) {
+  const source = metadata && typeof metadata === 'object' ? metadata : {};
+
+  const lifecycleVersion = Number.isFinite(Number(source.lifecycleVersion))
+    ? Math.max(0, Math.floor(Number(source.lifecycleVersion)))
+    : null;
+
+  const telemetryEpoch = typeof source.telemetryEpoch === 'string' && source.telemetryEpoch.trim().length > 0
+    ? source.telemetryEpoch.trim()
+    : null;
+
+  return {
+    lifecycleVersion,
+    telemetryEpoch
+  };
+}
+
+export function createTelemetryStore(maxEntries, metadata) {
   const entries = [];
   const maxSize = Number.isFinite(maxEntries) && maxEntries > 0 ? Math.floor(maxEntries) : 5000;
+  const meta = sanitizeTelemetryMetadata(metadata);
+  const completedRunIds = new Set();
 
   function append(entry) {
     entries.push(entry);
@@ -14,15 +33,27 @@ export function createTelemetryStore(maxEntries) {
       return null;
     }
 
+    const runId = state.runId;
+    if (eventType === 'run_end' && completedRunIds.has(runId)) {
+      return null;
+    }
+
     const entry = {
       timestamp: Date.now(),
-      runId: state.runId,
+      runId,
       eventType,
-      payload: payload || {}
+      payload: payload || {},
+      lifecycleVersion: meta.lifecycleVersion,
+      telemetryEpoch: meta.telemetryEpoch
     };
 
     state.telemetry.push(entry);
     append(entry);
+
+    if (eventType === 'run_end') {
+      completedRunIds.add(runId);
+    }
+
     return entry;
   }
 

@@ -87,7 +87,10 @@ export function createChainLabEngine() {
       onRunEnd: onRunEndStub,
       onUxEvent: onUxEventStub
     },
-    telemetry: createTelemetryStore(CONFIG.TELEMETRY.MAX_LOG_ENTRIES),
+    telemetry: createTelemetryStore(CONFIG.TELEMETRY.MAX_LOG_ENTRIES, {
+      lifecycleVersion: CONFIG.TELEMETRY.LIFECYCLE_VERSION,
+      telemetryEpoch: CONFIG.TELEMETRY.EPOCH
+    }),
     modifiers: {
       scoreBonus: 0,
       chainGrowthBonus: 0
@@ -239,6 +242,8 @@ export function createChainLabEngine() {
       levelId: state.levelId,
       result,
       reason,
+      lifecycleVersion: CONFIG.TELEMETRY.LIFECYCLE_VERSION,
+      telemetryEpoch: CONFIG.TELEMETRY.EPOCH,
       movesUsed: state.movesUsed,
       overload: state.overload,
       infectedCount: getInfectedCount(state),
@@ -278,6 +283,8 @@ export function createChainLabEngine() {
       levelId: state.levelId,
       result: 'abandoned',
       reason: reason || 'abandoned_transition',
+      lifecycleVersion: CONFIG.TELEMETRY.LIFECYCLE_VERSION,
+      telemetryEpoch: CONFIG.TELEMETRY.EPOCH,
       movesUsed: state.movesUsed,
       overload: state.overload,
       infectedCount: getInfectedCount(state),
@@ -485,6 +492,8 @@ export function createChainLabEngine() {
       levelId: runtime.state.levelId,
       levelName: runtime.state.levelName,
       levelIndex: runtime.state.levelIndex,
+      lifecycleVersion: CONFIG.TELEMETRY.LIFECYCLE_VERSION,
+      telemetryEpoch: CONFIG.TELEMETRY.EPOCH,
       movesLimit: runtime.state.movesLimit,
       overloadLimit: runtime.state.overloadLimit,
       collapseLimit: runtime.state.collapseLimit,

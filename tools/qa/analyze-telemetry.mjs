@@ -41,6 +41,7 @@ function formatConsoleReport(report) {
   const lines = [];
   lines.push('Signal District / Telemetry Difficulty Report');
   lines.push('');
+  lines.push(`Selected epoch: ${report.selectedEpochKey || report.summary.epochKey || 'unknown'}`);
   lines.push(`Levels observed: ${report.summary.levelsObserved}`);
   lines.push(`Started runs observed: ${report.summary.startedRunsObserved}`);
   lines.push(`Closed runs observed: ${report.summary.closedRunsObserved}`);
@@ -49,6 +50,7 @@ function formatConsoleReport(report) {
   lines.push(`Attempts observed: ${report.summary.attemptsObserved}`);
   lines.push(`Retries observed: ${report.summary.retriesObserved}`);
   lines.push(`Abandons observed: ${report.summary.abandonsObserved}`);
+  lines.push(`Duplicate run_end events: ${report.summary.duplicateRunEndEvents || 0}`);
   lines.push(`Avg retry rate: ${(report.summary.avgRetryRate * 100).toFixed(1)}%`);
   lines.push(`Avg abandon rate: ${(report.summary.avgAbandonRate * 100).toFixed(1)}%`);
   lines.push('');
@@ -56,6 +58,18 @@ function formatConsoleReport(report) {
   for (const bucket of Object.keys(DEFAULT_TARGET_DIFFICULTY_DISTRIBUTION)) {
     lines.push(`- ${bucket}: ${report.summary.actualDifficultyDistribution[bucket] || 0}`);
   }
+
+  if (Array.isArray(report.epochs) && report.epochs.length > 0) {
+    lines.push('');
+    lines.push('Epoch overview:');
+    for (let index = 0; index < report.epochs.length; index += 1) {
+      const epoch = report.epochs[index];
+      lines.push(
+        `- ${epoch.epochKey}: started=${epoch.summary.startedRunsObserved}, closed=${epoch.summary.closedRunsObserved}, open=${epoch.summary.openRunsObserved}, duplicateEnd=${epoch.summary.duplicateRunEndEvents || 0}`
+      );
+    }
+  }
+
   lines.push('');
   lines.push('Per-level actual difficulty:');
   for (let index = 0; index < report.perLevel.length; index += 1) {
