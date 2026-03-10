@@ -62,3 +62,29 @@
 - No purifier core behavior changes
 - No new mechanics introduced
 - Protected systems not touched
+
+## 2026-03-10 - Purifier Integration Pass: Improve Pack Flow Presence
+
+### Changed
+- Retagged `L25` (`Purifier Wake`) from `light` to `medium` (`difficulty` and `difficultyTag`) to align authored role with practical medium-slot characteristics.
+- No topology/mechanic/rules changes were made in this pass.
+
+### Why
+- `L25`/`L26`/`L27` were deferred mainly as `not_selected_for_slot_template`.
+- For `L25`, authored tag (`easy`) underweighted it against medium-slot candidates despite medium practical difficulty and valid constraints.
+- Retagging `L25` is the smallest safe content adjustment that improves real purifier pack integration without touching heuristics or slot semantics.
+
+### Files Changed in This Pass
+- `src/levels.js`
+- `qa/level-validation.json`
+- `qa/pack-build-report.json`
+- `qa_report.md`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Result
+- Pack selection now includes purifier levels at:
+  - medium slot `#5`: `L25`
+  - hard slot `#8`: `L28`
+- Protected systems not touched.

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-10T16:21:53.746Z",
+  "generatedAt": "2026-03-10T17:41:53.350Z",
   "summary": {
     "levelCount": 28,
     "solvableCount": 28,
@@ -4204,7 +4204,7 @@
     {
       "levelId": "L25",
       "levelName": "Purifier Wake",
-      "authoredDifficulty": "light",
+      "authoredDifficulty": "medium",
       "chapter": "Purifier Loop",
       "teachingGoal": "Route energy through the purifier lane to stabilize an infected relay while charging the core.",
       "movesLimit": 7,

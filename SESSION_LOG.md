@@ -32,7 +32,21 @@
 - Results:
   - validation and solvability checks pass (28/28)
   - `L25`/`L26`/`L27` no longer carry single-opening/single-solution/zero-margin flags
-  - pack build passes and selected slot composition remains unchanged
+  - pack build passes and selected slot composition remained unchanged at that time
+- Protected systems were not touched.
+
+## 2026-03-10 - Purifier Integration Pass (Pack Fit)
+- Starting state was clean on `main` at commit `2d7be28`.
+- Investigated deferred reasons for purifier-era levels and identified slot-fit scoring/tag alignment as primary cause.
+- Applied minimal scoped edit:
+  - retagged `L25` from `light` to `medium` (`difficulty` + `difficultyTag`).
+- Re-ran checks:
+  - validation/solvability pass (28/28)
+  - pack build pass
+  - hint smoke checks for `L25`-`L28` remain sensible
+- Outcome: purifier representation in selected pack improved:
+  - `L25` selected in medium slot `#5`
+  - `L28` remains selected in hard slot `#8`
 - Protected systems were not touched.
 
 ## Next Recommended Focus

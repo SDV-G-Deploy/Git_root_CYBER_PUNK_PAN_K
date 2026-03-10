@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-10T16:22:04.187Z",
+  "generatedAt": "2026-03-10T17:41:53.442Z",
   "candidateCount": 28,
   "acceptedCount": 10,
   "deferredCount": 18,
   "rejectedCount": 0,
   "rejectionCounts": {},
   "acceptedDifficultyCounts": {
-    "easy": 2,
-    "medium": 4,
+    "easy": 1,
+    "medium": 5,
     "hard": 3,
     "extreme": 1
   },
@@ -294,6 +294,19 @@
       "slotId": "slot5",
       "slotRole": "medium",
       "slotLabel": "Medium Puzzle B",
+      "levelId": "L25",
+      "levelName": "Purifier Wake",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 9.5,
+      "complexityScore": 14.05,
+      "slotScore": 105.85
+    },
+    {
+      "slotIndex": 6,
+      "slotId": "slot6",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle C",
       "levelId": "L23",
       "levelName": "Median Filter",
       "authoredDifficultyTag": "medium",
@@ -301,19 +314,6 @@
       "topologyScale": 9,
       "complexityScore": 14.49,
       "slotScore": 105.71
-    },
-    {
-      "slotIndex": 6,
-      "slotId": "slot6",
-      "slotRole": "medium",
-      "slotLabel": "Medium Puzzle C",
-      "levelId": "L13",
-      "levelName": "Overload Trap",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "easy",
-      "topologyScale": 7.5,
-      "complexityScore": 9.75,
-      "slotScore": 93.45
     },
     {
       "slotIndex": 7,
@@ -435,9 +435,9 @@
       "slotIndex": 5,
       "role": "medium",
       "label": "Medium Puzzle B",
-      "selectedLevelId": "L23",
-      "selectedLevelName": "Median Filter",
-      "slotScore": 105.71,
+      "selectedLevelId": "L25",
+      "selectedLevelName": "Purifier Wake",
+      "slotScore": 105.85,
       "constraintSummary": null
     },
     {
@@ -445,9 +445,9 @@
       "slotIndex": 6,
       "role": "medium",
       "label": "Medium Puzzle C",
-      "selectedLevelId": "L13",
-      "selectedLevelName": "Overload Trap",
-      "slotScore": 93.45,
+      "selectedLevelId": "L23",
+      "selectedLevelName": "Median Filter",
+      "slotScore": 105.71,
       "constraintSummary": null
     },
     {
@@ -582,6 +582,24 @@
       "topologyFingerprint": "topo_8b02e8f2"
     },
     {
+      "levelId": "L25",
+      "levelName": "Purifier Wake",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 39,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.05,
+      "topologyScale": 9.5,
+      "slotId": "slot5",
+      "slotRole": "medium",
+      "slotIndex": 5,
+      "slotScore": 105.85,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_bb99e57c"
+    },
+    {
       "levelId": "L23",
       "levelName": "Median Filter",
       "authoredDifficultyTag": "medium",
@@ -592,30 +610,12 @@
       "averageBranchingFactor": 2,
       "complexityScore": 14.49,
       "topologyScale": 9,
-      "slotId": "slot5",
-      "slotRole": "medium",
-      "slotIndex": 5,
-      "slotScore": 105.71,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_e7430aa9"
-    },
-    {
-      "levelId": "L13",
-      "levelName": "Overload Trap",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "easy",
-      "predictedActualDifficultyScore": 24,
-      "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 9.75,
-      "topologyScale": 7.5,
       "slotId": "slot6",
       "slotRole": "medium",
       "slotIndex": 6,
-      "slotScore": 93.45,
+      "slotScore": 105.71,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_8d543b60"
+      "topologyFingerprint": "topo_e7430aa9"
     },
     {
       "levelId": "L4",
@@ -856,6 +856,26 @@
       "topologyFingerprint": "topo_dcad37c4"
     },
     {
+      "levelId": "L13",
+      "levelName": "Overload Trap",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 9.75,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_8d543b60"
+    },
+    {
       "levelId": "L14",
       "levelName": "Split Feed",
       "authoredDifficultyTag": "medium",
@@ -956,26 +976,6 @@
       "topologyFingerprint": "topo_06421cbf"
     },
     {
-      "levelId": "L25",
-      "levelName": "Purifier Wake",
-      "authoredDifficultyTag": "easy",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 39,
-      "averageBranchingFactor": 2,
-      "complexityScore": 14.05,
-      "topologyScale": 9.5,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_bb99e57c"
-    },
-    {
       "levelId": "L26",
       "levelName": "Sanitize or Rush",
       "authoredDifficultyTag": "medium",
@@ -1024,8 +1024,8 @@
     "topo_2d212b04",
     "topo_407d0214",
     "topo_8b02e8f2",
+    "topo_bb99e57c",
     "topo_e7430aa9",
-    "topo_8d543b60",
     "topo_ed53586a",
     "topo_8e9e8072"
   ]
