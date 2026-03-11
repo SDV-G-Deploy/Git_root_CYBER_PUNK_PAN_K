@@ -7,7 +7,7 @@ const LEVELS = [
     difficultyTag: 'intro',
     teachingGoal: 'Learn the basic route: Power -> Relay -> Core.',
     parScore: 1500,
-    movesLimit: 4,
+    movesLimit: 5,
     overloadLimit: 6,
     collapseLimit: 4,
     nodes: [
@@ -31,11 +31,12 @@ const LEVELS = [
     difficultyTag: 'intro',
     teachingGoal: 'Learn that relays chain together and store charge across turns.',
     parScore: 1450,
-    movesLimit: 5,
+    movesLimit: 6,
     overloadLimit: 6,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 140, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 140, y: 360, injectPower: 2 },
       { id: 'R1', type: 'relay', x: 320, y: 180, threshold: 3, emitPower: 3 },
       { id: 'R2', type: 'relay', x: 520, y: 320, threshold: 3, emitPower: 3 },
       { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 7 }
@@ -43,7 +44,9 @@ const LEVELS = [
     edges: [
       { id: 'E1', from: 'P1', to: 'R1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'R1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E3', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E3', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 1, attenuation: 2, enabled: true },
+      { id: 'E5', from: 'P2', to: 'R2', capacity: 2, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 7 }
@@ -57,7 +60,7 @@ const LEVELS = [
     difficultyTag: 'intro',
     teachingGoal: 'Click the Firewall to open a route before trying to charge the Core.',
     parScore: 1400,
-    movesLimit: 5,
+    movesLimit: 6,
     overloadLimit: 6,
     collapseLimit: 4,
     nodes: [
@@ -86,6 +89,7 @@ const LEVELS = [
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 130, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 130, y: 380, injectPower: 3 },
       { id: 'R1', type: 'relay', x: 340, y: 180, threshold: 3, emitPower: 3 },
       { id: 'R2', type: 'relay', x: 340, y: 360, threshold: 3, emitPower: 3 },
       { id: 'C1', type: 'core', x: 700, y: 270, targetCharge: 12 }
@@ -94,7 +98,8 @@ const LEVELS = [
       { id: 'E1', from: 'P1', to: 'R1', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E2', from: 'P1', to: 'R2', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'P2', to: 'R2', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
@@ -853,7 +858,7 @@ const LEVELS = [
     difficultyTag: 'medium',
     teachingGoal: 'Use a firewall gate to decide when purifier support outranks raw relay throughput.',
     parScore: 1040,
-    movesLimit: 9,
+    movesLimit: 10,
     overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
@@ -963,6 +968,7 @@ const LEVELS = [
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 80, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 80, y: 360, injectPower: 3 },
       { id: 'F1', type: 'firewall', x: 230, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
       { id: 'O1', type: 'overload', x: 420, y: 170, emitPower: 5, threshold: 2, overloadThreshold: 4 },
       { id: 'U1', type: 'purifier', x: 420, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
@@ -979,7 +985,8 @@ const LEVELS = [
       { id: 'E6', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E7', from: 'U1', to: 'C1', capacity: 1, attenuation: 2, enabled: true },
       { id: 'E8', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
-      { id: 'E9', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true }
+      { id: 'E9', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E10', from: 'P2', to: 'U1', capacity: 2, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
@@ -1017,7 +1024,8 @@ const LEVELS = [
       { id: 'E7', from: 'R1', to: 'U1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E8', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
       { id: 'E9', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
-      { id: 'E10', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E10', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E11', from: 'P2', to: 'F1', capacity: 2, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 9 },
@@ -1032,7 +1040,7 @@ const LEVELS = [
     difficultyTag: 'challenge',
     teachingGoal: 'Balance route activation and full sanitation in the same run under two-lane pressure.',
     parScore: 940,
-    movesLimit: 11,
+    movesLimit: 12,
     overloadLimit: 9,
     collapseLimit: 4,
     nodes: [
@@ -1169,5 +1177,7 @@ export function clampLevelIndex(index, levels) {
 
   return Math.min(levels.length - 1, Math.max(0, Number(index) || 0));
 }
+
+
 
 

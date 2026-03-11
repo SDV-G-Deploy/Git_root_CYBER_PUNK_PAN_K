@@ -126,3 +126,60 @@
 - No gameplay-rule changes were made to purifier core behavior.
 - No new mechanics were introduced.
 - Protected systems were not touched.
+
+## 2026-03-11 - Autonomous Campaign Strengthening Pass (Onboarding + Presentation + QA)
+
+### Changed
+- Calibrated early campaign onboarding pressure with scoped edits:
+  - `L1`: `movesLimit 4 -> 5`
+  - `L2`: `movesLimit 5 -> 6`, added `P2`, added `E4 (R1 -> C1)` and `E5 (P2 -> R2)`
+  - `L3`: `movesLimit 5 -> 6`
+  - `L4`: added `P2`, added `E5 (P2 -> R2)`
+- Calibrated late campaign pressure without mechanic rewrites:
+  - `L29`: `movesLimit 9 -> 10`
+  - `L32`: added `P2`, added `E10 (P2 -> U1)`
+  - `L33`: added `E11 (P2 -> F1)`
+  - `L34`: `movesLimit 11 -> 12`
+- Improved campaign presentation in live runtime:
+  - added campaign status HUD label (`campaignStatusLabel`)
+  - level header now shows `Level X/Y`
+  - level-select labels now include objective tags (`CORE/GRID/CLEAN`)
+  - exposed `objectiveTypes` in `engine.getLevelList()` for UI surfacing
+- Improved mobile/touch UX:
+  - pointer-based aim events (`pointermove`, `pointerleave`, `pointercancel`)
+  - touch-aware tutorial/coach copy
+  - tutorial overlay scroll/sticky action hardening
+  - mobile control layout safer for small screens
+- Hardened runtime smoke coverage:
+  - level-list consistency and checkpoint spread
+  - hint tier progression cap
+  - reset/next boundary checks
+  - save/progression sanity check after L1 win
+  - JSON vs JSONL telemetry parity check
+- Added repository clarity entrypoint doc: `README.md`
+
+### Files Changed in This Pass
+- `src/levels.js`
+- `src/engine.js`
+- `src/bootstrap.js`
+- `src/ui.js`
+- `src/input.js`
+- `index.html`
+- `styles.css`
+- `tools/qa/runtime-smoke.mjs`
+- `README.md`
+- `qa/level-validation.json`
+- `qa/pack-build-report.json`
+- `qa_report.md`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `validate-levels`: pass (`36/36` solvable, `0` unsolved, `0` cutoffs)
+- `build-pack`: pass (`36` candidates, `10` accepted, `26` deferred, `0` rejected)
+- `runtime-smoke`: pass (expanded lifecycle/progression/telemetry checks)
+
+### Notes
+- Protected systems were not touched (Splitter, Fuse/Stabilizer, Delay, classifier semantics, slot thresholds, generator heuristics).
+- Structured pack remains a curated QA artifact and does not replace full authored campaign runtime flow.

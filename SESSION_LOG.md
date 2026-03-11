@@ -64,3 +64,32 @@
   - `scripts/runtime-smoke.ps1`
 - Runtime smoke verifies level lifecycle transitions, hint reset behavior, and telemetry run_end integrity (no duplicate run_end detected in smoke run).
 - Protected systems were not touched (Splitter, Fuse/Stabilizer, Delay, daily/seed semantics, classifier/slot semantics, generator heuristics).
+
+## 2026-03-11 - Autonomous Expansion Pass: Campaign Quality + UX + QA Hardening
+- Reconfirmed active runtime path (`index.html -> src/bootstrap.js -> src/engine.js`) and preserved legacy-file safety.
+- Early campaign onboarding pass applied on `L1`-`L4`:
+  - `L1` move slack increase (`4 -> 5`)
+  - `L2` reduced single-solution pressure via extra source/edges and move slack (`5 -> 6`)
+  - `L3` move slack increase (`5 -> 6`)
+  - `L4` optional second source path added to reduce forced opening
+- Late campaign calibration pass applied on `L29`, `L32`, `L33`, `L34`:
+  - softened tight or brittle opening pressure while keeping mechanics unchanged
+- Campaign presentation improvements:
+  - added campaign status HUD line (authored/unlocked/cleared/perfect + chapters)
+  - level header now shows campaign index (`X/Y`)
+  - level-select options now expose objective tags (`CORE/GRID/CLEAN`)
+  - tutorial copy now clarifies authored campaign visibility vs QA structured-pack curation
+- Mobile/touch pass:
+  - pointer-based aim updates (`pointermove`, `pointerleave`, `pointercancel`)
+  - tutorial/coach copy updated for touch reality (not hover-only)
+  - tutorial overlay scroll and sticky action bar improved for small screens
+  - mobile control layout made safer (full-width level select)
+- QA hardening:
+  - expanded `runtime-smoke` with level-list consistency, hint-tier cap checks, boundary next-level checks, save/progression sanity, and telemetry JSON-vs-JSONL parity
+- Repo clarity:
+  - added `README.md` with runtime map, QA command set, and authored-vs-pack distinction
+- Validation after all changes:
+  - `validate-levels`: pass (`36/36`, `0` unsolved, `0` cutoffs)
+  - `build-pack`: pass (`10` accepted, `26` deferred, `0` rejected)
+  - `runtime-smoke`: pass (expanded checks)
+- Protected systems were not modified.

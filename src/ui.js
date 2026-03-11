@@ -115,6 +115,37 @@ function buildBonusLines(summary) {
   ];
 }
 
+function formatObjectiveTag(type) {
+  if (type === 'power_core') {
+    return 'CORE';
+  }
+
+  if (type === 'activate_all') {
+    return 'GRID';
+  }
+
+  if (type === 'clean_corruption') {
+    return 'CLEAN';
+  }
+
+  return 'MIX';
+}
+
+function buildLevelObjectiveTags(level) {
+  if (!Array.isArray(level?.objectiveTypes) || level.objectiveTypes.length === 0) {
+    return 'CORE';
+  }
+
+  const tags = [];
+  for (let i = 0; i < level.objectiveTypes.length; i += 1) {
+    const tag = formatObjectiveTag(level.objectiveTypes[i]);
+    if (tags.indexOf(tag) < 0) {
+      tags.push(tag);
+    }
+  }
+
+  return tags.join('+');
+}
 function buildLevelOptionLabel(level) {
   const prefix = level.locked
     ? '[LOCKED]'
@@ -124,7 +155,8 @@ function buildLevelOptionLabel(level) {
         ? '[CLEAR]'
         : '[OPEN]';
   const score = level.bestScore > 0 ? ` | ${level.bestScore}` : '';
-  return `${prefix} ${level.id} ${level.name}${score}`;
+  const objectiveTags = buildLevelObjectiveTags(level);
+  return `${prefix} ${level.id} ${level.name} [${objectiveTags}]${score}`;
 }
 
 function buildHintTargetText(hint) {
@@ -184,7 +216,7 @@ function getCoachCopy(snapshot, summary) {
     return {
       title: 'Signal Brief',
       body: 'Complete the active level objectives to stabilize the district grid.',
-      meta: 'Hover nodes to inspect their role before committing a move.'
+      meta: 'Desktop: hover nodes to inspect roles. Touch: use Hint before committing taps.'
     };
   }
 
@@ -201,7 +233,7 @@ function getCoachCopy(snapshot, summary) {
       return {
         title: 'No target selected',
         body: 'Clicks only count on Power and Firewall nodes.',
-        meta: 'Hover a node first. Clickable nodes glow brighter than passive ones.'
+        meta: 'Aim near a node first on desktop, or use Hint on touch. Clickable nodes glow brighter.'
       };
     }
 
@@ -249,7 +281,7 @@ function getCoachCopy(snapshot, summary) {
   return {
     title: 'Next Move',
     body: summary.nextObjectiveText || 'Complete the listed objectives.',
-    meta: `Par ${summary.parScore} | Hover nodes to inspect them. Neon pulses show where energy just traveled.`
+    meta: `Par ${summary.parScore} | Desktop hover shows node details. On touch, use Hint and watch neon pulses for flow.`
   };
 }
 
@@ -262,6 +294,7 @@ export function createUI(documentRef) {
     objectiveLabel: getEl(documentRef, 'objectiveLabel'),
     levelLabel: getEl(documentRef, 'levelLabel'),
     chainStatusLabel: getEl(documentRef, 'chainStatusLabel'),
+    campaignStatusLabel: getEl(documentRef, 'campaignStatusLabel'),
     levelSelect: getEl(documentRef, 'levelSelect'),
     helpButton: getEl(documentRef, 'helpButton'),
     retryButton: getEl(documentRef, 'retryButton'),
@@ -352,6 +385,24 @@ export function createUI(documentRef) {
     if (refs.playtestModeToggle) {
       refs.playtestModeToggle.checked = Boolean(enabled);
     }
+  }
+
+  function setCampaignStatus(status) {
+    if (!refs.campaignStatusLabel) {
+      return;
+    }
+
+    if (!status || !Number.isFinite(status.total)) {
+      setText(textCache, 'campaign-status', refs.campaignStatusLabel, 'Campaign: loading...');
+      return;
+    }
+
+    setText(
+      textCache,
+      'campaign-status',
+      refs.campaignStatusLabel,
+      `Campaign: ${status.total} authored (${status.chapters} chapters) | unlocked ${status.unlocked}/${status.total} | cleared ${status.completed} | perfect ${status.perfect}`
+    );
   }
 
   function renderOutcomeBonusList(summary) {
@@ -487,7 +538,7 @@ export function createUI(documentRef) {
     } else {
       const row = documentRef.createElement('li');
       row.className = 'chain-log-empty';
-      row.textContent = 'No propagation yet. Click a Power or Firewall node.';
+      row.textContent = 'No propagation yet. Tap or click a Power or Firewall node.';
       refs.chainLogList.appendChild(row);
     }
   }
@@ -540,7 +591,7 @@ export function createUI(documentRef) {
         textCache,
         'hud-level',
         refs.levelLabel,
-        `Level: ${snapshot.levelId} - ${snapshot.levelName} | ${snapshot.chapter}`
+        `Level ${snapshot.levelIndex + 1}/${snapshot.levelCount}: ${snapshot.levelId} - ${snapshot.levelName} | ${snapshot.chapter}`
       );
       setText(
         textCache,
@@ -616,7 +667,7 @@ export function createUI(documentRef) {
     isTutorialVisible,
     applyPlaytestMode,
     setTelemetryReport,
-    setSoundEnabled
+    setSoundEnabled,
+    setCampaignStatus
   };
 }
-

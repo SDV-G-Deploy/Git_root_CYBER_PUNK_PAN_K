@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-03-10T19:27:49.188Z",
+  "generatedAt": "2026-03-11T18:45:45.342Z",
   "candidateCount": 36,
   "acceptedCount": 10,
   "deferredCount": 26,
   "rejectedCount": 0,
   "rejectionCounts": {},
   "acceptedDifficultyCounts": {
-    "easy": 1,
-    "medium": 5,
-    "hard": 2,
-    "extreme": 2
+    "easy": 2,
+    "medium": 4,
+    "hard": 3,
+    "extreme": 1
   },
   "acceptedSlotCounts": {
     "boss": 1,
@@ -245,10 +245,10 @@
       "levelId": "L1",
       "levelName": "Boot Link",
       "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyClass": "easy",
       "topologyScale": 4,
       "complexityScore": 7.5,
-      "slotScore": 95.5
+      "slotScore": 108.5
     },
     {
       "slotIndex": 2,
@@ -259,22 +259,22 @@
       "levelName": "Split Charge",
       "authoredDifficultyTag": "easy",
       "predictedActualDifficultyClass": "easy",
-      "topologyScale": 6,
-      "complexityScore": 8.8,
-      "slotScore": 106.75
+      "topologyScale": 7.5,
+      "complexityScore": 11.75,
+      "slotScore": 103.8
     },
     {
       "slotIndex": 3,
       "slotId": "slot3",
       "slotRole": "easy",
       "slotLabel": "Easy Puzzle B",
-      "levelId": "L21",
-      "levelName": "Twin Injectors",
-      "authoredDifficultyTag": "easy",
+      "levelId": "L3",
+      "levelName": "First Firewall",
+      "authoredDifficultyTag": "warmup",
       "predictedActualDifficultyClass": "medium",
-      "topologyScale": 5.5,
-      "complexityScore": 11.45,
-      "slotScore": 88.55
+      "topologyScale": 4,
+      "complexityScore": 11.3,
+      "slotScore": 91.4
     },
     {
       "slotIndex": 4,
@@ -346,26 +346,26 @@
       "slotId": "slot9",
       "slotRole": "challenge",
       "slotLabel": "Challenge Puzzle",
-      "levelId": "L34",
-      "levelName": "Vector Balance",
-      "authoredDifficultyTag": "challenge",
-      "predictedActualDifficultyClass": "extreme",
-      "topologyScale": 11.5,
-      "complexityScore": 23.42,
-      "slotScore": 185.26
-    },
-    {
-      "slotIndex": 10,
-      "slotId": "slot10",
-      "slotRole": "boss",
-      "slotLabel": "Boss Puzzle",
       "levelId": "L20",
       "levelName": "District Core",
       "authoredDifficultyTag": "hard",
       "predictedActualDifficultyClass": "extreme",
       "topologyScale": 12,
       "complexityScore": 24.7,
-      "slotScore": 267.25
+      "slotScore": 195.43
+    },
+    {
+      "slotIndex": 10,
+      "slotId": "slot10",
+      "slotRole": "boss",
+      "slotLabel": "Boss Puzzle",
+      "levelId": "L32",
+      "levelName": "Quarantine Bypass",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 13,
+      "complexityScore": 22.82,
+      "slotScore": 268.81
     }
   ],
   "unfilledSlots": [],
@@ -375,9 +375,9 @@
       "slotIndex": 10,
       "role": "boss",
       "label": "Boss Puzzle",
-      "selectedLevelId": "L20",
-      "selectedLevelName": "District Core",
-      "slotScore": 267.25,
+      "selectedLevelId": "L32",
+      "selectedLevelName": "Quarantine Bypass",
+      "slotScore": 268.81,
       "constraintSummary": null
     },
     {
@@ -387,7 +387,7 @@
       "label": "Warmup Puzzle",
       "selectedLevelId": "L1",
       "selectedLevelName": "Boot Link",
-      "slotScore": 95.5,
+      "slotScore": 108.5,
       "constraintSummary": null
     },
     {
@@ -395,9 +395,9 @@
       "slotIndex": 9,
       "role": "challenge",
       "label": "Challenge Puzzle",
-      "selectedLevelId": "L34",
-      "selectedLevelName": "Vector Balance",
-      "slotScore": 185.26,
+      "selectedLevelId": "L20",
+      "selectedLevelName": "District Core",
+      "slotScore": 195.43,
       "constraintSummary": null
     },
     {
@@ -457,7 +457,7 @@
       "label": "Easy Puzzle A",
       "selectedLevelId": "L4",
       "selectedLevelName": "Split Charge",
-      "slotScore": 106.75,
+      "slotScore": 103.8,
       "constraintSummary": null
     },
     {
@@ -465,14 +465,50 @@
       "slotIndex": 3,
       "role": "easy",
       "label": "Easy Puzzle B",
-      "selectedLevelId": "L21",
-      "selectedLevelName": "Twin Injectors",
-      "slotScore": 88.55,
+      "selectedLevelId": "L3",
+      "selectedLevelName": "First Firewall",
+      "slotScore": 91.4,
       "constraintSummary": null
     }
   ],
   "telemetryCalibration": null,
   "acceptedEntries": [
+    {
+      "levelId": "L32",
+      "levelName": "Quarantine Bypass",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 7,
+      "solutionCount": 256,
+      "averageBranchingFactor": 3,
+      "complexityScore": 22.82,
+      "topologyScale": 13,
+      "slotId": "slot10",
+      "slotRole": "boss",
+      "slotIndex": 10,
+      "slotScore": 268.81,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_b4c4950e"
+    },
+    {
+      "levelId": "L1",
+      "levelName": "Boot Link",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 7.5,
+      "topologyScale": 4,
+      "slotId": "slot1",
+      "slotRole": "warmup",
+      "slotIndex": 1,
+      "slotScore": 108.5,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_9bb0827e"
+    },
     {
       "levelId": "L20",
       "levelName": "District Core",
@@ -484,48 +520,12 @@
       "averageBranchingFactor": 3,
       "complexityScore": 24.7,
       "topologyScale": 12,
-      "slotId": "slot10",
-      "slotRole": "boss",
-      "slotIndex": 10,
-      "slotScore": 267.25,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_4d4055d2"
-    },
-    {
-      "levelId": "L1",
-      "levelName": "Boot Link",
-      "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 32,
-      "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 7.5,
-      "topologyScale": 4,
-      "slotId": "slot1",
-      "slotRole": "warmup",
-      "slotIndex": 1,
-      "slotScore": 95.5,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_9bb0827e"
-    },
-    {
-      "levelId": "L34",
-      "levelName": "Vector Balance",
-      "authoredDifficultyTag": "challenge",
-      "predictedActualDifficultyClass": "extreme",
-      "predictedActualDifficultyScore": 88,
-      "minMoves": 10,
-      "solutionCount": 56,
-      "averageBranchingFactor": 2,
-      "complexityScore": 23.42,
-      "topologyScale": 11.5,
       "slotId": "slot9",
       "slotRole": "challenge",
       "slotIndex": 9,
-      "slotScore": 185.26,
+      "slotScore": 195.43,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_933bb666"
+      "topologyFingerprint": "topo_4d4055d2"
     },
     {
       "levelId": "L16",
@@ -622,36 +622,36 @@
       "levelName": "Split Charge",
       "authoredDifficultyTag": "easy",
       "predictedActualDifficultyClass": "easy",
-      "predictedActualDifficultyScore": 24,
+      "predictedActualDifficultyScore": 18,
       "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 8.8,
-      "topologyScale": 6,
+      "solutionCount": 27,
+      "averageBranchingFactor": 2,
+      "complexityScore": 11.75,
+      "topologyScale": 7.5,
       "slotId": "slot2",
       "slotRole": "easy",
       "slotIndex": 2,
-      "slotScore": 106.75,
+      "slotScore": 103.8,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_ed53586a"
+      "topologyFingerprint": "topo_2c776cbf"
     },
     {
-      "levelId": "L21",
-      "levelName": "Twin Injectors",
-      "authoredDifficultyTag": "easy",
+      "levelId": "L3",
+      "levelName": "First Firewall",
+      "authoredDifficultyTag": "warmup",
       "predictedActualDifficultyClass": "medium",
       "predictedActualDifficultyScore": 45,
       "minMoves": 4,
-      "solutionCount": 16,
+      "solutionCount": 15,
       "averageBranchingFactor": 2,
-      "complexityScore": 11.45,
-      "topologyScale": 5.5,
+      "complexityScore": 11.3,
+      "topologyScale": 4,
       "slotId": "slot3",
       "slotRole": "easy",
       "slotIndex": 3,
-      "slotScore": 88.55,
+      "slotScore": 91.4,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_8e9e8072"
+      "topologyFingerprint": "topo_2db4e036"
     }
   ],
   "deferredEntries": [
@@ -659,33 +659,13 @@
       "levelId": "L2",
       "levelName": "Relay Ladder",
       "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 63,
-      "minMoves": 5,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 10.45,
-      "topologyScale": 5.5,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_a993e5e6"
-    },
-    {
-      "levelId": "L3",
-      "levelName": "First Firewall",
-      "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 53,
-      "minMoves": 4,
-      "solutionCount": 5,
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 3,
+      "solutionCount": 22,
       "averageBranchingFactor": 2,
-      "complexityScore": 11.63,
-      "topologyScale": 4,
+      "complexityScore": 12.09,
+      "topologyScale": 7.5,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -693,7 +673,7 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_2db4e036"
+      "topologyFingerprint": "topo_a1290ae2"
     },
     {
       "levelId": "L5",
@@ -976,6 +956,26 @@
       "topologyFingerprint": "topo_c771455d"
     },
     {
+      "levelId": "L21",
+      "levelName": "Twin Injectors",
+      "authoredDifficultyTag": "easy",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 16,
+      "averageBranchingFactor": 2,
+      "complexityScore": 11.45,
+      "topologyScale": 5.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_8e9e8072"
+    },
+    {
       "levelId": "L24",
       "levelName": "Purge Junction",
       "authoredDifficultyTag": "medium",
@@ -1040,11 +1040,11 @@
       "levelName": "Purity Switch",
       "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "extreme",
-      "predictedActualDifficultyScore": 88,
+      "predictedActualDifficultyScore": 80,
       "minMoves": 8,
-      "solutionCount": 24,
+      "solutionCount": 108,
       "averageBranchingFactor": 2,
-      "complexityScore": 19.66,
+      "complexityScore": 19.31,
       "topologyScale": 9.5,
       "slotId": null,
       "slotRole": null,
@@ -1096,15 +1096,35 @@
       "topologyFingerprint": "topo_21e5914e"
     },
     {
-      "levelId": "L32",
-      "levelName": "Quarantine Bypass",
+      "levelId": "L33",
+      "levelName": "Containment Broker",
       "authoredDifficultyTag": "hard",
       "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 70,
-      "minMoves": 7,
-      "solutionCount": 6,
+      "predictedActualDifficultyScore": 62,
+      "minMoves": 4,
+      "solutionCount": 3907,
+      "averageBranchingFactor": 3,
+      "complexityScore": 19.72,
+      "topologyScale": 13.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_840f0fb5"
+    },
+    {
+      "levelId": "L34",
+      "levelName": "Vector Balance",
+      "authoredDifficultyTag": "challenge",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 80,
+      "minMoves": 10,
+      "solutionCount": 188,
       "averageBranchingFactor": 2,
-      "complexityScore": 20.22,
+      "complexityScore": 23.26,
       "topologyScale": 11.5,
       "slotId": null,
       "slotRole": null,
@@ -1113,27 +1133,7 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_71314e88"
-    },
-    {
-      "levelId": "L33",
-      "levelName": "Containment Broker",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 70,
-      "minMoves": 4,
-      "solutionCount": 39,
-      "averageBranchingFactor": 3,
-      "complexityScore": 20.72,
-      "topologyScale": 13,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_4e695e50"
+      "topologyFingerprint": "topo_933bb666"
     },
     {
       "levelId": "L35",
@@ -1178,15 +1178,15 @@
   ],
   "rejectedEntries": [],
   "topologyFingerprints": [
-    "topo_4d4055d2",
+    "topo_b4c4950e",
     "topo_9bb0827e",
-    "topo_933bb666",
+    "topo_4d4055d2",
     "topo_2d212b04",
     "topo_407d0214",
     "topo_8b02e8f2",
     "topo_bb99e57c",
     "topo_e7430aa9",
-    "topo_ed53586a",
-    "topo_8e9e8072"
+    "topo_2c776cbf",
+    "topo_2db4e036"
   ]
 }

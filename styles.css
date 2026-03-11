@@ -58,6 +58,11 @@ body {
   font-size: 14px;
 }
 
+#campaignStatusLabel {
+  color: #9fd7ff;
+  font-size: 12px;
+}
+
 .level-select-wrap {
   font-size: 13px;
   color: var(--muted);
@@ -113,7 +118,7 @@ body {
   border: 2px solid #26465a;
   background: #0c1f2b;
   display: block;
-  touch-action: manipulation;
+  touch-action: none;
   box-shadow: 0 0 0 1px rgba(111, 170, 203, 0.08), 0 16px 36px rgba(0, 0, 0, 0.35);
 }
 
@@ -422,6 +427,8 @@ body {
   overflow-y: auto;
   margin-top: 8px;
   padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .tutorial-kicker {
@@ -485,6 +492,9 @@ body {
   display: flex;
   justify-content: flex-end;
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(9, 21, 31, 0), rgba(9, 21, 31, 0.95) 45%);
 }
 
 .playtest-mode .summary,
@@ -519,7 +529,13 @@ body {
     gap: 8px;
   }
 
-  #levelSelect,
+  #levelSelect {
+    flex: 1 1 100%;
+    min-width: 0;
+    width: 100%;
+    margin-left: 0;
+  }
+
   #soundToggleButton,
   #helpButton,
   #hintButton,
@@ -591,3 +607,4 @@ body {
     width: 100%;
   }
 }
+

@@ -1,9 +1,9 @@
 # PROJECT_STATE.md
 
-Last updated: 2026-03-10
+Last updated: 2026-03-11
 
 ## Repository State Snapshot
-- Current local HEAD at start of this pass: `8fe2e69` on `main`
+- Local HEAD at start of this autonomous pass: `8fe2e69` on `main`
 - Purifier recovery merge remains in history: `acb8cbd` (includes `0faa562`)
 
 ## Project Summary
@@ -11,64 +11,66 @@ CyberPunkPuzzleWars is a browser puzzle game about routing energy through node n
 
 ## Active Runtime and Structure
 - Active playable entry path: `index.html` -> `src/bootstrap.js` -> `src/engine.js`
-- Live gameplay/content logic is in `src/`
-- Root-level `game.js`, `main.js`, `levels.js` are legacy files and not the active runtime path
+- Live gameplay/content/UI logic is in `src/`
+- Root-level `game.js`, `main.js`, `levels.js` are legacy and not the active runtime path
+- Added repo clarity doc: `README.md` (runtime map + QA flow + authored-vs-pack distinction)
 
-## Core Implemented Mechanics
-- Power nodes inject energy.
-- Firewall nodes open/close/rotate route mode and may inject energy when open.
-- Relay, purifier, virus, overload, and core nodes are passive (not directly clickable).
-- Turn flow: click -> prepare turn -> seed packet -> queue propagation -> virus spread -> purifier effects -> decay -> objective check -> lose check.
-- Energy propagation uses node `emitPower` (not full charge dump).
-- Edge attenuation reduces output.
-- Above-capacity output adds global overload.
-- Propagation safeguard: max 256 propagation steps per turn.
-- Virus adds corruption to neighbors each turn.
-- Corruption threshold infects nodes.
-- Infected nodes accept only 50% incoming energy.
-- Enough accepted energy in a turn can cleanse infection.
-- Overload nodes can explode if throughput exceeds threshold.
-- Explosions disable connected edges and add overload penalty.
-
-## Purifier Mechanic
-Purifier is implemented as a passive support node:
-- Purifier is a node type.
-- Not directly clickable.
-- When powered above threshold and not corrupted/exploded, it reduces corruption progress on adjacent non-virus nodes.
-- Effect occurs at end of turn after virus spread.
-- Can fully cleanse adjacent infection when corruption progress reaches 0.
+## Core Mechanics Status
+- Power and Firewall nodes are player-clickable inputs.
+- Relay, Purifier, Virus, Overload, and Core nodes remain passive/autonomous.
+- Purifier behavior unchanged this pass (no runtime mechanic rewrite).
+- Protected mechanics were not altered: Splitter, Fuse/Stabilizer, Delay, classifier semantics, slot thresholds, generator heuristics.
 
 ## Campaign Content State
 - Total authored levels: **36** (`L1`-`L36`)
-- Chapter distribution:
+- Chapters:
   - Boot Sector: 5
   - Firewall Ring: 5
   - Quarantine Loop: 6
   - Overload Channel: 4
   - Purifier Loop: 6
   - District Core: 10
-- Objective distribution:
+- Objective totals:
   - `power_core`: 36
   - `activate_all`: 7
   - `clean_corruption`: 11
 
-## Latest Campaign Expansion (Night Pass)
-Added new late-campaign levels on existing mechanics only:
-- `L29` Purity Switch
-- `L30` Patch Window
-- `L31` Sterile Lattice
-- `L32` Quarantine Bypass
-- `L33` Containment Broker
-- `L34` Vector Balance
-- `L35` Sanitation Circuit
-- `L36` Protocol Apex
+## Latest Autonomous Pass (2026-03-11)
+### Early campaign / onboarding calibration
+- `L1`: move budget increased `4 -> 5` (less punitive onboarding pacing)
+- `L2`: move budget increased `5 -> 6`, added optional secondary source/edge (`P2`, `E5`) and a light bypass (`E4`) to remove single-solution pressure
+- `L3`: move budget increased `5 -> 6`
+- `L4`: added optional secondary source/route (`P2`, `E5`) to preserve teaching while increasing opening freedom
 
-Design focus: stronger purifier-era and mixed-priority families (firewall routing + overload risk + virus pressure + sanitation goals).
+### Late campaign calibration
+- `L29`: move budget increased `9 -> 10`
+- `L32`: added optional secondary source/route (`P2`, `E10`) to reduce single-opening pressure
+- `L33`: added optional alternate injection route (`E11`) to reduce brittle openings
+- `L34`: move budget increased `11 -> 12`
 
-## QA and Reliability State
-- Added runtime smoke script: `tools/qa/runtime-smoke.mjs`
-- Wrapper command: `scripts/runtime-smoke.ps1`
-- Smoke checks verify core lifecycle flow (level start/switch/retry/next, hints, and telemetry run_end integrity).
+### Campaign presentation / surfacing
+- HUD now includes campaign status (`authored total`, chapter count, unlocked/cleared/perfect)
+- Level header now shows campaign position (`Level X/Y`)
+- Level select labels now include objective tags (`CORE`, `GRID`, `CLEAN`) using engine-provided level metadata
+- Tutorial copy now explicitly explains authored campaign visibility vs QA structured-pack tooling
+
+### Mobile / touch UX
+- Input hover tracking moved to pointer events (`pointermove`/`pointerleave` + `pointercancel`)
+- Touch copy added in coach/tutorial text (no desktop-only hover assumption)
+- Tutorial overlay scrolling hardened (`-webkit-overflow-scrolling`, `overscroll-behavior`) and sticky action bar
+- Mobile HUD control layout updated so level select stays full-width and primary buttons remain accessible
+- Canvas touch behavior tightened with `touch-action: none` for reliable tap interaction
+
+### QA / smoke hardening
+- Expanded `tools/qa/runtime-smoke.mjs` coverage:
+  - level-list consistency checks
+  - checkpoint sweep across early + late campaign (`L1`, `L2`, `L4`, `L25`, `L29`, `L32`, `L34`, `L36`)
+  - hint tier progression cap checks
+  - reset/retry lifecycle checks
+  - boundary `nextLevel` check at final level
+  - multi-objective metadata sanity (`L30`)
+  - save/progression sanity via `applyRunSummaryToSave` after a real L1 win
+  - telemetry parity checks for JSON vs JSONL exports
 
 ## Current Validation Status
 Latest verified state after this pass:
@@ -81,21 +83,14 @@ Latest verified state after this pass:
   - accepted: 10
   - deferred: 26
   - rejected: 0
-- `runtime-smoke`: pass
-
-## Protected Systems
-Do not touch unless explicitly requested:
-- Splitter
-- Fuse/Stabilizer
-- Delay
-- Campaign systems
+- `runtime-smoke`: pass (expanded coverage)
 
 ## Known Limitations
-- Early tutorial cluster (`L1`, `L2`, `L4`, `L10`, `L13`, `L14`, `L24`) still contains single-path style levels by design/history.
-- Some late levels remain high-pressure (`tight_move_budget` on `L29`, `L34`).
-- Current structured pack template still selects a subset of campaign levels, so most new late levels remain deferred in slot assignment.
+- `L1` remains intentionally single-solution as the strict first onboarding step.
+- Legacy single-path levels still exist outside the narrowed scope (`L10`, `L13`, `L14`, `L24`).
+- Structured pack is intentionally selective (`10/36`) and should continue to be treated as QA curation, not full campaign replacement.
 
 ## Recommended Next Steps
-1. Run a narrow early-campaign softening pass (`L1`-`L4`) to reduce repeated single-path feel without removing onboarding clarity.
-2. Run telemetry-calibrated difficulty pass for `L29`-`L36` after real play sessions, then retag only where evidence supports it.
-3. Keep purifier/runtime rules unchanged; continue improving campaign quality through content-level tuning.
+1. Run telemetry-driven checks to decide whether `L1` should stay strict or get a minimal optional branch.
+2. Perform a second targeted pass on remaining legacy single-path outliers (`L10`, `L13`, `L14`, `L24`) without changing core mechanics.
+3. If desired, add a small UI affordance to filter level select by chapter while preserving existing save compatibility.

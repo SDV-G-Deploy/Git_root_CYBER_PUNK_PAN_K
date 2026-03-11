@@ -4,7 +4,7 @@ Generated levels checked: 36
 Solvable: 36
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 39001
+Total states explored: 48665
 
 ## Gameplay Rules Summary
 
@@ -53,10 +53,10 @@ Total states explored: 39001
 
 | Level | Status | Authored | Estimated | Min moves | Solutions | Branching | Issues |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- |
-| L1 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path, tight_move_budget |
-| L2 | Solvable | intro | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path, zero_margin_move_budget |
-| L3 | Solvable | intro | Medium | 4 | 5 | 2 | tight_move_budget |
-| L4 | Solvable | light | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
+| L1 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
+| L2 | Solvable | intro | Medium | 3 | 22 | 2 | none |
+| L3 | Solvable | intro | Medium | 4 | 15 | 2 | none |
+| L4 | Solvable | light | Easy | 3 | 27 | 2 | none |
 | L5 | Solvable | light | Hard | 5 | 37 | 2 | none |
 | L6 | Solvable | light | Hard | 5 | 18 | 2 | none |
 | L7 | Solvable | medium | Hard | 6 | 1648 | 3 | none |
@@ -81,12 +81,12 @@ Total states explored: 39001
 | L26 | Solvable | medium | Hard | 7 | 54 | 2 | none |
 | L27 | Solvable | medium | Hard | 8 | 45 | 2 | none |
 | L28 | Solvable | hard | Hard | 6 | 72 | 2 | none |
-| L29 | Solvable | medium | Hard | 8 | 24 | 2 | tight_move_budget |
+| L29 | Solvable | medium | Hard | 8 | 108 | 2 | none |
 | L30 | Solvable | medium | Hard | 5 | 1016 | 3 | none |
 | L31 | Solvable | hard | Hard | 7 | 308 | 2 | none |
-| L32 | Solvable | hard | Hard | 7 | 6 | 2 | single_opening_solution |
-| L33 | Solvable | hard | Hard | 4 | 39 | 3 | single_opening_solution |
-| L34 | Solvable | challenge | Hard | 10 | 56 | 2 | tight_move_budget |
+| L32 | Solvable | hard | Hard | 7 | 256 | 3 | none |
+| L33 | Solvable | hard | Hard | 4 | 3907 | 3 | none |
+| L34 | Solvable | challenge | Hard | 10 | 188 | 2 | none |
 | L35 | Solvable | challenge | Hard | 7 | 1005 | 3 | none |
 | L36 | Solvable | boss | Hard | 7 | 1422 | 3 | none |
 
@@ -100,72 +100,7 @@ Total states explored: 39001
 - Authored difficulty: intro
 - Estimated difficulty: Easy (5.5)
 - Minimal winning path: P1 -> P1 -> P1
-- Minimal moves: 3 / 4
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 4
-- Dead states: 0
-- Overflow paths: 0
-- Clickable nodes at start: P1
-- Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path, tight_move_budget
-- Root branch analysis:
-  - P1: keeps a win alive; minMoves=3; path=P1
-
-### L2 Relay Ladder
-
-- Chapter: Boot Sector
-- Teaching goal: Learn that relays chain together and store charge across turns.
-- Status: Solvable
-- Authored difficulty: intro
-- Estimated difficulty: Medium (7.5)
-- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1
-- Minimal moves: 5 / 5
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 6
-- Dead states: 0
-- Overflow paths: 0
-- Clickable nodes at start: P1
-- Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path, zero_margin_move_budget
-- Root branch analysis:
-  - P1: keeps a win alive; minMoves=5; path=P1
-
-### L3 First Firewall
-
-- Chapter: Boot Sector
-- Teaching goal: Click the Firewall to open a route before trying to charge the Core.
-- Status: Solvable
-- Authored difficulty: intro
-- Estimated difficulty: Medium (7.69)
-- Minimal winning path: F1 -> P1 -> P1 -> P1
-- Minimal moves: 4 / 5
-- Solution count (capped): 5
-- Average branching factor: 2
-- Explored states: 39
-- Dead states: 11
-- Overflow paths: 0
-- Clickable nodes at start: F1, P1
-- Non-interactable clickables: none
-- Issues: tight_move_budget
-- Root branch analysis:
-  - F1: keeps a win alive; minMoves=4; path=F1
-  - P1: keeps a win alive; minMoves=5; path=P1
-- Dead state examples:
-  - moves=2, overload=0, infected=0, path=P1 -> P1
-  - moves=3, overload=0, infected=0, path=F1 -> F1 -> P1
-  - moves=3, overload=0, infected=0, path=P1 -> P1 -> F1
-
-### L4 Split Charge
-
-- Chapter: Boot Sector
-- Teaching goal: Feed both relay branches and stack charge on the core efficiently.
-- Status: Solvable
-- Authored difficulty: light
-- Estimated difficulty: Easy (5.5)
-- Minimal winning path: P1 -> P1 -> P1
-- Minimal moves: 3 / 6
+- Minimal moves: 3 / 5
 - Solution count (capped): 1
 - Average branching factor: 1
 - Explored states: 4
@@ -176,6 +111,77 @@ Total states explored: 39001
 - Issues: single_opening_solution, single_solution_path
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=3; path=P1
+
+### L2 Relay Ladder
+
+- Chapter: Boot Sector
+- Teaching goal: Learn that relays chain together and store charge across turns.
+- Status: Solvable
+- Authored difficulty: intro
+- Estimated difficulty: Medium (5.51)
+- Minimal winning path: P1 -> P1 -> P1
+- Minimal moves: 3 / 6
+- Solution count (capped): 22
+- Average branching factor: 2
+- Explored states: 71
+- Dead states: 6
+- Overflow paths: 0
+- Clickable nodes at start: P1, P2
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=3; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
+- Dead state examples:
+  - moves=4, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2
+  - moves=5, overload=0, infected=0, path=P1 -> P2 -> P2 -> P2 -> P2
+  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P1 -> P2 -> P2
+
+### L3 First Firewall
+
+- Chapter: Boot Sector
+- Teaching goal: Click the Firewall to open a route before trying to charge the Core.
+- Status: Solvable
+- Authored difficulty: intro
+- Estimated difficulty: Medium (7.2)
+- Minimal winning path: F1 -> P1 -> P1 -> P1
+- Minimal moves: 4 / 6
+- Solution count (capped): 15
+- Average branching factor: 2
+- Explored states: 55
+- Dead states: 11
+- Overflow paths: 0
+- Clickable nodes at start: F1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - F1: keeps a win alive; minMoves=4; path=F1
+  - P1: keeps a win alive; minMoves=5; path=P1
+- Dead state examples:
+  - moves=3, overload=0, infected=0, path=P1 -> P1 -> P1
+  - moves=4, overload=0, infected=0, path=F1 -> F1 -> P1 -> P1
+  - moves=4, overload=0, infected=0, path=P1 -> P1 -> P1 -> F1
+
+### L4 Split Charge
+
+- Chapter: Boot Sector
+- Teaching goal: Feed both relay branches and stack charge on the core efficiently.
+- Status: Solvable
+- Authored difficulty: light
+- Estimated difficulty: Easy (5)
+- Minimal winning path: P1 -> P1 -> P1
+- Minimal moves: 3 / 6
+- Solution count (capped): 27
+- Average branching factor: 2
+- Explored states: 45
+- Dead states: 0
+- Overflow paths: 0
+- Clickable nodes at start: P1, P2
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=3; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
 
 ### L5 Firewall Router
 
@@ -760,24 +766,24 @@ Total states explored: 39001
 - Teaching goal: Use a firewall gate to decide when purifier support outranks raw relay throughput.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (12.41)
+- Estimated difficulty: Hard (11.89)
 - Minimal winning path: F1 -> F1 -> P1 -> F1 -> P1 -> P1 -> F1 -> P1
-- Minimal moves: 8 / 9
-- Solution count (capped): 24
+- Minimal moves: 8 / 10
+- Solution count (capped): 108
 - Average branching factor: 2
-- Explored states: 246
-- Dead states: 99
+- Explored states: 371
+- Dead states: 117
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
-- Issues: tight_move_budget
+- Issues: none
 - Root branch analysis:
   - F1: keeps a win alive; minMoves=8; path=F1
   - P1: keeps a win alive; minMoves=9; path=P1
 - Dead state examples:
-  - moves=2, overload=0, infected=1, path=P1 -> P1
-  - moves=3, overload=0, infected=1, path=F1 -> P1 -> P1
   - moves=3, overload=0, infected=1, path=P1 -> P1 -> P1
+  - moves=4, overload=0, infected=1, path=F1 -> P1 -> P1 -> P1
+  - moves=4, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1
 
 ### L30 Patch Window
 
@@ -836,20 +842,21 @@ Total states explored: 39001
 - Teaching goal: Alternate firewall routes to keep overload under control while purifier support preserves full activation.
 - Status: Solvable
 - Authored difficulty: hard
-- Estimated difficulty: Hard (12.3)
+- Estimated difficulty: Hard (12.78)
 - Minimal winning path: F1 -> F1 -> P1 -> P1 -> P1 -> F1 -> P1
 - Minimal moves: 7 / 9
-- Solution count (capped): 6
-- Average branching factor: 2
-- Explored states: 471
-- Dead states: 220
+- Solution count (capped): 256
+- Average branching factor: 3
+- Explored states: 5996
+- Dead states: 2276
 - Overflow paths: 0
-- Clickable nodes at start: F1, P1
+- Clickable nodes at start: F1, P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution
+- Issues: none
 - Root branch analysis:
   - F1: keeps a win alive; minMoves=7; path=F1
   - P1: dead branch; minMoves=n/a; path=P1
+  - P2: keeps a win alive; minMoves=8; path=P2
 - Dead state examples:
   - moves=1, overload=0, infected=0, path=P1
   - moves=2, overload=2, infected=1, path=P1 -> F1
@@ -861,25 +868,25 @@ Total states explored: 39001
 - Teaching goal: Coordinate dual sources so purifier upkeep and core throughput do not fight each other.
 - Status: Solvable
 - Authored difficulty: hard
-- Estimated difficulty: Hard (11.64)
-- Minimal winning path: P2 -> P2 -> F1 -> F1
+- Estimated difficulty: Hard (8.6)
+- Minimal winning path: P2 -> F1 -> F1 -> P2
 - Minimal moves: 4 / 10
-- Solution count (capped): 39
+- Solution count (capped): 3907
 - Average branching factor: 3
-- Explored states: 5324
-- Dead states: 3226
+- Explored states: 8459
+- Dead states: 2260
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution
+- Issues: none
 - Root branch analysis:
-  - F1: dead branch; minMoves=n/a; path=F1
-  - P1: dead branch; minMoves=n/a; path=P1
+  - F1: keeps a win alive; minMoves=5; path=F1
+  - P1: keeps a win alive; minMoves=7; path=P1
   - P2: keeps a win alive; minMoves=4; path=P2
 - Dead state examples:
-  - moves=1, overload=2, infected=0, path=F1
-  - moves=1, overload=0, infected=0, path=P1
-  - moves=2, overload=2, infected=2, path=F1 -> F1
+  - moves=4, overload=0, infected=2, path=P1 -> P1 -> P1 -> P1
+  - moves=4, overload=1, infected=2, path=P1 -> P1 -> P1 -> P2
+  - moves=4, overload=1, infected=2, path=P1 -> P1 -> P2 -> P1
 
 ### L34 Vector Balance
 
@@ -887,24 +894,24 @@ Total states explored: 39001
 - Teaching goal: Balance route activation and full sanitation in the same run under two-lane pressure.
 - Status: Solvable
 - Authored difficulty: challenge
-- Estimated difficulty: Hard (15.11)
+- Estimated difficulty: Hard (14.86)
 - Minimal winning path: F1 -> F1 -> P1 -> P1 -> F1 -> F1 -> F1 -> F1 -> F1 -> F1
-- Minimal moves: 10 / 11
-- Solution count (capped): 56
+- Minimal moves: 10 / 12
+- Solution count (capped): 188
 - Average branching factor: 2
-- Explored states: 1254
-- Dead states: 649
+- Explored states: 2011
+- Dead states: 960
 - Overflow paths: 0
 - Clickable nodes at start: F1, P1
 - Non-interactable clickables: none
-- Issues: tight_move_budget
+- Issues: none
 - Root branch analysis:
   - F1: keeps a win alive; minMoves=10; path=F1
   - P1: keeps a win alive; minMoves=11; path=P1
 - Dead state examples:
-  - moves=2, overload=0, infected=1, path=P1 -> P1
-  - moves=3, overload=0, infected=1, path=F1 -> F1 -> F1
-  - moves=3, overload=0, infected=1, path=F1 -> P1 -> P1
+  - moves=3, overload=0, infected=1, path=P1 -> P1 -> P1
+  - moves=4, overload=0, infected=1, path=F1 -> F1 -> F1 -> P1
+  - moves=4, overload=0, infected=1, path=F1 -> P1 -> F1 -> F1
 
 ### L35 Sanitation Circuit
 
@@ -970,7 +977,7 @@ Estimated difficulty distribution is Easy 5, Medium 10, Hard 21, Unsolvable 0. T
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L2 (1 solution), L4 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution). Tight move budgets remain in L1 (3/4), L2 (5/5), L3 (4/5), L9 (5/6), L18 (5/6), L20 (9/10), L29 (8/9), L34 (10/11). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 
@@ -978,7 +985,7 @@ Early and mid-game difficulty jumps are steeper than the authored labels imply. 
 
 ### Rebalancing Recommendations
 
-Give `L2` one extra move or lower the core target by 1 so the second tutorial level does not require an exact five-click script. Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 

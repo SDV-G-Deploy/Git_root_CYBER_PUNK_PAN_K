@@ -250,8 +250,40 @@ function bootstrap() {
     });
   }
 
+  function buildCampaignStatus(levels) {
+    const list = Array.isArray(levels) ? levels : [];
+    const chapterSet = new Set();
+    let unlocked = 0;
+    let completed = 0;
+    let perfect = 0;
+
+    for (let i = 0; i < list.length; i += 1) {
+      const level = list[i];
+      chapterSet.add(level.chapter || 'Unknown');
+      if (!level.locked) {
+        unlocked += 1;
+      }
+      if (level.completed) {
+        completed += 1;
+      }
+      if (level.perfect) {
+        perfect += 1;
+      }
+    }
+
+    return {
+      total: list.length,
+      chapters: chapterSet.size,
+      unlocked,
+      completed,
+      perfect
+    };
+  }
+
   function renderLevelSelect() {
-    ui.renderLevelSelect(buildLevelSelectViewModel(), game.getCurrentLevelIndex());
+    const levels = buildLevelSelectViewModel();
+    ui.renderLevelSelect(levels, game.getCurrentLevelIndex());
+    ui.setCampaignStatus(buildCampaignStatus(levels));
   }
 
   function syncUI() {

@@ -24,7 +24,7 @@ export function createInputController(options) {
     handleUserGesture();
   });
 
-  canvas.addEventListener('mousemove', (event) => {
+  canvas.addEventListener('pointermove', (event) => {
     if (ui.isTutorialVisible()) {
       return;
     }
@@ -38,7 +38,20 @@ export function createInputController(options) {
     });
   });
 
-  canvas.addEventListener('mouseleave', () => {
+  canvas.addEventListener('pointerleave', () => {
+    if (ui.isTutorialVisible()) {
+      return;
+    }
+
+    enqueueCommand({
+      type: 'aim',
+      x: 0,
+      y: 0,
+      active: false
+    });
+  });
+
+  canvas.addEventListener('pointercancel', () => {
     if (ui.isTutorialVisible()) {
       return;
     }
@@ -124,3 +137,4 @@ export function createInputController(options) {
     }
   });
 }
+

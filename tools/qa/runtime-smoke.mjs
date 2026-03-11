@@ -1,5 +1,6 @@
 import { createChainLabEngine } from '../../src/engine.js';
 import { loadLevels } from '../../src/levels.js';
+import { applyRunSummaryToSave, createDefaultSaveData } from '../../src/persistence.js';
 
 function assertCondition(condition, message) {
   if (!condition) {
@@ -85,6 +86,92 @@ function collectTelemetryCounters(records) {
   return counters;
 }
 
+function verifyLevelList(engine, levels) {
+  const levelList = engine.getLevelList();
+  assertCondition(Array.isArray(levelList), 'engine.getLevelList() must return an array');
+  assertCondition(levelList.length === levels.length, 'Level list length mismatch between engine and authored levels');
+
+  const listedIds = new Set(levelList.map((level) => level.id));
+  for (let i = 0; i < levels.length; i += 1) {
+    assertCondition(listedIds.has(levels[i].id), `Missing level in engine level list: ${levels[i].id}`);
+  }
+
+  const sampleWithObjectives = levelList.find((level) => Array.isArray(level.objectiveTypes));
+  assertCondition(Boolean(sampleWithObjectives), 'Level list is missing objectiveTypes metadata');
+}
+
+function verifyHintTierProgression(engine, levelId) {
+  const first = engine.requestHint();
+  const second = engine.requestHint();
+  const third = engine.requestHint();
+  const fourth = engine.requestHint();
+
+  assertCondition(first && first.tierShown === 1, `Hint tier 1 missing on ${levelId}`);
+  assertCondition(second && second.tierShown === 2, `Hint tier 2 missing on ${levelId}`);
+  assertCondition(third && third.tierShown === 3, `Hint tier 3 missing on ${levelId}`);
+  assertCondition(fourth && fourth.tierShown === 3, `Hint tier should remain capped on ${levelId}`);
+}
+
+function verifyProgressSaveAfterWin(engine, levels, levelIndexById) {
+  const l1Index = levelIndexById.get('L1');
+  assertCondition(Number.isFinite(l1Index), 'L1 not found for save/progress smoke check');
+
+  engine.setLevel(l1Index);
+  const actionNode = findPrimaryActionNode(levels[l1Index]);
+  assertCondition(actionNode, 'L1 has no clickable action node');
+
+  let summary = engine.getRunSummary();
+  let guard = 0;
+  while (summary && summary.phase !== 'end' && guard < 12) {
+    const fired = engine.fireShot(actionNode.x, actionNode.y);
+    assertCondition(fired === true, 'Failed to fire on L1 during save/progress smoke check');
+    summary = engine.getRunSummary();
+    guard += 1;
+  }
+
+  assertCondition(summary && summary.result === 'win', 'L1 did not reach win state in save/progress smoke check');
+
+  const saveData = createDefaultSaveData();
+  const nextSave = applyRunSummaryToSave(saveData, summary, levels.length);
+  assertCondition(
+    nextSave.progress.highestUnlockedLevelIndex >= 1,
+    'Save progression did not unlock next level after L1 win'
+  );
+  assertCondition(
+    nextSave.progress.completedLevelIds.includes('L1'),
+    'Save progression did not record L1 completion'
+  );
+}
+
+function verifyTelemetryFormats(engine) {
+  const telemetryRawJson = engine.exportTelemetry('json');
+  const telemetryRecords = JSON.parse(telemetryRawJson);
+  const counters = collectTelemetryCounters(telemetryRecords);
+
+  assertCondition(counters.runStart > 0, 'No run_start events were captured in telemetry');
+  assertCondition(counters.runEnd > 0, 'No run_end events were captured in telemetry');
+  assertCondition(counters.duplicateRunEndEvents === 0, 'Duplicate run_end events detected in telemetry');
+
+  const telemetryRawJsonl = engine.exportTelemetry('jsonl');
+  const lines = telemetryRawJsonl
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  assertCondition(lines.length > 0, 'JSONL telemetry export is empty');
+  for (let i = 0; i < lines.length; i += 1) {
+    const parsed = JSON.parse(lines[i]);
+    assertCondition(parsed && typeof parsed === 'object', `Invalid JSONL telemetry line at ${i + 1}`);
+  }
+
+  assertCondition(
+    lines.length === telemetryRecords.length,
+    `JSON and JSONL telemetry record count mismatch (${telemetryRecords.length} vs ${lines.length})`
+  );
+
+  return counters;
+}
+
 function runSmoke() {
   const levels = loadLevels();
   const levelIndexById = new Map();
@@ -98,7 +185,9 @@ function runSmoke() {
     startLevelIndex: 0
   });
 
-  const checkpoints = ['L1', 'L25', 'L29', 'L34', 'L36'];
+  verifyLevelList(engine, levels);
+
+  const checkpoints = ['L1', 'L2', 'L4', 'L25', 'L29', 'L32', 'L34', 'L36'];
 
   for (let index = 0; index < checkpoints.length; index += 1) {
     const levelId = checkpoints[index];
@@ -109,8 +198,12 @@ function runSmoke() {
     let summary = engine.getRunSummary();
     assertCondition(summary && summary.levelId === levelId, `Failed to load level ${levelId}`);
 
-    const hint = engine.requestHint();
-    assertCondition(hint && hint.tierShown === 1, `Hint tier did not start at 1 on ${levelId}`);
+    if (index === 0) {
+      verifyHintTierProgression(engine, levelId);
+    } else {
+      const hint = engine.requestHint();
+      assertCondition(hint && hint.tierShown === 1, `Hint tier did not start at 1 on ${levelId}`);
+    }
 
     const actionNode = findPrimaryActionNode(levels[levelIndex]);
     assertCondition(actionNode, `No clickable action node found for ${levelId}`);
@@ -130,21 +223,30 @@ function runSmoke() {
     assertCondition(snapshot.hint && snapshot.hint.tierShown === 0, `Hint tier did not reset on ${levelId}`);
   }
 
+  const l30Index = levelIndexById.get('L30');
+  assertCondition(Number.isFinite(l30Index), 'L30 not found for multi-objective smoke check');
+  engine.setLevel(l30Index);
+  const l30Summary = engine.getRunSummary();
+  assertCondition(l30Summary && l30Summary.objectivesTotal >= 3, 'L30 objective metadata did not load as expected');
+
   engine.setLevel(0);
   const nextLevelWorked = engine.nextLevel();
   assertCondition(nextLevelWorked === true, 'nextLevel returned false from level 1');
   assertCondition(engine.getCurrentLevelIndex() === 1, 'nextLevel did not advance to level index 1');
 
-  const telemetryRaw = engine.exportTelemetry('json');
-  const telemetryRecords = JSON.parse(telemetryRaw);
-  const counters = collectTelemetryCounters(telemetryRecords);
+  const lastIndex = levels.length - 1;
+  engine.setLevel(lastIndex);
+  const nextFromLast = engine.nextLevel();
+  assertCondition(nextFromLast === false, 'nextLevel should return false at final level');
+  assertCondition(engine.getCurrentLevelIndex() === lastIndex, 'nextLevel from final level changed current index');
 
-  assertCondition(counters.runStart > 0, 'No run_start events were captured in telemetry');
-  assertCondition(counters.runEnd > 0, 'No run_end events were captured in telemetry');
-  assertCondition(counters.duplicateRunEndEvents === 0, 'Duplicate run_end events detected in telemetry');
+  verifyProgressSaveAfterWin(engine, levels, levelIndexById);
+
+  const counters = verifyTelemetryFormats(engine);
 
   console.log('Runtime smoke check passed.');
   console.log(`Levels loaded: ${levels.length}`);
+  console.log(`Checkpoints: ${checkpoints.join(', ')}`);
   console.log(`Telemetry: run_start=${counters.runStart}, run_end=${counters.runEnd}, retry=${counters.retry}`);
 }
 

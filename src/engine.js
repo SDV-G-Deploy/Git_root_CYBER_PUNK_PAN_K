@@ -778,7 +778,10 @@ export function createChainLabEngine() {
       teachingGoal: level.teachingGoal,
       parScore: level.parScore,
       movesLimit: level.movesLimit,
-      overloadLimit: level.overloadLimit
+      overloadLimit: level.overloadLimit,
+      objectiveTypes: Array.isArray(level.objectives)
+        ? Array.from(new Set(level.objectives.map((objective) => objective.type)))
+        : []
     }));
   }
 
