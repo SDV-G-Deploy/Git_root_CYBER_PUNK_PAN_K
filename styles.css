@@ -9,6 +9,7 @@
   --muted: #9cc1d4;
   --power: #4cd2ff;
   --relay: #7ad46f;
+  --splitter: #c6ff6e;
   --firewall: #ba9cff;
   --purifier: #75f2c8;
   --virus: #ff5e7e;
@@ -232,6 +233,10 @@ body {
 
 .legend-item.relay strong {
   color: var(--relay);
+}
+
+.legend-item.splitter strong {
+  color: var(--splitter);
 }
 
 .legend-item.firewall strong {
@@ -607,4 +612,3 @@ body {
     width: 100%;
   }
 }
-

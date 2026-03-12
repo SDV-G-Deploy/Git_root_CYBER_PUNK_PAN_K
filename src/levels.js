@@ -1142,9 +1142,142 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
       { type: 'clean_corruption' }
     ]
+  },
+  {
+    id: 'L37',
+    name: 'Splitter Primer',
+    chapter: 'Splitter Lab',
+    difficulty: 'intro',
+    difficultyTag: 'intro',
+    teachingGoal: 'Feed one splitter to power two relay lanes in the same turn.',
+    parScore: 880,
+    movesLimit: 6,
+    overloadLimit: 7,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 5 },
+      { id: 'S1', type: 'splitter', x: 270, y: 270, threshold: 2, emitPower: 4 },
+      { id: 'R1', type: 'relay', x: 470, y: 170, threshold: 2, emitPower: 2 },
+      { id: 'R2', type: 'relay', x: 470, y: 370, threshold: 2, emitPower: 2 },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 6 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'S1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'S1', to: 'R1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'S1', to: 'R2', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R2', to: 'C1', capacity: 2, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 6 },
+      { type: 'activate_all' }
+    ]
+  },
+  {
+    id: 'L38',
+    name: 'Forked Budget',
+    chapter: 'Splitter Lab',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Choose between a direct overloaded lane and a safer but weaker splitter lane.',
+    parScore: 860,
+    movesLimit: 6,
+    overloadLimit: 4,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 80, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 240, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 440, y: 170, emitPower: 4, threshold: 2, overloadThreshold: 4 },
+      { id: 'S1', type: 'splitter', x: 440, y: 370, emitPower: 4, threshold: 2 },
+      { id: 'R1', type: 'relay', x: 620, y: 320, emitPower: 2, threshold: 2 },
+      { id: 'R2', type: 'relay', x: 620, y: 440, emitPower: 2, threshold: 2 },
+      { id: 'C1', type: 'core', x: 860, y: 270, targetCharge: 9 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'O1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'F1', to: 'S1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E4', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'S1', to: 'R1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E6', from: 'S1', to: 'R2', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E7', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'R2', to: 'C1', capacity: 2, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 9 }
+    ]
+  },
+  {
+    id: 'L39',
+    name: 'Cleansing Split',
+    chapter: 'Splitter Lab',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Use splitter coverage to keep purifier support online while clearing corruption and charging the core.',
+    parScore: 840,
+    movesLimit: 7,
+    overloadLimit: 7,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 5 },
+      { id: 'S1', type: 'splitter', x: 270, y: 270, threshold: 2, emitPower: 6 },
+      { id: 'R1', type: 'relay', x: 470, y: 200, emitPower: 2, threshold: 2, corrupted: true },
+      { id: 'U1', type: 'purifier', x: 470, y: 360, emitPower: 3, threshold: 2, purifierStrength: 1 },
+      { id: 'V1', type: 'virus', x: 620, y: 140, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 5 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'S1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'S1', to: 'R1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'S1', to: 'U1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'U1', to: 'R1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 5 },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L40',
+    name: 'Split Containment',
+    chapter: 'Splitter Lab',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Alternate firewall lanes so splitter support can stabilize virus pressure while overload remains useful.',
+    parScore: 820,
+    movesLimit: 8,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 70, y: 270, injectPower: 5 },
+      { id: 'F1', type: 'firewall', x: 230, y: 270, firewallOpen: false, firewallModes: [['E2'], ['E3'], ['E2', 'E3']], activeMode: 0, injectPower: 2 },
+      { id: 'O1', type: 'overload', x: 430, y: 160, emitPower: 4, threshold: 2, overloadThreshold: 4 },
+      { id: 'S1', type: 'splitter', x: 430, y: 360, emitPower: 4, threshold: 2 },
+      { id: 'U1', type: 'purifier', x: 620, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'R1', type: 'relay', x: 620, y: 220, emitPower: 2, threshold: 2 },
+      { id: 'V1', type: 'virus', x: 760, y: 120, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 880, y: 270, targetCharge: 9 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'O1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'F1', to: 'S1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E4', from: 'S1', to: 'U1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E5', from: 'S1', to: 'R1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E6', from: 'U1', to: 'O1', capacity: 1, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E8', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E9', from: 'V1', to: 'O1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E10', from: 'U1', to: 'R1', capacity: 1, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 9 },
+      { type: 'clean_corruption' }
+    ]
   }
 ];
-
 function cloneLevel(level) {
   return {
     ...level,
@@ -1177,7 +1310,3 @@ export function clampLevelIndex(index, levels) {
 
   return Math.min(levels.length - 1, Math.max(0, Number(index) || 0));
 }
-
-
-
-

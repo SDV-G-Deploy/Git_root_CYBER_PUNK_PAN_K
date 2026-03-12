@@ -17,6 +17,7 @@ export const CONFIG = Object.freeze({
     COLORS: {
       power: '#4cd2ff',
       relay: '#7ad46f',
+      splitter: '#c6ff6e',
       firewall: '#ba9cff',
       purifier: '#75f2c8',
       virus: '#ff5e7e',
@@ -117,6 +118,7 @@ export const OBJECTIVE_TYPES = Object.freeze({
 export const NODE_TYPES = Object.freeze({
   POWER: 'power',
   RELAY: 'relay',
+  SPLITTER: 'splitter',
   FIREWALL: 'firewall',
   PURIFIER: 'purifier',
   VIRUS: 'virus',
@@ -127,6 +129,3 @@ export const NODE_TYPES = Object.freeze({
 
 export const PLAYTEST_MODE_KEY = 'signal_district_chainlab_playtest_mode';
 export const TUTORIAL_SEEN_KEY = 'signal_district_chainlab_tutorial_seen';
-
-
-

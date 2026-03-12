@@ -161,6 +161,8 @@ export function emitPackets(state, node) {
   const packets = [];
   let overloadAdded = 0;
 
+  const eligibleEdges = [];
+
   for (let i = 0; i < outgoing.length; i += 1) {
     const edge = state.edges[outgoing[i]];
     edge.overloadedThisTurn = false;
@@ -169,27 +171,82 @@ export function emitPackets(state, node) {
       continue;
     }
 
-    let output = Math.max(0, node.emitPower - edge.attenuation);
-    if (output <= 0) {
-      continue;
-    }
+    eligibleEdges.push(outgoing[i]);
+  }
 
-    if (output > edge.capacity) {
-      overloadAdded += output - edge.capacity;
-      output = edge.capacity;
-      edge.overloadedThisTurn = true;
-    }
+  if (node.baseType === NODE_TYPES.SPLITTER) {
+    eligibleEdges.sort((leftIndex, rightIndex) => {
+      const leftId = String(state.edges[leftIndex].id || '');
+      const rightId = String(state.edges[rightIndex].id || '');
 
-    if (output <= 0) {
-      continue;
-    }
+      if (leftId < rightId) {
+        return -1;
+      }
 
-    packets.push({
-      fromNodeId: node.id,
-      toNodeId: edge.to,
-      edgeId: edge.id,
-      energy: output
+      if (leftId > rightId) {
+        return 1;
+      }
+
+      return leftIndex - rightIndex;
     });
+
+    const activeOutputCount = eligibleEdges.length;
+    const totalEmit = Math.max(0, Math.trunc(Number(node.emitPower) || 0));
+    const baseShare = activeOutputCount > 0 ? Math.floor(totalEmit / activeOutputCount) : 0;
+    const remainder = activeOutputCount > 0 ? totalEmit % activeOutputCount : 0;
+
+    for (let i = 0; i < eligibleEdges.length; i += 1) {
+      const edge = state.edges[eligibleEdges[i]];
+      const splitShare = baseShare + (i < remainder ? 1 : 0);
+      let output = Math.max(0, splitShare - edge.attenuation);
+
+      if (output <= 0) {
+        continue;
+      }
+
+      if (output > edge.capacity) {
+        overloadAdded += output - edge.capacity;
+        output = edge.capacity;
+        edge.overloadedThisTurn = true;
+      }
+
+      if (output <= 0) {
+        continue;
+      }
+
+      packets.push({
+        fromNodeId: node.id,
+        toNodeId: edge.to,
+        edgeId: edge.id,
+        energy: output
+      });
+    }
+  } else {
+    for (let i = 0; i < eligibleEdges.length; i += 1) {
+      const edge = state.edges[eligibleEdges[i]];
+      let output = Math.max(0, node.emitPower - edge.attenuation);
+
+      if (output <= 0) {
+        continue;
+      }
+
+      if (output > edge.capacity) {
+        overloadAdded += output - edge.capacity;
+        output = edge.capacity;
+        edge.overloadedThisTurn = true;
+      }
+
+      if (output <= 0) {
+        continue;
+      }
+
+      packets.push({
+        fromNodeId: node.id,
+        toNodeId: edge.to,
+        edgeId: edge.id,
+        energy: output
+      });
+    }
   }
 
   node.emittedThisTurn = true;

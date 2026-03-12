@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-11T18:45:45.342Z",
-  "candidateCount": 36,
+  "generatedAt": "2026-03-12T15:10:32.837Z",
+  "candidateCount": 40,
   "acceptedCount": 10,
-  "deferredCount": 26,
+  "deferredCount": 30,
   "rejectedCount": 0,
   "rejectionCounts": {},
   "acceptedDifficultyCounts": {
-    "easy": 2,
-    "medium": 4,
+    "easy": 3,
+    "medium": 3,
     "hard": 3,
     "extreme": 1
   },
@@ -268,13 +268,13 @@
       "slotId": "slot3",
       "slotRole": "easy",
       "slotLabel": "Easy Puzzle B",
-      "levelId": "L3",
-      "levelName": "First Firewall",
+      "levelId": "L37",
+      "levelName": "Splitter Primer",
       "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "medium",
-      "topologyScale": 4,
-      "complexityScore": 11.3,
-      "slotScore": 91.4
+      "predictedActualDifficultyClass": "easy",
+      "topologyScale": 7.5,
+      "complexityScore": 9.75,
+      "slotScore": 100.85
     },
     {
       "slotIndex": 4,
@@ -465,9 +465,9 @@
       "slotIndex": 3,
       "role": "easy",
       "label": "Easy Puzzle B",
-      "selectedLevelId": "L3",
-      "selectedLevelName": "First Firewall",
-      "slotScore": 91.4,
+      "selectedLevelId": "L37",
+      "selectedLevelName": "Splitter Primer",
+      "slotScore": 100.85,
       "constraintSummary": null
     }
   ],
@@ -636,22 +636,22 @@
       "topologyFingerprint": "topo_2c776cbf"
     },
     {
-      "levelId": "L3",
-      "levelName": "First Firewall",
+      "levelId": "L37",
+      "levelName": "Splitter Primer",
       "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 15,
-      "averageBranchingFactor": 2,
-      "complexityScore": 11.3,
-      "topologyScale": 4,
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 9.75,
+      "topologyScale": 7.5,
       "slotId": "slot3",
       "slotRole": "easy",
       "slotIndex": 3,
-      "slotScore": 91.4,
+      "slotScore": 100.85,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_2db4e036"
+      "topologyFingerprint": "topo_cbef7083"
     }
   ],
   "deferredEntries": [
@@ -674,6 +674,26 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_a1290ae2"
+    },
+    {
+      "levelId": "L3",
+      "levelName": "First Firewall",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 15,
+      "averageBranchingFactor": 2,
+      "complexityScore": 11.3,
+      "topologyScale": 4,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_2db4e036"
     },
     {
       "levelId": "L5",
@@ -1174,6 +1194,66 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_90c9ed0e"
+    },
+    {
+      "levelId": "L38",
+      "levelName": "Forked Budget",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 53,
+      "minMoves": 5,
+      "solutionCount": 28,
+      "averageBranchingFactor": 2,
+      "complexityScore": 16.69,
+      "topologyScale": 11,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_b265e5bb"
+    },
+    {
+      "levelId": "L39",
+      "levelName": "Cleansing Split",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 51,
+      "minMoves": 5,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 12.7,
+      "topologyScale": 9,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_1e30be02"
+    },
+    {
+      "levelId": "L40",
+      "levelName": "Split Containment",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 58,
+      "averageBranchingFactor": 2,
+      "complexityScore": 16.99,
+      "topologyScale": 13,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_49fb5bf6"
     }
   ],
   "rejectedEntries": [],
@@ -1187,6 +1267,6 @@
     "topo_bb99e57c",
     "topo_e7430aa9",
     "topo_2c776cbf",
-    "topo_2db4e036"
+    "topo_cbef7083"
   ]
 }

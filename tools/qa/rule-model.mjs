@@ -12,6 +12,11 @@ function describeNodeTypes() {
       interaction: `Default threshold ${CONFIG.TURN.RELAY_THRESHOLD}, default emit ${CONFIG.TURN.RELAY_EMIT_POWER}. Loses ${CONFIG.TURN.DECAY_PER_TURN} charge after each turn.`,
       purpose: 'Forward energy deeper into the network.'
     },
+    [NODE_TYPES.SPLITTER]: {
+      behavior: 'Passive branch node. When active, it splits its emit power across active outgoing routes before attenuation is applied.',
+      interaction: 'Not clickable. Eligible outputs are enabled outgoing edges. Shares are floor-divided evenly, then any remainder is assigned in ascending edge id order. If one output is active, it receives the full pre-attenuation emit.',
+      purpose: 'Creates deterministic multi-route budgeting tradeoffs instead of single-lane forwarding.'
+    },
     [NODE_TYPES.FIREWALL]: {
       behavior: 'Clickable. Opens, closes, or rotates route modes and may inject a small charge on click when open.',
       interaction: `Default threshold ${CONFIG.TURN.FIREWALL_THRESHOLD}, click inject ${CONFIG.TURN.FIREWALL_CLICK_INJECT}, emit ${CONFIG.TURN.FIREWALL_EMIT_POWER}. Corrupted firewalls remain clickable but cannot auto-emit until cleansed.`,
@@ -45,7 +50,7 @@ export function extractRuleModel() {
     playerActions: [
       'Click Power nodes.',
       'Click Firewall nodes to open, close, or rotate modes.',
-      'No direct interaction with Relay, Virus, Overload, or Core nodes.'
+      'No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes.'
     ],
     turnFlow: [
       'Player clicks a clickable node.',
@@ -69,6 +74,7 @@ export function extractRuleModel() {
     },
     energyRules: {
       attenuation: 'Each edge reduces outgoing node emitPower by its attenuation, then caps to edge capacity.',
+      splitterDistribution: 'Splitter nodes divide emit power evenly across enabled outgoing edges; leftover 1-point remainders are assigned by ascending edge id, then attenuation/capacity rules apply per edge.',
       overflowPenalty: 'Any energy above edge capacity is added to global overload and the edge is marked overloaded for the turn.',
       corruptionAbsorbFactor: `Corrupted nodes only accept floor(incoming * ${CONFIG.TURN.CORRUPTION_ABSORB_FACTOR}).`,
       cleanseThreshold: `Corrupted non-virus nodes are cleansed if accumulated accepted energy this turn reaches ${CONFIG.TURN.CLEANSE_THRESHOLD}.`,

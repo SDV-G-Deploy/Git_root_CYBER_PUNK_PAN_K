@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-03-11T18:45:45.220Z",
+  "generatedAt": "2026-03-12T15:10:20.521Z",
   "summary": {
-    "levelCount": 36,
-    "solvableCount": 36,
+    "levelCount": 40,
+    "solvableCount": 40,
     "unsolvedCount": 0,
     "searchCutoffCount": 0,
-    "totalStatesExplored": 48665,
+    "totalStatesExplored": 48959,
     "issueCounts": {
-      "single_opening_solution": 5,
-      "single_solution_path": 5,
-      "tight_move_budget": 3
+      "single_opening_solution": 7,
+      "single_solution_path": 7,
+      "tight_move_budget": 4
     },
     "difficultyCounts": {
-      "Easy": 5,
-      "Medium": 10,
+      "Easy": 6,
+      "Medium": 13,
       "Hard": 21,
       "Unsolvable": 0
     }
@@ -6816,6 +6816,632 @@
       "nonInteractableClickables": [],
       "difficultyEstimate": "Hard",
       "difficultyScore": 12.07,
+      "issues": []
+    },
+    {
+      "levelId": "L37",
+      "levelName": "Splitter Primer",
+      "authoredDifficulty": "intro",
+      "chapter": "Splitter Lab",
+      "teachingGoal": "Feed one splitter to power two relay lanes in the same turn.",
+      "movesLimit": 6,
+      "overloadLimit": 7,
+      "collapseLimit": 4,
+      "totalStates": 4,
+      "expandedStates": 3,
+      "generatedTransitions": 3,
+      "repeatedStates": 0,
+      "overflowStates": 0,
+      "winningStateCount": 1,
+      "terminalLossStateCount": 0,
+      "averageBranchingFactor": 1,
+      "solvable": true,
+      "minMoves": 3,
+      "minimalMoves": 3,
+      "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 3,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 0,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "P1",
+        "P1",
+        "P1"
+      ],
+      "maxCoreCharge": 6,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "P1",
+        "P1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 3,
+        "overload": 0,
+        "infectedCount": 0,
+        "coreCharge": 6,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 3,
+          "solutionCount": 1,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [],
+      "lossReasonCounts": {},
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        }
+      ],
+      "interactableAtStart": [
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Easy",
+      "difficultyScore": 5.5,
+      "issues": [
+        "single_opening_solution",
+        "single_solution_path"
+      ]
+    },
+    {
+      "levelId": "L38",
+      "levelName": "Forked Budget",
+      "authoredDifficulty": "medium",
+      "chapter": "Splitter Lab",
+      "teachingGoal": "Choose between a direct overloaded lane and a safer but weaker splitter lane.",
+      "movesLimit": 6,
+      "overloadLimit": 4,
+      "collapseLimit": 4,
+      "totalStates": 87,
+      "expandedStates": 45,
+      "generatedTransitions": 90,
+      "repeatedStates": 4,
+      "overflowStates": 0,
+      "winningStateCount": 24,
+      "terminalLossStateCount": 18,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 5,
+      "minimalMoves": 5,
+      "solutionCount": 28,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 28,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          }
+        ]
+      },
+      "deadStateCount": 15,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "F1",
+        "F1",
+        "F1"
+      ],
+      "maxCoreCharge": 10,
+      "bestObjectiveCount": 1,
+      "bestProgressPath": [
+        "F1",
+        "F1",
+        "P1",
+        "P1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 5,
+        "overload": 1,
+        "infectedCount": 0,
+        "coreCharge": 10,
+        "objectivesCompleted": 1,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 5,
+          "solutionCount": 14,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 6,
+          "solutionCount": 14,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 2,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 1,
+          "infectedCount": 0,
+          "path": [
+            "P1",
+            "P1",
+            "F1"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "energy_overload": 3,
+        "out_of_moves": 15
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Medium",
+      "difficultyScore": 8.03,
+      "issues": [
+        "tight_move_budget"
+      ]
+    },
+    {
+      "levelId": "L39",
+      "levelName": "Cleansing Split",
+      "authoredDifficulty": "medium",
+      "chapter": "Splitter Lab",
+      "teachingGoal": "Use splitter coverage to keep purifier support online while clearing corruption and charging the core.",
+      "movesLimit": 7,
+      "overloadLimit": 7,
+      "collapseLimit": 4,
+      "totalStates": 6,
+      "expandedStates": 5,
+      "generatedTransitions": 5,
+      "repeatedStates": 0,
+      "overflowStates": 0,
+      "winningStateCount": 1,
+      "terminalLossStateCount": 0,
+      "averageBranchingFactor": 1,
+      "solvable": true,
+      "minMoves": 5,
+      "minimalMoves": 5,
+      "solutionCount": 1,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 5,
+        "solutionCount": 1,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 0,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P1"
+      ],
+      "maxCoreCharge": 5,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "P1",
+        "P1",
+        "P1",
+        "P1",
+        "P1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 5,
+        "overload": 0,
+        "infectedCount": 0,
+        "coreCharge": 5,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 5,
+          "solutionCount": 1,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [],
+      "lossReasonCounts": {},
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        }
+      ],
+      "interactableAtStart": [
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Medium",
+      "difficultyScore": 7.5,
+      "issues": [
+        "single_opening_solution",
+        "single_solution_path"
+      ]
+    },
+    {
+      "levelId": "L40",
+      "levelName": "Split Containment",
+      "authoredDifficulty": "hard",
+      "chapter": "Splitter Lab",
+      "teachingGoal": "Alternate firewall lanes so splitter support can stabilize virus pressure while overload remains useful.",
+      "movesLimit": 8,
+      "overloadLimit": 8,
+      "collapseLimit": 4,
+      "totalStates": 197,
+      "expandedStates": 102,
+      "generatedTransitions": 204,
+      "repeatedStates": 8,
+      "overflowStates": 0,
+      "winningStateCount": 54,
+      "terminalLossStateCount": 41,
+      "averageBranchingFactor": 2,
+      "solvable": true,
+      "minMoves": 4,
+      "minimalMoves": 4,
+      "solutionCount": 58,
+      "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "F1",
+          "nodeType": "firewall"
+        },
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        }
+      ],
+      "solverProof": {
+        "solvable": true,
+        "minMoves": 4,
+        "solutionCount": 58,
+        "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "F1",
+            "nodeType": "firewall"
+          },
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          }
+        ]
+      },
+      "deadStateCount": 34,
+      "searchCutoff": false,
+      "minimalWinningPath": [
+        "F1",
+        "F1",
+        "F1",
+        "P1"
+      ],
+      "maxCoreCharge": 12,
+      "bestObjectiveCount": 2,
+      "bestProgressPath": [
+        "P1",
+        "F1",
+        "F1",
+        "F1",
+        "F1",
+        "P1",
+        "F1",
+        "F1"
+      ],
+      "bestProgressState": {
+        "movesUsed": 8,
+        "overload": 4,
+        "infectedCount": 0,
+        "coreCharge": 12,
+        "objectivesCompleted": 2,
+        "result": "win",
+        "endReason": "objectives_complete"
+      },
+      "rootBranchAnalysis": [
+        {
+          "action": "F1",
+          "nodeType": "firewall",
+          "solvable": true,
+          "minMovesToWin": 4,
+          "solutionCount": 23,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "F1"
+          ]
+        },
+        {
+          "action": "P1",
+          "nodeType": "power",
+          "solvable": true,
+          "minMovesToWin": 6,
+          "solutionCount": 35,
+          "endState": "in_progress",
+          "endReason": null,
+          "path": [
+            "P1"
+          ]
+        }
+      ],
+      "deadStateExamples": [
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "F1",
+            "P1"
+          ]
+        },
+        {
+          "movesUsed": 4,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P1",
+            "P1",
+            "P1",
+            "P1"
+          ]
+        }
+      ],
+      "lossReasonCounts": {
+        "out_of_moves": 41
+      },
+      "clickableNodes": [
+        {
+          "id": "P1",
+          "type": "power"
+        },
+        {
+          "id": "F1",
+          "type": "firewall"
+        }
+      ],
+      "interactableAtStart": [
+        "F1",
+        "P1"
+      ],
+      "nonInteractableClickables": [],
+      "difficultyEstimate": "Medium",
+      "difficultyScore": 7.04,
       "issues": []
     }
   ]

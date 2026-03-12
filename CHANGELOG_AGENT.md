@@ -183,3 +183,52 @@
 ### Notes
 - Protected systems were not touched (Splitter, Fuse/Stabilizer, Delay, classifier semantics, slot thresholds, generator heuristics).
 - Structured pack remains a curated QA artifact and does not replace full authored campaign runtime flow.
+
+## 2026-03-12 - Splitter Node Implementation Pass (Scoped Mechanic Wave)
+
+### Changed
+- Added new node type `splitter` in runtime config and node taxonomy.
+- Implemented splitter emission in `src/node.js`:
+  - passive, non-clickable behavior (inherits existing clickability contract);
+  - deterministic equal split across enabled outgoing edges;
+  - odd remainder assignment by ascending edge id;
+  - attenuation/capacity/overload still applied per edge after split.
+- Added splitter readability/UI support:
+  - legend entry in `index.html`
+  - legend color token and style in `styles.css`
+  - node color/tag/status label in `src/render.js`
+  - hover/type descriptions in `src/gameState.js`
+- Added splitter introductory content slice (`4` handcrafted levels):
+  - `L37` Splitter Primer
+  - `L38` Forked Budget
+  - `L39` Cleansing Split
+  - `L40` Split Containment
+- Updated QA parity and smoke coverage:
+  - rule model docs in `tools/qa/rule-model.mjs`
+  - runtime checkpoint expansion in `tools/qa/runtime-smoke.mjs` (`L37`, `L40`)
+
+### Files Changed in This Pass
+- `src/config.js`
+- `src/node.js`
+- `src/gameState.js`
+- `src/render.js`
+- `src/levels.js`
+- `index.html`
+- `styles.css`
+- `tools/qa/rule-model.mjs`
+- `tools/qa/runtime-smoke.mjs`
+- `qa/level-validation.json`
+- `qa/pack-build-report.json`
+- `qa_report.md`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `validate-levels`: pass (`40/40` solvable, `0` unsolved, `0` cutoffs)
+- `build-pack`: pass (`40` candidates, `10` accepted, `30` deferred, `0` rejected)
+- `runtime-smoke`: pass (splitter checkpoints included)
+
+### Notes
+- Scope remained focused on Splitter Node only.
+- Protected systems were not changed: daily/seed behavior, pack semantics, classifier semantics, slot thresholds, generator heuristics, Fuse/Stabilizer, Delay, and campaign infrastructure.

@@ -187,7 +187,7 @@ function runSmoke() {
 
   verifyLevelList(engine, levels);
 
-  const checkpoints = ['L1', 'L2', 'L4', 'L25', 'L29', 'L32', 'L34', 'L36'];
+  const checkpoints = ['L1', 'L2', 'L4', 'L25', 'L29', 'L32', 'L34', 'L36', 'L37', 'L40'];
 
   for (let index = 0; index < checkpoints.length; index += 1) {
     const levelId = checkpoints[index];

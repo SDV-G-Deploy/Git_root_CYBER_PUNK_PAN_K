@@ -1,17 +1,17 @@
 # Chain Lab QA Report
 
-Generated levels checked: 36
-Solvable: 36
+Generated levels checked: 40
+Solvable: 40
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 48665
+Total states explored: 48959
 
 ## Gameplay Rules Summary
 
 ### Player Actions
 - Click Power nodes.
 - Click Firewall nodes to open, close, or rotate modes.
-- No direct interaction with Relay, Virus, Overload, or Core nodes.
+- No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes.
 
 ### Turn Flow
 - Player clicks a clickable node.
@@ -36,6 +36,7 @@ Total states explored: 48665
 ### Node Types
 - `power`: Clickable. Injects energy into itself on click, then emits along outgoing edges. Inject power defaults to 5. Always active unless custom level data changes its inject power. Purpose: Primary player-controlled energy source.
 - `relay`: Passive. Stores incoming charge and auto-emits once charge reaches threshold. Default threshold 3, default emit 3. Loses 1 charge after each turn. Purpose: Forward energy deeper into the network.
+- `splitter`: Passive branch node. When active, it splits its emit power across active outgoing routes before attenuation is applied. Not clickable. Eligible outputs are enabled outgoing edges. Shares are floor-divided evenly, then any remainder is assigned in ascending edge id order. If one output is active, it receives the full pre-attenuation emit. Purpose: Creates deterministic multi-route budgeting tradeoffs instead of single-lane forwarding.
 - `firewall`: Clickable. Opens, closes, or rotates route modes and may inject a small charge on click when open. Default threshold 2, click inject 2, emit 3. Corrupted firewalls remain clickable but cannot auto-emit until cleansed. Purpose: Player-controlled routing and branch selection.
 - `purifier`: Passive support node. When charged above threshold, it reduces corruption on adjacent nodes at end of turn. Default threshold 2, emit 2, cleanse power 1. It is not directly clickable. Purpose: Adds tactical counterplay to infection by rewarding purifier route support.
 - `virus`: Passive hazard. Spreads corruption to neighbors at the end of each turn. Default spread 1 per turn. Cannot be directly clicked. Purpose: Creates time pressure and routing tension.
@@ -44,6 +45,7 @@ Total states explored: 48665
 
 ### Energy Rules
 - `attenuation`: Each edge reduces outgoing node emitPower by its attenuation, then caps to edge capacity.
+- `splitterDistribution`: Splitter nodes divide emit power evenly across enabled outgoing edges; leftover 1-point remainders are assigned by ascending edge id, then attenuation/capacity rules apply per edge.
 - `overflowPenalty`: Any energy above edge capacity is added to global overload and the edge is marked overloaded for the turn.
 - `corruptionAbsorbFactor`: Corrupted nodes only accept floor(incoming * 0.5).
 - `cleanseThreshold`: Corrupted non-virus nodes are cleansed if accumulated accepted energy this turn reaches 2.
@@ -89,6 +91,10 @@ Total states explored: 48665
 | L34 | Solvable | challenge | Hard | 10 | 188 | 2 | none |
 | L35 | Solvable | challenge | Hard | 7 | 1005 | 3 | none |
 | L36 | Solvable | boss | Hard | 7 | 1422 | 3 | none |
+| L37 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
+| L38 | Solvable | medium | Medium | 5 | 28 | 2 | tight_move_budget |
+| L39 | Solvable | medium | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path |
+| L40 | Solvable | hard | Medium | 4 | 58 | 2 | none |
 
 ## Level Details
 
@@ -965,27 +971,117 @@ Total states explored: 48665
   - moves=3, overload=0, infected=1, path=P1 -> P1 -> F1
   - moves=3, overload=0, infected=1, path=P1 -> P1 -> P1
 
+### L37 Splitter Primer
+
+- Chapter: Splitter Lab
+- Teaching goal: Feed one splitter to power two relay lanes in the same turn.
+- Status: Solvable
+- Authored difficulty: intro
+- Estimated difficulty: Easy (5.5)
+- Minimal winning path: P1 -> P1 -> P1
+- Minimal moves: 3 / 6
+- Solution count (capped): 1
+- Average branching factor: 1
+- Explored states: 4
+- Dead states: 0
+- Overflow paths: 0
+- Clickable nodes at start: P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution, single_solution_path
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=3; path=P1
+
+### L38 Forked Budget
+
+- Chapter: Splitter Lab
+- Teaching goal: Choose between a direct overloaded lane and a safer but weaker splitter lane.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Medium (8.03)
+- Minimal winning path: F1 -> F1 -> F1 -> F1 -> F1
+- Minimal moves: 5 / 6
+- Solution count (capped): 28
+- Average branching factor: 2
+- Explored states: 87
+- Dead states: 15
+- Overflow paths: 0
+- Clickable nodes at start: F1, P1
+- Non-interactable clickables: none
+- Issues: tight_move_budget
+- Root branch analysis:
+  - F1: keeps a win alive; minMoves=5; path=F1
+  - P1: keeps a win alive; minMoves=6; path=P1
+- Dead state examples:
+  - moves=2, overload=0, infected=0, path=P1 -> P1
+  - moves=3, overload=1, infected=0, path=P1 -> P1 -> F1
+  - moves=3, overload=0, infected=0, path=P1 -> P1 -> P1
+
+### L39 Cleansing Split
+
+- Chapter: Splitter Lab
+- Teaching goal: Use splitter coverage to keep purifier support online while clearing corruption and charging the core.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Medium (7.5)
+- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1
+- Minimal moves: 5 / 7
+- Solution count (capped): 1
+- Average branching factor: 1
+- Explored states: 6
+- Dead states: 0
+- Overflow paths: 0
+- Clickable nodes at start: P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution, single_solution_path
+- Root branch analysis:
+  - P1: keeps a win alive; minMoves=5; path=P1
+
+### L40 Split Containment
+
+- Chapter: Splitter Lab
+- Teaching goal: Alternate firewall lanes so splitter support can stabilize virus pressure while overload remains useful.
+- Status: Solvable
+- Authored difficulty: hard
+- Estimated difficulty: Medium (7.04)
+- Minimal winning path: F1 -> F1 -> F1 -> P1
+- Minimal moves: 4 / 8
+- Solution count (capped): 58
+- Average branching factor: 2
+- Explored states: 197
+- Dead states: 34
+- Overflow paths: 0
+- Clickable nodes at start: F1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - F1: keeps a win alive; minMoves=4; path=F1
+  - P1: keeps a win alive; minMoves=6; path=P1
+- Dead state examples:
+  - moves=3, overload=0, infected=1, path=P1 -> P1 -> P1
+  - moves=4, overload=0, infected=1, path=P1 -> P1 -> F1 -> P1
+  - moves=4, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1
+
 ## Findings
 
 ### Overall Solvability
 
-All 36 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
+All 40 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
 
 ### Difficulty Curve
 
-Estimated difficulty distribution is Easy 5, Medium 10, Hard 21, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium).
+Estimated difficulty distribution is Easy 6, Medium 13, Hard 21, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution), L37 (1 solution), L39 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10), L38 (5/6). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 
-Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
+Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
 
 ### Rebalancing Recommendations
 
-Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 

@@ -1,4 +1,4 @@
-﻿import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
+import { CONFIG, NODE_TYPES, OBJECTIVE_TYPES } from './config.js';
 
 export function createRunId() {
   const now = Date.now().toString(36);
@@ -33,6 +33,10 @@ function defaultThresholdForType(type) {
     return CONFIG.TURN.RELAY_THRESHOLD;
   }
 
+  if (type === NODE_TYPES.SPLITTER) {
+    return CONFIG.TURN.RELAY_THRESHOLD;
+  }
+
   if (type === NODE_TYPES.FIREWALL) {
     return CONFIG.TURN.FIREWALL_THRESHOLD;
   }
@@ -54,6 +58,10 @@ function defaultEmitForType(type, injectPower) {
   }
 
   if (type === NODE_TYPES.RELAY) {
+    return CONFIG.TURN.RELAY_EMIT_POWER;
+  }
+
+  if (type === NODE_TYPES.SPLITTER) {
     return CONFIG.TURN.RELAY_EMIT_POWER;
   }
 
@@ -210,6 +218,10 @@ function getNodeTypeLabel(type) {
     return 'Relay Node';
   }
 
+  if (type === NODE_TYPES.SPLITTER) {
+    return 'Splitter Node';
+  }
+
   if (type === NODE_TYPES.FIREWALL) {
     return 'Firewall Node';
   }
@@ -284,6 +296,12 @@ function buildHoverInfo(state) {
   } else if (node.baseType === NODE_TYPES.RELAY) {
     actionText = 'Relay nodes auto-forward once charged enough.';
     detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower}.`;
+  } else if (node.baseType === NODE_TYPES.SPLITTER) {
+    actionText = 'Splitter nodes divide output across every active outgoing route (extra remainder goes to lower edge IDs).';
+    const activeOutputs = (state.outgoingByNode.get(node.id) || [])
+      .filter((edgeIndex) => state.edges[edgeIndex]?.enabled)
+      .length;
+    detailText = `${chargeText} | Needs ${node.threshold}, splits ${node.emitPower} across ${activeOutputs} routes.`;
   } else if (node.baseType === NODE_TYPES.PURIFIER) {
     actionText = 'Purifier auto-cleans adjacent infection when it stays powered.';
     detailText = `${chargeText} | Needs ${node.threshold}, cleanse ${node.purifierStrength}/turn.`;

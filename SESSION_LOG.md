@@ -93,3 +93,28 @@
   - `build-pack`: pass (`10` accepted, `26` deferred, `0` rejected)
   - `runtime-smoke`: pass (expanded checks)
 - Protected systems were not modified.
+
+## 2026-03-12 - Splitter Node Focused Implementation Wave
+- Started from clean state on `main` at `5199af7` (clean working tree).
+- Implemented new passive node type `splitter` in active runtime and shared solver path (`src/node.js` emission flow).
+- Added deterministic split contract:
+  - split `emitPower` evenly across enabled outgoing edges;
+  - assign odd remainder by ascending edge id order;
+  - apply attenuation/capacity/overload per edge after split.
+- Added player-facing readability updates:
+  - splitter legend item (`S`) in `index.html` + `styles.css`
+  - splitter label/color/tag in runtime render
+  - splitter hover/type descriptions in `src/gameState.js`
+- Added four handcrafted splitter intro levels in `src/levels.js`:
+  - `L37` Splitter Primer
+  - `L38` Forked Budget
+  - `L39` Cleansing Split
+  - `L40` Split Containment
+- Updated QA parity/docs:
+  - `tools/qa/rule-model.mjs` splitter contract + energy rule note
+  - `tools/qa/runtime-smoke.mjs` checkpoints now include `L37` and `L40`
+- Validation after implementation:
+  - `validate-levels`: pass (`40/40` solvable, `0` unsolved, `0` cutoffs)
+  - `build-pack`: pass (`40` candidates, `10` accepted, `30` deferred, `0` rejected)
+  - `runtime-smoke`: pass
+- Protected systems outside splitter scope were not touched.

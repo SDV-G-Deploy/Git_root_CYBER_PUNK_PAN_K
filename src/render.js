@@ -26,6 +26,10 @@ function getNodeColor(node) {
     return CONFIG.NODES.COLORS.relay;
   }
 
+  if (node.baseType === NODE_TYPES.SPLITTER) {
+    return CONFIG.NODES.COLORS.splitter;
+  }
+
   if (node.baseType === NODE_TYPES.FIREWALL) {
     return CONFIG.NODES.COLORS.firewall;
   }
@@ -223,6 +227,8 @@ function drawNodeTypeTag(ctx, node) {
     tag = 'P';
   } else if (node.baseType === NODE_TYPES.RELAY) {
     tag = 'R';
+  } else if (node.baseType === NODE_TYPES.SPLITTER) {
+    tag = 'S';
   } else if (node.baseType === NODE_TYPES.FIREWALL) {
     tag = 'F';
   } else if (node.baseType === NODE_TYPES.PURIFIER) {
@@ -419,6 +425,17 @@ function drawNodes(ctx, state) {
         : 'LOCKED';
       ctx.fillStyle = '#dacbff';
       ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.baseType === NODE_TYPES.SPLITTER) {
+      const activeOutputs = (state.outgoingByNode.get(node.id) || [])
+        .filter((edgeIndex) => state.edges[edgeIndex]?.enabled)
+        .length;
+      const splitLabel = node.active
+        ? `SPLIT x${Math.max(1, activeOutputs)}`
+        : `PRIME ${node.charge}/${node.threshold}`;
+      ctx.fillStyle = node.active ? '#efffcc' : '#b2c39d';
+      ctx.fillText(splitLabel, node.x, node.y - node.radius - 11);
     }
 
     if (node.baseType === NODE_TYPES.PURIFIER) {

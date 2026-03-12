@@ -1,10 +1,10 @@
 # PROJECT_STATE.md
 
-Last updated: 2026-03-11
+Last updated: 2026-03-12
 
 ## Repository State Snapshot
-- Local HEAD at start of this autonomous pass: `8fe2e69` on `main`
-- Purifier recovery merge remains in history: `acb8cbd` (includes `0faa562`)
+- Local HEAD at start of splitter pass: `5199af7` on `main`
+- This pass is a tightly scoped mechanic wave for Splitter Node only.
 
 ## Project Summary
 CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under pressure from infection, overload, firewall routing constraints, and multi-objective level logic.
@@ -13,16 +13,26 @@ CyberPunkPuzzleWars is a browser puzzle game about routing energy through node n
 - Active playable entry path: `index.html` -> `src/bootstrap.js` -> `src/engine.js`
 - Live gameplay/content/UI logic is in `src/`
 - Root-level `game.js`, `main.js`, `levels.js` are legacy and not the active runtime path
-- Added repo clarity doc: `README.md` (runtime map + QA flow + authored-vs-pack distinction)
 
 ## Core Mechanics Status
 - Power and Firewall nodes are player-clickable inputs.
-- Relay, Purifier, Virus, Overload, and Core nodes remain passive/autonomous.
-- Purifier behavior unchanged this pass (no runtime mechanic rewrite).
-- Protected mechanics were not altered: Splitter, Fuse/Stabilizer, Delay, classifier semantics, slot thresholds, generator heuristics.
+- Relay, Splitter, Purifier, Virus, Overload, and Core nodes are passive/autonomous.
+- Splitter Node is now implemented in runtime with deterministic split behavior:
+  - not clickable;
+  - emits when charged like other passive emitters;
+  - divides `emitPower` evenly across enabled outgoing edges;
+  - odd remainder goes deterministically by ascending edge id order;
+  - attenuation/capacity/overload rules apply per output edge after split.
+- Protected systems were not altered in this pass:
+  - daily/seed behavior;
+  - pack semantics;
+  - classifier semantics;
+  - slot thresholds;
+  - generator heuristics;
+  - Fuse/Stabilizer and Delay.
 
 ## Campaign Content State
-- Total authored levels: **36** (`L1`-`L36`)
+- Total authored levels: **40** (`L1`-`L40`)
 - Chapters:
   - Boot Sector: 5
   - Firewall Ring: 5
@@ -30,67 +40,52 @@ CyberPunkPuzzleWars is a browser puzzle game about routing energy through node n
   - Overload Channel: 4
   - Purifier Loop: 6
   - District Core: 10
+  - Splitter Lab: 4
 - Objective totals:
-  - `power_core`: 36
-  - `activate_all`: 7
-  - `clean_corruption`: 11
+  - `power_core`: 40
+  - `activate_all`: 8
+  - `clean_corruption`: 13
 
-## Latest Autonomous Pass (2026-03-11)
-### Early campaign / onboarding calibration
-- `L1`: move budget increased `4 -> 5` (less punitive onboarding pacing)
-- `L2`: move budget increased `5 -> 6`, added optional secondary source/edge (`P2`, `E5`) and a light bypass (`E4`) to remove single-solution pressure
-- `L3`: move budget increased `5 -> 6`
-- `L4`: added optional secondary source/route (`P2`, `E5`) to preserve teaching while increasing opening freedom
+## Latest Scoped Pass (2026-03-12) - Splitter Node Wave
+### Mechanic/runtime
+- Added node type `splitter` and visual token/color support.
+- Implemented deterministic split emission in `emitPackets` for splitter nodes.
+- Kept existing attenuation, capacity, overload, and turn-flow semantics unchanged.
 
-### Late campaign calibration
-- `L29`: move budget increased `9 -> 10`
-- `L32`: added optional secondary source/route (`P2`, `E10`) to reduce single-opening pressure
-- `L33`: added optional alternate injection route (`E11`) to reduce brittle openings
-- `L34`: move budget increased `11 -> 12`
+### Player readability
+- Added splitter node legend entry (`S`) in UI.
+- Added splitter hover text explaining passive split behavior and deterministic remainder rule.
+- Added splitter in node-type label mapping and active-state readout.
 
-### Campaign presentation / surfacing
-- HUD now includes campaign status (`authored total`, chapter count, unlocked/cleared/perfect)
-- Level header now shows campaign position (`Level X/Y`)
-- Level select labels now include objective tags (`CORE`, `GRID`, `CLEAN`) using engine-provided level metadata
-- Tutorial copy now explicitly explains authored campaign visibility vs QA structured-pack tooling
+### QA/model parity
+- Updated rule-model contract to include splitter behavior and energy rule description.
+- Runtime smoke checkpoints now include splitter levels (`L37`, `L40`).
 
-### Mobile / touch UX
-- Input hover tracking moved to pointer events (`pointermove`/`pointerleave` + `pointercancel`)
-- Touch copy added in coach/tutorial text (no desktop-only hover assumption)
-- Tutorial overlay scrolling hardened (`-webkit-overflow-scrolling`, `overscroll-behavior`) and sticky action bar
-- Mobile HUD control layout updated so level select stays full-width and primary buttons remain accessible
-- Canvas touch behavior tightened with `touch-action: none` for reliable tap interaction
-
-### QA / smoke hardening
-- Expanded `tools/qa/runtime-smoke.mjs` coverage:
-  - level-list consistency checks
-  - checkpoint sweep across early + late campaign (`L1`, `L2`, `L4`, `L25`, `L29`, `L32`, `L34`, `L36`)
-  - hint tier progression cap checks
-  - reset/retry lifecycle checks
-  - boundary `nextLevel` check at final level
-  - multi-objective metadata sanity (`L30`)
-  - save/progression sanity via `applyRunSummaryToSave` after a real L1 win
-  - telemetry parity checks for JSON vs JSONL exports
+### New handcrafted introductory levels
+- `L37` Splitter Primer (intro)
+- `L38` Forked Budget (medium)
+- `L39` Cleansing Split (medium)
+- `L40` Split Containment (hard)
 
 ## Current Validation Status
 Latest verified state after this pass:
 - `validate-levels`: pass
-  - solvability: **36/36**
+  - solvability: **40/40**
   - unsolved: 0
   - search cutoffs: 0
 - `build-pack`: pass
-  - candidates: 36
+  - candidates: 40
   - accepted: 10
-  - deferred: 26
+  - deferred: 30
   - rejected: 0
-- `runtime-smoke`: pass (expanded coverage)
+- `runtime-smoke`: pass
+  - checkpoints include splitter slice (`L37`, `L40`)
 
 ## Known Limitations
-- `L1` remains intentionally single-solution as the strict first onboarding step.
-- Legacy single-path levels still exist outside the narrowed scope (`L10`, `L13`, `L14`, `L24`).
-- Structured pack is intentionally selective (`10/36`) and should continue to be treated as QA curation, not full campaign replacement.
+- Intro splitter objective levels `L37` and `L39` still register single-solution-path flags under current solver heuristics.
+- Remainder priority is deterministic but data-order-facing (`edge id` order), so readability depends on authored edge naming discipline.
 
 ## Recommended Next Steps
-1. Run telemetry-driven checks to decide whether `L1` should stay strict or get a minimal optional branch.
-2. Perform a second targeted pass on remaining legacy single-path outliers (`L10`, `L13`, `L14`, `L24`) without changing core mechanics.
-3. If desired, add a small UI affordance to filter level select by chapter while preserving existing save compatibility.
+1. Add one optional alternate solve line to `L39` if reducing single-path pressure becomes a design goal.
+2. If splitter coverage expands, add one dedicated QA probe for uneven split remainder (`emitPower % outputs != 0`) in scripted smoke.
+3. Keep further mechanic waves isolated (no cross-mechanic rewrite with protected systems).
