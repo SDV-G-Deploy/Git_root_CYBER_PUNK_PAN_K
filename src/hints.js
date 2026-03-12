@@ -136,6 +136,26 @@ function findDormantPurifierId(state) {
   return null;
 }
 
+function findPrimeableBreakerId(state) {
+  if (!state || !Array.isArray(state.nodes)) {
+    return null;
+  }
+
+  for (let i = 0; i < state.nodes.length; i += 1) {
+    const node = state.nodes[i];
+    if (
+      node.baseType === NODE_TYPES.BREAKER &&
+      !node.exploded &&
+      !node.corrupted &&
+      !node.breakerPending
+    ) {
+      return node.id;
+    }
+  }
+
+  return null;
+}
+
 function captureMetrics(state) {
   return {
     coreCharge: getCoreCharge(state),
@@ -360,6 +380,7 @@ function buildDirectionalHint(state) {
   const coreNodeId = findPrimaryCoreNodeId(state);
   const closedFirewallId = findClosedFirewallId(state);
   const dormantPurifierId = findDormantPurifierId(state);
+  const primeableBreakerId = findPrimeableBreakerId(state);
 
   if (state.phase === 'end') {
     return {
@@ -417,6 +438,16 @@ function buildDirectionalHint(state) {
       kind: 'directional',
       message: 'A nearby purifier is idle. Route energy through it to suppress infection pressure.',
       targetNodeId: dormantPurifierId,
+      secondaryNodeId: coreNodeId || null
+    };
+  }
+
+  if (primeableBreakerId) {
+    return {
+      tier: 1,
+      kind: 'directional',
+      message: 'A breaker lane is available. Prime it before feeding risky routes.',
+      targetNodeId: primeableBreakerId,
       secondaryNodeId: coreNodeId || null
     };
   }
