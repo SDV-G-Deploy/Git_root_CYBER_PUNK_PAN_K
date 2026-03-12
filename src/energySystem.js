@@ -40,6 +40,33 @@ function hasQueue(state) {
   return state.queueHead < state.queue.length;
 }
 
+function addUniqueEntry(list, key, entry) {
+  if (!Array.isArray(list)) {
+    return false;
+  }
+
+  for (let i = 0; i < list.length; i += 1) {
+    if (list[i] && list[i].key === key) {
+      return false;
+    }
+  }
+
+  list.push({ key, ...entry });
+  return true;
+}
+
+function removeByNodeId(list, nodeId) {
+  if (!Array.isArray(list) || !nodeId) {
+    return;
+  }
+
+  for (let i = list.length - 1; i >= 0; i -= 1) {
+    if (list[i] && list[i].nodeId === nodeId) {
+      list.splice(i, 1);
+    }
+  }
+}
+
 function infectNode(node) {
   if (node.corrupted || node.exploded || node.baseType === NODE_TYPES.VIRUS) {
     return false;
@@ -107,7 +134,8 @@ function processPacket(state, packet, hooks) {
     return;
   }
 
-  const accepted = receiveEnergy(node, packet.energy);
+  const receiveResult = receiveEnergy(node, packet.energy);
+  const accepted = Number(receiveResult.accepted) || 0;
   if (accepted <= 0) {
     return;
   }
@@ -122,6 +150,15 @@ function processPacket(state, packet, hooks) {
     energyIn: packet.energy,
     energyAccepted: accepted
   });
+
+  if (receiveResult.corruptionLoss > 0) {
+    addUniqueEntry(state.lastTurn.corruptionAbsorbed, node.id, {
+      nodeId: node.id,
+      loss: receiveResult.corruptionLoss,
+      accepted,
+      incoming: receiveResult.incoming
+    });
+  }
 
   if (node.active && state.lastTurn.activatedNodes.indexOf(node.id) < 0) {
     state.lastTurn.activatedNodes.push(node.id);
@@ -169,13 +206,104 @@ function processPacket(state, packet, hooks) {
   }
 
   if (!canEmit(node)) {
+    const belowThreshold = (
+      !node.exploded &&
+      !node.corrupted &&
+      node.baseType !== NODE_TYPES.POWER &&
+      node.baseType !== NODE_TYPES.CORE &&
+      node.baseType !== NODE_TYPES.VIRUS &&
+      !(node.baseType === NODE_TYPES.FIREWALL && !node.firewallOpen) &&
+      Number.isFinite(node.threshold) &&
+      node.charge < node.threshold
+    );
+
+    if (belowThreshold) {
+      addUniqueEntry(state.lastTurn.belowThresholdNodes, node.id, {
+        nodeId: node.id,
+        charge: node.charge,
+        threshold: node.threshold
+      });
+    }
+
     return;
   }
+
+  removeByNodeId(state.lastTurn.belowThresholdNodes, node.id);
 
   const emission = emitPackets(state, node);
   if (emission.overloadAdded > 0) {
     state.overload += emission.overloadAdded;
     state.lastTurn.overloadDelta += emission.overloadAdded;
+  }
+
+  const diagnostics = emission.diagnostics || {};
+
+  if (Array.isArray(diagnostics.splitEvents)) {
+    for (let i = 0; i < diagnostics.splitEvents.length; i += 1) {
+      const splitEvent = diagnostics.splitEvents[i];
+      addUniqueEntry(
+        state.lastTurn.splitEvents,
+        splitEvent.nodeId,
+        {
+          nodeId: splitEvent.nodeId,
+          outputCount: splitEvent.outputCount,
+          emitPower: splitEvent.emitPower
+        }
+      );
+    }
+  }
+
+  if (Array.isArray(diagnostics.attenuatedEdges)) {
+    for (let i = 0; i < diagnostics.attenuatedEdges.length; i += 1) {
+      const attenuated = diagnostics.attenuatedEdges[i];
+      const key = `${attenuated.edgeId}_${attenuated.fromNodeId}`;
+      const inserted = addUniqueEntry(state.lastTurn.attenuatedEdges, key, {
+        edgeId: attenuated.edgeId,
+        fromNodeId: attenuated.fromNodeId,
+        toNodeId: attenuated.toNodeId,
+        rawPower: attenuated.rawPower,
+        attenuation: attenuated.attenuation
+      });
+
+      if (inserted) {
+        state.lastTurn.trace.push({
+          step: state.propagationSteps,
+          fromNodeId: attenuated.fromNodeId,
+          toNodeId: attenuated.toNodeId,
+          edgeId: attenuated.edgeId,
+          energyIn: attenuated.rawPower,
+          energyAccepted: 0,
+          detail: `attenuated_zero_${attenuated.edgeId}`
+        });
+      }
+    }
+  }
+
+  if (Array.isArray(diagnostics.cappedEdges)) {
+    for (let i = 0; i < diagnostics.cappedEdges.length; i += 1) {
+      const capped = diagnostics.cappedEdges[i];
+      const key = `${capped.edgeId}_${capped.fromNodeId}`;
+      const inserted = addUniqueEntry(state.lastTurn.cappedEdges, key, {
+        edgeId: capped.edgeId,
+        fromNodeId: capped.fromNodeId,
+        toNodeId: capped.toNodeId,
+        beforeCap: capped.beforeCap,
+        capacity: capped.capacity,
+        overflow: capped.overflow
+      });
+
+      if (inserted) {
+        state.lastTurn.trace.push({
+          step: state.propagationSteps,
+          fromNodeId: capped.fromNodeId,
+          toNodeId: capped.toNodeId,
+          edgeId: capped.edgeId,
+          energyIn: capped.beforeCap,
+          energyAccepted: capped.capacity,
+          detail: `capped_${capped.edgeId}_${capped.overflow}`
+        });
+      }
+    }
   }
 
   if (Array.isArray(emission.breakerDissipation) && emission.breakerDissipation.length > 0) {
@@ -376,6 +504,11 @@ export function prepareTurn(state) {
     breakerDissipation: [],
     explodedNodes: [],
     objectiveProgress: [],
+    belowThresholdNodes: [],
+    attenuatedEdges: [],
+    cappedEdges: [],
+    splitEvents: [],
+    corruptionAbsorbed: [],
     status: 'Resolving network propagation...'
   };
 
@@ -432,7 +565,3 @@ export function resolvePropagation(state, hooks) {
     overflow: false
   };
 }
-
-
-
-

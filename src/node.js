@@ -109,7 +109,13 @@ export function toggleFirewallMode(state, firewallNode) {
 export function receiveEnergy(node, energy) {
   const incoming = Math.max(0, energy);
   if (incoming <= 0 || node.exploded) {
-    return 0;
+    return {
+      incoming,
+      effective: 0,
+      accepted: 0,
+      corruptionLoss: 0,
+      capacityLoss: 0
+    };
   }
 
   const effective = node.corrupted
@@ -117,7 +123,13 @@ export function receiveEnergy(node, energy) {
     : incoming;
 
   if (effective <= 0) {
-    return 0;
+    return {
+      incoming,
+      effective: 0,
+      accepted: 0,
+      corruptionLoss: node.corrupted ? incoming : 0,
+      capacityLoss: 0
+    };
   }
 
   const before = node.charge;
@@ -134,7 +146,13 @@ export function receiveEnergy(node, energy) {
     node.cleanseAccumulated += accepted;
   }
 
-  return accepted;
+  return {
+    incoming,
+    effective,
+    accepted,
+    corruptionLoss: Math.max(0, incoming - effective),
+    capacityLoss: Math.max(0, effective - accepted)
+  };
 }
 
 export function canEmit(node) {
@@ -162,6 +180,11 @@ export function emitPackets(state, node) {
   const packets = [];
   let overloadAdded = 0;
   const breakerDissipation = [];
+  const diagnostics = {
+    splitEvents: [],
+    attenuatedEdges: [],
+    cappedEdges: []
+  };
 
   const eligibleEdges = [];
 
@@ -197,17 +220,47 @@ export function emitPackets(state, node) {
     const baseShare = activeOutputCount > 0 ? Math.floor(totalEmit / activeOutputCount) : 0;
     const remainder = activeOutputCount > 0 ? totalEmit % activeOutputCount : 0;
 
+    if (activeOutputCount > 0) {
+      diagnostics.splitEvents.push({
+        nodeId: node.id,
+        outputCount: activeOutputCount,
+        emitPower: totalEmit
+      });
+    }
+
     for (let i = 0; i < eligibleEdges.length; i += 1) {
       const edge = state.edges[eligibleEdges[i]];
       const splitShare = baseShare + (i < remainder ? 1 : 0);
-      let output = Math.max(0, splitShare - edge.attenuation);
+      const attenuated = splitShare - edge.attenuation;
+
+      if (attenuated <= 0) {
+        diagnostics.attenuatedEdges.push({
+          edgeId: edge.id,
+          fromNodeId: node.id,
+          toNodeId: edge.to,
+          rawPower: splitShare,
+          attenuation: edge.attenuation
+        });
+        continue;
+      }
+
+      let output = attenuated;
 
       if (output <= 0) {
         continue;
       }
 
       if (output > edge.capacity) {
-        overloadAdded += output - edge.capacity;
+        const overflow = output - edge.capacity;
+        overloadAdded += overflow;
+        diagnostics.cappedEdges.push({
+          edgeId: edge.id,
+          fromNodeId: node.id,
+          toNodeId: edge.to,
+          beforeCap: output,
+          capacity: edge.capacity,
+          overflow
+        });
         output = edge.capacity;
         edge.overloadedThisTurn = true;
       }
@@ -226,7 +279,20 @@ export function emitPackets(state, node) {
   } else {
     for (let i = 0; i < eligibleEdges.length; i += 1) {
       const edge = state.edges[eligibleEdges[i]];
-      let output = Math.max(0, node.emitPower - edge.attenuation);
+      const attenuated = node.emitPower - edge.attenuation;
+
+      if (attenuated <= 0) {
+        diagnostics.attenuatedEdges.push({
+          edgeId: edge.id,
+          fromNodeId: node.id,
+          toNodeId: edge.to,
+          rawPower: Math.max(0, Number(node.emitPower) || 0),
+          attenuation: edge.attenuation
+        });
+        continue;
+      }
+
+      let output = attenuated;
 
       if (output <= 0) {
         continue;
@@ -251,7 +317,16 @@ export function emitPackets(state, node) {
       }
 
       if (output > edge.capacity) {
-        overloadAdded += output - edge.capacity;
+        const overflow = output - edge.capacity;
+        overloadAdded += overflow;
+        diagnostics.cappedEdges.push({
+          edgeId: edge.id,
+          fromNodeId: node.id,
+          toNodeId: edge.to,
+          beforeCap: output,
+          capacity: edge.capacity,
+          overflow
+        });
         output = edge.capacity;
         edge.overloadedThisTurn = true;
       }
@@ -274,7 +349,8 @@ export function emitPackets(state, node) {
   return {
     packets,
     overloadAdded,
-    breakerDissipation
+    breakerDissipation,
+    diagnostics
   };
 }
 
@@ -290,4 +366,3 @@ export function applyDecay(node) {
 
   node.charge = Math.max(0, node.charge - CONFIG.TURN.DECAY_PER_TURN);
 }
-

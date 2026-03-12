@@ -273,6 +273,35 @@ function getNextObjectiveText(state) {
   return 'All objectives complete.';
 }
 
+function buildOutgoingRouteText(state, node, maxRoutes) {
+  const outgoing = state.outgoingByNode.get(node.id) || [];
+  if (!outgoing || outgoing.length === 0) {
+    return 'none';
+  }
+
+  const routes = [];
+  for (let i = 0; i < outgoing.length; i += 1) {
+    const edge = state.edges[outgoing[i]];
+    if (!edge) {
+      continue;
+    }
+
+    const route = `${edge.to} cap${edge.capacity}/att${edge.attenuation}${edge.enabled ? '' : ' off'}`;
+    routes.push(route);
+  }
+
+  if (routes.length === 0) {
+    return 'none';
+  }
+
+  const limit = Number.isFinite(maxRoutes) ? Math.max(1, Math.floor(maxRoutes)) : routes.length;
+  if (routes.length <= limit) {
+    return routes.join(', ');
+  }
+
+  return `${routes.slice(0, limit).join(', ')}, +${routes.length - limit} more`;
+}
+
 function buildHoverInfo(state) {
   if (!state.hoverNodeId) {
     return null;
@@ -306,7 +335,7 @@ function buildHoverInfo(state) {
 
   if (node.baseType === NODE_TYPES.POWER) {
     actionText = 'Click to inject energy into connected routes.';
-    detailText = `${chargeText} | Injects ${node.injectPower} energy each click.`;
+    detailText = `${chargeText} | Injector ${node.injectPower}/click | Routes: ${buildOutgoingRouteText(state, node, 3)}.`;
   } else if (node.baseType === NODE_TYPES.FIREWALL) {
     const hasModes = Array.isArray(node.firewallModes) && node.firewallModes.length > 0;
 
@@ -319,14 +348,16 @@ function buildHoverInfo(state) {
       for (let i = 0; i < modeEdges.length; i += 1) {
         const edgeId = modeEdges[i];
         const edge = state.edges.find((entry) => entry.id === edgeId && entry.from === node.id);
-        const destinationId = edge ? edge.to : String(edgeId);
-        if (destinations.indexOf(destinationId) < 0) {
-          destinations.push(destinationId);
+        const destination = edge
+          ? `${edge.to} cap${edge.capacity}/att${edge.attenuation}`
+          : String(edgeId);
+        if (destinations.indexOf(destination) < 0) {
+          destinations.push(destination);
         }
       }
 
       const routeText = destinations.length > 0 ? destinations.join(', ') : 'none';
-      const outputText = modeEdges.length > 1 ? `multi-output x${modeEdges.length}` : 'single-output';
+      const routeKind = modeEdges.length > 1 ? `multi-output x${modeEdges.length}` : 'single-output';
       const gateText = node.firewallOpen
         ? `Mode ${activeMode + 1}/${totalModes}`
         : `Locked (next Mode ${activeMode + 1}/${totalModes})`;
@@ -336,38 +367,38 @@ function buildHoverInfo(state) {
           ? 'Click to rotate to the next route mode.'
           : 'Click to lock this route gate.'
         : 'Click to open this route gate.';
-      detailText = `${chargeText} | ${gateText} -> ${routeText} (${outputText}).`;
+      detailText = `${chargeText} | Rotating firewall | ${gateText} -> ${routeText} (${routeKind}).`;
     } else {
       actionText = node.firewallOpen
         ? 'Click to lock this route gate.'
         : 'Click to open this route and enable all outgoing edges.';
-      detailText = `${chargeText} | Binary gate: locked or open-all outputs.`;
+      detailText = `${chargeText} | Binary firewall (off/on all) | Routes: ${buildOutgoingRouteText(state, node, 4)}.`;
     }
   } else if (node.baseType === NODE_TYPES.RELAY) {
     actionText = 'Relay nodes auto-forward once charged enough.';
-    detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower}.`;
+    detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower} | Routes: ${buildOutgoingRouteText(state, node, 3)}.`;
   } else if (node.baseType === NODE_TYPES.SPLITTER) {
     actionText = 'Splitter nodes divide output across every active outgoing route (extra remainder goes to lower edge IDs).';
     const activeOutputs = (state.outgoingByNode.get(node.id) || [])
       .filter((edgeIndex) => state.edges[edgeIndex]?.enabled)
       .length;
-    detailText = `${chargeText} | Needs ${node.threshold}, splits ${node.emitPower} across ${activeOutputs} routes.`;
+    detailText = `${chargeText} | Needs ${node.threshold}, splits ${node.emitPower} across ${activeOutputs} live routes | Routes: ${buildOutgoingRouteText(state, node, 4)}.`;
   } else if (node.baseType === NODE_TYPES.BREAKER) {
     if (node.breakerPending) {
       actionText = 'Breaker is primed: your next turn through this node will be capped and excess will dissipate safely.';
     } else {
       actionText = 'Click to prime a one-turn safety cap on this node for your next move.';
     }
-    detailText = `${chargeText} | Prime cap ${node.breakerCap}, base emit ${node.emitPower}.`;
+    detailText = `${chargeText} | Prime cap ${node.breakerCap}, base emit ${node.emitPower} | Routes: ${buildOutgoingRouteText(state, node, 3)}.`;
   } else if (node.baseType === NODE_TYPES.PURIFIER) {
     actionText = 'Purifier auto-cleans adjacent infection when it stays powered.';
-    detailText = `${chargeText} | Needs ${node.threshold}, cleanse ${node.purifierStrength}/turn.`;
+    detailText = `${chargeText} | Needs ${node.threshold}, cleanse ${node.purifierStrength}/turn | Routes: ${buildOutgoingRouteText(state, node, 3)}.`;
   } else if (node.baseType === NODE_TYPES.VIRUS) {
     actionText = 'Hazard node. It infects nearby nodes at the end of each turn.';
     detailText = `Spread ${node.spreadRate} per turn | ${stateText}`;
   } else if (node.baseType === NODE_TYPES.OVERLOAD) {
     actionText = 'Auto-forwards charge but can explode if fed too much in one turn.';
-    detailText = `${chargeText} | Safe throughput ${node.overloadThreshold}.`;
+    detailText = `${chargeText} | Safe throughput ${node.overloadThreshold} | Routes: ${buildOutgoingRouteText(state, node, 3)}.`;
   } else if (node.baseType === NODE_TYPES.CORE) {
     actionText = 'Main objective. Fill the core to the target charge.';
     detailText = `${chargeText} | ${stateText}`;
@@ -383,7 +414,7 @@ function buildHoverInfo(state) {
     node.baseType !== NODE_TYPES.CORE &&
     (node.corrupted || corruptionProgress > 0)
   ) {
-    detailText = `${detailText} | Corruption ${corruptionProgress}/${corruptionThreshold}`;
+    detailText = `${detailText} | Corruption ${corruptionProgress}/${corruptionThreshold} (infected routes absorb part of incoming power)`;
   }
 
   return {
@@ -457,6 +488,11 @@ export function createState(level, levelIndex, levelCount) {
       breakerDissipation: [],
       explodedNodes: [],
       objectiveProgress: [],
+      belowThresholdNodes: [],
+      attenuatedEdges: [],
+      cappedEdges: [],
+      splitEvents: [],
+      corruptionAbsorbed: [],
       status: 'Awaiting input.'
     },
 
@@ -648,7 +684,12 @@ export function getRunSummary(state) {
       breakerArmedNodes: state.lastTurn.breakerArmedNodes.slice(),
       breakerDissipation: state.lastTurn.breakerDissipation.map((entry) => ({ ...entry })),
       explodedNodes: state.lastTurn.explodedNodes.slice(),
-      objectiveProgress: state.lastTurn.objectiveProgress.slice()
+      objectiveProgress: state.lastTurn.objectiveProgress.slice(),
+      belowThresholdNodes: state.lastTurn.belowThresholdNodes.map((entry) => ({ ...entry })),
+      attenuatedEdges: state.lastTurn.attenuatedEdges.map((entry) => ({ ...entry })),
+      cappedEdges: state.lastTurn.cappedEdges.map((entry) => ({ ...entry })),
+      splitEvents: state.lastTurn.splitEvents.map((entry) => ({ ...entry })),
+      corruptionAbsorbed: state.lastTurn.corruptionAbsorbed.map((entry) => ({ ...entry }))
     },
     revision: state.revision
   };
@@ -669,6 +710,7 @@ export function createObjectiveText(objective) {
 
   return 'Unknown objective';
 }
+
 
 
 

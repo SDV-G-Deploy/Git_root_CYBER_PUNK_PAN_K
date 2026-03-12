@@ -193,6 +193,41 @@ function drawEdges(ctx, state, nodeMap) {
   }
 }
 
+function drawEdgeStats(ctx, state, nodeMap) {
+  for (let i = 0; i < state.edges.length; i += 1) {
+    const edge = state.edges[i];
+    const from = nodeMap.get(edge.from);
+    const to = nodeMap.get(edge.to);
+    if (!from || !to) {
+      continue;
+    }
+
+    const hovered = isHoveredNode(state, edge.from) || isHoveredNode(state, edge.to);
+    const interesting = hovered || edge.attenuation > 1 || edge.capacity <= 2 || edge.overloadedThisTurn;
+    if (!interesting) {
+      continue;
+    }
+
+    const mx = (from.x + to.x) * 0.5;
+    const my = (from.y + to.y) * 0.5;
+    const text = `c${edge.capacity}/a${edge.attenuation}`;
+
+    ctx.save();
+    ctx.font = '10px monospace';
+    const width = Math.max(20, Math.ceil(ctx.measureText(text).width) + 8);
+    ctx.fillStyle = 'rgba(8, 20, 29, 0.72)';
+    ctx.fillRect(mx - width * 0.5, my - 7, width, 14);
+    ctx.strokeStyle = edge.overloadedThisTurn ? '#ff9f7c' : 'rgba(120, 184, 217, 0.65)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(mx - width * 0.5, my - 7, width, 14);
+    ctx.fillStyle = edge.overloadedThisTurn ? '#ffd0bf' : '#cbe9ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, mx, my);
+    ctx.restore();
+  }
+}
+
 function drawEdgeBursts(ctx, state, nodeMap) {
   for (let i = 0; i < state.effects.edgeBursts.length; i += 1) {
     const burst = state.effects.edgeBursts[i];
@@ -423,18 +458,32 @@ function drawNodes(ctx, state) {
 
     ctx.fillText(chargeLabel, node.x, node.y + node.radius + 11);
 
+    if (node.baseType === NODE_TYPES.POWER) {
+      ctx.fillStyle = '#c9f2ff';
+      ctx.fillText(`INJ ${node.injectPower}`, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.baseType === NODE_TYPES.RELAY) {
+      const relayLabel = node.active
+        ? `EM ${node.emitPower}`
+        : `NEED ${node.charge}/${node.threshold}`;
+      ctx.fillStyle = node.active ? '#d6ffd6' : '#a9c4a1';
+      ctx.fillText(relayLabel, node.x, node.y - node.radius - 11);
+    }
+
     if (node.baseType === NODE_TYPES.FIREWALL) {
-      let modeLabel = node.firewallOpen ? 'OPEN ALL' : 'LOCKED';
+      let modeLabel = node.firewallOpen ? 'ON ALL' : 'OFF';
 
       if (Array.isArray(node.firewallModes) && node.firewallModes.length > 0) {
         const totalModes = node.firewallModes.length;
         const activeMode = Math.max(0, Math.min(totalModes - 1, Math.floor(Number(node.activeMode) || 0)));
         const modeEdges = Array.isArray(node.firewallModes[activeMode]) ? node.firewallModes[activeMode] : [];
         const outputCount = modeEdges.length;
+        const routeKind = outputCount > 1 ? 'MULTI' : 'SINGLE';
 
         modeLabel = node.firewallOpen
-          ? `M${activeMode + 1}/${totalModes} x${Math.max(1, outputCount)}`
-          : `LOCK M${activeMode + 1}/${totalModes}`;
+          ? `M${activeMode + 1}/${totalModes} OUT${Math.max(1, outputCount)} ${routeKind}`
+          : `OFF M${activeMode + 1}/${totalModes}`;
       }
 
       ctx.fillStyle = '#dacbff';
@@ -497,11 +546,28 @@ function drawNodes(ctx, state) {
     }
 
     if (node.baseType === NODE_TYPES.OVERLOAD) {
+      const threshold = Math.max(1, Number(node.overloadThreshold) || 1);
+      const ratio = Math.max(0, node.throughputThisTurn / threshold);
+      const risk = ratio >= 0.9 ? 'CRIT' : ratio >= 0.55 ? 'WARM' : 'CALM';
+      const riskColor = risk === 'CRIT' ? '#ff816e' : risk === 'WARM' ? '#ffc16e' : '#8dd9ff';
       const overloadLabel = node.exploded
         ? 'BOOM'
-        : `TP ${node.throughputThisTurn}/${node.overloadThreshold}`;
+        : `${risk} ${node.throughputThisTurn}/${threshold}`;
       ctx.fillStyle = node.exploded ? '#ffd6b8' : '#ffe1be';
       ctx.fillText(overloadLabel, node.x, node.y - node.radius - 11);
+
+      if (!node.exploded) {
+        ctx.save();
+        ctx.globalAlpha = risk === 'CRIT' ? 0.65 : risk === 'WARM' ? 0.42 : 0.26;
+        ctx.strokeStyle = riskColor;
+        ctx.lineWidth = risk === 'CRIT' ? 3 : 2;
+        ctx.shadowBlur = risk === 'CRIT' ? 16 : 9;
+        ctx.shadowColor = riskColor;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius + 6 + Math.min(5, ratio * 4), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     if (node.baseType === NODE_TYPES.VIRUS) {
@@ -680,6 +746,7 @@ export function renderState(ctx, state) {
   drawArena(ctx, state);
   drawEdgeBursts(ctx, state, nodeMap);
   drawEdges(ctx, state, nodeMap);
+  drawEdgeStats(ctx, state, nodeMap);
   drawVirusThreatRings(ctx, state, nodeMap);
   drawPackets(ctx, state, nodeMap);
   drawNodes(ctx, state);
@@ -688,4 +755,7 @@ export function renderState(ctx, state) {
   drawDangerFlash(ctx, state);
   ctx.restore();
 }
+
+
+
 

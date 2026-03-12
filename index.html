@@ -19,9 +19,20 @@
         <span id="chainStatusLabel">Infected: 0/0 | Virus: 0</span>
         <span id="campaignStatusLabel">Campaign: loading...</span>
       </div>
+      <div class="overload-meter" aria-live="polite">
+        <span id="overloadMeterLabel">Overload Pressure 0/0</span>
+        <div class="overload-track"><div id="overloadMeterFill" class="overload-fill calm"></div></div>
+        <span id="overloadDeltaLabel">Turn delta: +0</span>
+      </div>
+      <div class="ops-strip" aria-live="polite">
+        <span id="objectiveFocusLabel">Objective: complete level objectives.</span>
+        <span id="riskFocusLabel">Risk: waiting for telemetry.</span>
+        <span id="eventFocusLabel">Recent: awaiting input.</span>
+      </div>
       <label class="level-select-wrap" for="levelSelect">Level</label>
       <select id="levelSelect" aria-label="Select level"></select>
-      <button id="soundToggleButton" type="button">Sound: On</button>
+      <button id="soundToggleButton" type="button">SFX: On</button>
+      <button id="musicToggleButton" type="button">Music: Off</button>
       <button id="helpButton" type="button">How to play</button>
       <button id="hintButton" type="button">Hint</button>
       <button id="retryButton" type="button">Retry</button>
@@ -49,14 +60,14 @@
     <section class="legend" aria-label="Node legend">
       <h2 class="legend-title">Node Types</h2>
       <div class="legend-items">
-        <span class="legend-item power"><strong>P</strong> Power: click to inject energy.</span>
-        <span class="legend-item relay"><strong>R</strong> Relay: forwards charge when active.</span>
+        <span class="legend-item power"><strong>P</strong> Power: click to inject energy (watch INJ value).</span>
+        <span class="legend-item relay"><strong>R</strong> Relay: forwards only after threshold is met.</span>
         <span class="legend-item splitter"><strong>S</strong> Splitter: divides emit energy across active outgoing routes.</span>
         <span class="legend-item breaker"><strong>B</strong> Breaker: click to prime a one-turn safety cap next turn.</span>
-        <span class="legend-item firewall"><strong>F</strong> Firewall: click to open; some are simple open-all gates, others rotate mode routes (including multi-output modes).</span>
+        <span class="legend-item firewall"><strong>F</strong> Firewall: binary off/on-all or rotating modes (single and multi-output). Watch mode text and output count.</span>
         <span class="legend-item purifier"><strong>U</strong> Purifier: auto-cleans adjacent infection when powered.</span>
         <span class="legend-item virus"><strong>V</strong> Virus: spreads infection each turn.</span>
-        <span class="legend-item overload"><strong>O</strong> Overload: may explode if overfed.</span>
+        <span class="legend-item overload"><strong>O</strong> Overload: calm/warm/critical state reflects this turn's throughput risk.</span>
         <span class="legend-item core"><strong>C</strong> Core: main objective node.</span>
       </div>
     </section>
@@ -134,7 +145,7 @@
       <pre id="telemetryReportOutput" class="telemetry-report hidden"></pre>
     </section>
 
-    <p class="hint">Click Power, Firewall, or Breaker nodes. Neon glow means interactive. White pulses show activation. Dashed pink rings mark nodes threatened by virus spread next turn. Orange flash means overload. Final score depends on clear, efficiency, overload control, and network cleanliness.</p>
+    <p class="hint">Click Power, Firewall, or Breaker nodes. Neon glow means interactive. INJ/PRIME/CAP labels show injector strength and node readiness. White pulses show activation. Dashed pink rings mark nodes threatened by virus spread next turn. Orange flash means overload, and the overload bar shows current pressure and turn delta.</p>
   </main>
 
   <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
@@ -150,7 +161,7 @@
           </article>
           <article class="tutorial-block">
             <h3>Input</h3>
-            <p>Click Power nodes to inject energy. Click Firewall nodes to open/rotate routes (watch M1/M2 labels for active mode and output count). Click Breaker nodes to prime a one-turn safety cap for the next turn.</p>
+            <p>Click Power nodes to inject energy (INJ value can differ per node). Click Firewall nodes to open/rotate routes (watch mode and output-count labels). Click Breaker nodes to prime a one-turn safety cap for the next turn.</p>
           </article>
           <article class="tutorial-block">
             <h3>Purifier + Danger</h3>
@@ -174,4 +185,5 @@
   <script type="module" src="src/bootstrap.js"></script>
 </body>
 </html>
+
 

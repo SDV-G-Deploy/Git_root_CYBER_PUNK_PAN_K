@@ -29,6 +29,19 @@ function setToggle(cache, key, element, className, enabled) {
   element.classList.toggle(className, next);
 }
 
+function setStyle(cache, key, element, property, value) {
+  if (!element) {
+    return;
+  }
+
+  if (cache.get(key) === value) {
+    return;
+  }
+
+  cache.set(key, value);
+  element.style[property] = value;
+}
+
 function buildObjectiveLine(objective) {
   const status = objective.done ? '[OK]' : '[ ]';
   return `${status} ${objective.text}`;
@@ -36,8 +49,15 @@ function buildObjectiveLine(objective) {
 
 function buildTraceLine(entry) {
   if (entry.detail) {
-    if (entry.detail.startsWith('firewall_open_m')) {
-      const mode = entry.detail.replace('firewall_open_m', '');
+    const modeMatch = /^firewall_open_m(\d+)(?:_o(\d+)_t([a-z_]+))?$/.exec(entry.detail);
+    if (modeMatch) {
+      const mode = modeMatch[1];
+      const outputs = modeMatch[2];
+      const type = modeMatch[3];
+      if (outputs) {
+        const typeText = type ? type.replace(/_/g, ' ') : 'route';
+        return `#${entry.step} ${entry.toNodeId}: firewall mode ${mode} open (${outputs} outputs, ${typeText})`;
+      }
       return `#${entry.step} ${entry.toNodeId}: firewall mode ${mode} opened`;
     }
 
@@ -58,6 +78,19 @@ function buildTraceLine(entry) {
     if (entry.detail.startsWith('breaker_dissipate_')) {
       const amount = entry.detail.replace('breaker_dissipate_', '');
       return `#${entry.step} ${entry.toNodeId}: breaker dissipated ${amount}`;
+    }
+
+    if (entry.detail.startsWith('attenuated_zero_')) {
+      const edgeId = entry.detail.replace('attenuated_zero_', '');
+      return `#${entry.step} ${entry.fromNodeId}: edge ${edgeId} attenuated to zero`;
+    }
+
+    if (entry.detail.startsWith('capped_')) {
+      const cappedMatch = /^capped_(.+)_([0-9]+)$/.exec(entry.detail);
+      if (cappedMatch) {
+        return `#${entry.step} ${entry.fromNodeId}: edge ${cappedMatch[1]} capped (+${cappedMatch[2]} overload)`;
+      }
+      return `#${entry.step} ${entry.toNodeId}: ${entry.detail}`;
     }
 
     if (entry.detail === 'flow_cleanse') {
@@ -178,6 +211,7 @@ function buildLevelObjectiveTags(level) {
 
   return tags.join('+');
 }
+
 function buildLevelOptionLabel(level) {
   const prefix = level.locked
     ? '[LOCKED]'
@@ -233,6 +267,112 @@ function buildObjectiveTypeText(summary) {
   }
 
   return `Objective Type: ${labels.join(' + ')}`;
+}
+
+function summarizeFlowDiagnostics(summary) {
+  if (!summary || !summary.lastTurn) {
+    return '';
+  }
+
+  const notes = [];
+  const lastTurn = summary.lastTurn;
+
+  if (Array.isArray(lastTurn.belowThresholdNodes) && lastTurn.belowThresholdNodes.length > 0) {
+    const nodes = lastTurn.belowThresholdNodes
+      .slice(0, 2)
+      .map((entry) => `${entry.nodeId} ${entry.charge}/${entry.threshold}`)
+      .join(', ');
+    notes.push(`Below threshold: ${nodes}`);
+  }
+
+  if (Array.isArray(lastTurn.attenuatedEdges) && lastTurn.attenuatedEdges.length > 0) {
+    const edges = lastTurn.attenuatedEdges
+      .slice(0, 3)
+      .map((entry) => entry.edgeId)
+      .join(', ');
+    notes.push(`Attenuated to zero: ${edges}`);
+  }
+
+  if (Array.isArray(lastTurn.cappedEdges) && lastTurn.cappedEdges.length > 0) {
+    const capped = lastTurn.cappedEdges
+      .slice(0, 2)
+      .map((entry) => `${entry.edgeId}(+${entry.overflow})`)
+      .join(', ');
+    notes.push(`Capped edges: ${capped}`);
+  }
+
+  if (Array.isArray(lastTurn.splitEvents) && lastTurn.splitEvents.length > 0) {
+    const splits = lastTurn.splitEvents
+      .slice(0, 2)
+      .map((entry) => `${entry.nodeId} x${entry.outputCount}`)
+      .join(', ');
+    notes.push(`Split lanes: ${splits}`);
+  }
+
+  if (Array.isArray(lastTurn.corruptionAbsorbed) && lastTurn.corruptionAbsorbed.length > 0) {
+    const absorbed = lastTurn.corruptionAbsorbed
+      .slice(0, 2)
+      .map((entry) => `${entry.nodeId} (-${entry.loss})`)
+      .join(', ');
+    notes.push(`Infection absorbed power: ${absorbed}`);
+  }
+
+  return notes.join(' | ');
+}
+
+function buildRiskFocus(snapshot, summary) {
+  if (!summary || !snapshot) {
+    return 'Risk: waiting for telemetry';
+  }
+
+  if (summary.phase === 'end') {
+    return summary.result === 'win'
+      ? 'Risk: run complete'
+      : `Risk: ${summary.lastTurn.status || 'run failed'}`;
+  }
+
+  const overloadRatio = summary.overloadLimit > 0
+    ? summary.overload / summary.overloadLimit
+    : 0;
+
+  if (overloadRatio >= 0.8 || (summary.lastTurn && summary.lastTurn.overloadDelta > 0)) {
+    const delta = summary.lastTurn && Number.isFinite(summary.lastTurn.overloadDelta)
+      ? summary.lastTurn.overloadDelta
+      : 0;
+    return `Risk: overload pressure ${summary.overload}/${summary.overloadLimit}${delta > 0 ? ` (delta +${delta})` : ''}`;
+  }
+
+  if (snapshot.infectedCount > 0 || snapshot.virusThreatCount > 0) {
+    return `Risk: infection ${snapshot.infectedCount}/${summary.collapseLimit}, threatened ${snapshot.virusThreatCount || 0}`;
+  }
+
+  return 'Risk: stable network pressure';
+}
+
+function buildRecentEvent(summary) {
+  if (!summary || !summary.lastTurn) {
+    return 'Recent: awaiting input';
+  }
+
+  const lastTurn = summary.lastTurn;
+  if (Array.isArray(lastTurn.explodedNodes) && lastTurn.explodedNodes.length > 0) {
+    return `Recent: overload explosion at ${lastTurn.explodedNodes.join(', ')}`;
+  }
+
+  const diagnostics = summarizeFlowDiagnostics(summary);
+  if (diagnostics) {
+    return `Recent: ${diagnostics}`;
+  }
+
+  if (Array.isArray(lastTurn.purifiedNodes) && lastTurn.purifiedNodes.length > 0) {
+    return `Recent: purifier affected ${lastTurn.purifiedNodes.join(', ')}`;
+  }
+
+  if (Array.isArray(lastTurn.corruptionNew) && lastTurn.corruptionNew.length > 0) {
+    return `Recent: virus spread to ${lastTurn.corruptionNew.join(', ')}`;
+  }
+
+  return `Recent: ${lastTurn.status || 'awaiting input'}`;
 }
 
 function getCoachCopy(snapshot, summary) {
@@ -326,6 +466,15 @@ function getCoachCopy(snapshot, summary) {
     }
   }
 
+  const diagnostics = summarizeFlowDiagnostics(summary);
+  if (diagnostics) {
+    return {
+      title: 'Flow Diagnostics',
+      body: 'This turn had constrained routing effects that reduced effective throughput.',
+      meta: diagnostics
+    };
+  }
+
   if (summary.lastTurn && summary.lastTurn.corruptionNew && summary.lastTurn.corruptionNew.length > 0) {
     return {
       title: 'Virus Spread',
@@ -348,6 +497,12 @@ export function createUI(documentRef) {
     shotsLabel: getEl(documentRef, 'shotsLabel'),
     targetLabel: getEl(documentRef, 'targetLabel'),
     objectiveLabel: getEl(documentRef, 'objectiveLabel'),
+    objectiveFocusLabel: getEl(documentRef, 'objectiveFocusLabel'),
+    riskFocusLabel: getEl(documentRef, 'riskFocusLabel'),
+    eventFocusLabel: getEl(documentRef, 'eventFocusLabel'),
+    overloadMeterLabel: getEl(documentRef, 'overloadMeterLabel'),
+    overloadMeterFill: getEl(documentRef, 'overloadMeterFill'),
+    overloadDeltaLabel: getEl(documentRef, 'overloadDeltaLabel'),
     levelLabel: getEl(documentRef, 'levelLabel'),
     chainStatusLabel: getEl(documentRef, 'chainStatusLabel'),
     campaignStatusLabel: getEl(documentRef, 'campaignStatusLabel'),
@@ -356,6 +511,7 @@ export function createUI(documentRef) {
     retryButton: getEl(documentRef, 'retryButton'),
     hintButton: getEl(documentRef, 'hintButton'),
     soundToggleButton: getEl(documentRef, 'soundToggleButton'),
+    musicToggleButton: getEl(documentRef, 'musicToggleButton'),
     coachTitle: getEl(documentRef, 'coachTitle'),
     coachBody: getEl(documentRef, 'coachBody'),
     coachMeta: getEl(documentRef, 'coachMeta'),
@@ -397,6 +553,7 @@ export function createUI(documentRef) {
 
   const textCache = new Map();
   const toggleCache = new Map();
+  const styleCache = new Map();
   let tutorialVisible = false;
   let chainKey = '';
   let levelSelectKey = '';
@@ -557,9 +714,12 @@ export function createUI(documentRef) {
       return;
     }
 
-    const status = summary.lastTurn && summary.lastTurn.status
-      ? summary.lastTurn.status
-      : 'Awaiting move...';
+    const diagnostics = summarizeFlowDiagnostics(summary);
+    const status = diagnostics
+      ? `${summary.lastTurn && summary.lastTurn.status ? summary.lastTurn.status : 'Awaiting move...'} | ${diagnostics}`
+      : summary.lastTurn && summary.lastTurn.status
+        ? summary.lastTurn.status
+        : 'Awaiting move...';
 
     setText(textCache, 'chain-status', refs.chainFeedStatus, status);
 
@@ -569,7 +729,8 @@ export function createUI(documentRef) {
       turn: summary.turnIndex,
       result: summary.result,
       objectives,
-      trace
+      trace,
+      diagnostics
     });
 
     if (chainHash === chainKey) {
@@ -582,6 +743,12 @@ export function createUI(documentRef) {
     for (let i = 0; i < objectives.length; i += 1) {
       const row = documentRef.createElement('li');
       row.textContent = buildObjectiveLine(objectives[i]);
+      refs.chainLogList.appendChild(row);
+    }
+
+    if (diagnostics) {
+      const row = documentRef.createElement('li');
+      row.textContent = `[diag] ${diagnostics}`;
       refs.chainLogList.appendChild(row);
     }
 
@@ -638,6 +805,38 @@ export function createUI(documentRef) {
     }
   }
 
+  function syncOverloadMeter(summary) {
+    if (!summary) {
+      return;
+    }
+
+    const limit = Math.max(1, Number(summary.overloadLimit) || 1);
+    const current = Math.max(0, Number(summary.overload) || 0);
+    const ratio = Math.max(0, Math.min(1, current / limit));
+    const pct = `${Math.round(ratio * 100)}%`;
+    const delta = summary.lastTurn && Number.isFinite(summary.lastTurn.overloadDelta)
+      ? summary.lastTurn.overloadDelta
+      : 0;
+
+    const state = ratio >= 0.8 || delta >= 2
+      ? 'critical'
+      : ratio >= 0.45 || delta > 0
+        ? 'warning'
+        : 'calm';
+
+    setText(textCache, 'overload-meter-label', refs.overloadMeterLabel, `Overload Pressure ${current}/${limit}`);
+    setText(
+      textCache,
+      'overload-delta-label',
+      refs.overloadDeltaLabel,
+      delta > 0 ? `Turn delta: +${delta}` : delta < 0 ? `Turn delta: ${delta}` : 'Turn delta: +0'
+    );
+    setStyle(styleCache, 'overload-fill-width', refs.overloadMeterFill, 'width', pct);
+    setToggle(toggleCache, 'overload-fill-calm', refs.overloadMeterFill, 'calm', state === 'calm');
+    setToggle(toggleCache, 'overload-fill-warning', refs.overloadMeterFill, 'warning', state === 'warning');
+    setToggle(toggleCache, 'overload-fill-critical', refs.overloadMeterFill, 'critical', state === 'critical');
+  }
+
   function sync({ snapshot, summary, trace }) {
     if (snapshot) {
       setText(textCache, 'hud-turn', refs.scoreLabel, `Turn: ${snapshot.turnIndex}`);
@@ -668,6 +867,11 @@ export function createUI(documentRef) {
         refs.objectiveLabel,
         buildObjectiveTypeText(summary)
       );
+      setText(textCache, 'objective-focus', refs.objectiveFocusLabel, `Objective: ${summary.nextObjectiveText}`);
+      setText(textCache, 'risk-focus', refs.riskFocusLabel, buildRiskFocus(snapshot, summary));
+      setText(textCache, 'event-focus', refs.eventFocusLabel, buildRecentEvent(summary));
+      syncOverloadMeter(summary);
+
       setText(
         textCache,
         'summary-result',
@@ -711,8 +915,13 @@ export function createUI(documentRef) {
   }
 
   function setSoundEnabled(enabled) {
-    const label = enabled ? 'Sound: On' : 'Sound: Off';
+    const label = enabled ? 'SFX: On' : 'SFX: Off';
     setText(textCache, 'sound-toggle', refs.soundToggleButton, label);
+  }
+
+  function setMusicEnabled(enabled) {
+    const label = enabled ? 'Music: On' : 'Music: Off';
+    setText(textCache, 'music-toggle', refs.musicToggleButton, label);
   }
 
   return {
@@ -724,7 +933,7 @@ export function createUI(documentRef) {
     applyPlaytestMode,
     setTelemetryReport,
     setSoundEnabled,
+    setMusicEnabled,
     setCampaignStatus
   };
 }
-

@@ -59,7 +59,64 @@ body {
   gap: 12px;
   font-size: 14px;
 }
+.overload-meter {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  min-width: 220px;
+  flex: 1 1 220px;
+  padding: 8px 10px;
+  border: 1px solid rgba(95, 163, 201, 0.4);
+  background: rgba(8, 21, 32, 0.92);
+}
 
+#overloadMeterLabel,
+#overloadDeltaLabel {
+  font-size: 12px;
+  color: #cfeeff;
+}
+
+.overload-track {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  border: 1px solid rgba(88, 137, 168, 0.7);
+  background: rgba(7, 15, 23, 0.85);
+  overflow: hidden;
+}
+
+.overload-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.18s linear, background 0.18s linear, box-shadow 0.18s linear;
+}
+
+.overload-fill.calm {
+  background: linear-gradient(90deg, #5ac9ff, #78e2ff);
+  box-shadow: 0 0 10px rgba(92, 206, 255, 0.45);
+}
+
+.overload-fill.warning {
+  background: linear-gradient(90deg, #ffd166, #ff9f54);
+  box-shadow: 0 0 10px rgba(255, 168, 88, 0.45);
+}
+
+.overload-fill.critical {
+  background: linear-gradient(90deg, #ff7d6c, #ff4f6b);
+  box-shadow: 0 0 12px rgba(255, 96, 110, 0.55);
+}
+
+.ops-strip {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 360px;
+  min-width: 280px;
+  padding: 8px 10px;
+  border: 1px solid rgba(80, 136, 171, 0.35);
+  background: rgba(8, 18, 27, 0.85);
+  font-size: 12px;
+  color: #b8dbef;
+}
 #campaignStatusLabel {
   color: #9fd7ff;
   font-size: 12px;
@@ -75,6 +132,7 @@ body {
 #hintButton,
 #retryButton,
 #soundToggleButton,
+#musicToggleButton,
 .outcome-actions button,
 .playtest-actions button,
 .upgrade-row button,
@@ -94,11 +152,13 @@ body {
 #helpButton,
 #hintButton,
 #retryButton,
-#soundToggleButton {
+#soundToggleButton,
+#musicToggleButton {
   padding: 8px 14px;
 }
 
-#soundToggleButton {
+#soundToggleButton,
+#musicToggleButton {
   margin-left: auto;
 }
 
@@ -106,6 +166,7 @@ body {
 #hintButton:hover,
 #retryButton:hover,
 #soundToggleButton:hover,
+#musicToggleButton:hover,
 .outcome-actions button:hover,
 .playtest-actions button:hover,
 .upgrade-row button:hover,
@@ -538,6 +599,12 @@ body {
   .stats {
     gap: 8px;
   }
+  .overload-meter,
+  .ops-strip {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+  }
 
   #levelSelect {
     flex: 1 1 100%;
@@ -547,6 +614,7 @@ body {
   }
 
   #soundToggleButton,
+  #musicToggleButton,
   #helpButton,
   #hintButton,
   #retryButton {
@@ -617,5 +685,13 @@ body {
     width: 100%;
   }
 }
+
+
+
+
+
+
+
+
 
 
