@@ -221,6 +221,23 @@ function simulateActionInPlace(state, action) {
     }
   }
 
+  if (node.baseType === NODE_TYPES.BREAKER) {
+    node.breakerPending = true;
+    state.lastTurn.trace.push({
+      step: 0,
+      fromNodeId: 'player',
+      toNodeId: node.id,
+      edgeId: null,
+      energyIn: 0,
+      energyAccepted: 0,
+      detail: `breaker_primed_cap${node.breakerCap}`
+    });
+
+    if (node.injectOnClick && node.injectPower > 0) {
+      injectPower = node.injectPower;
+    }
+  }
+
   if (injectPower > 0) {
     seedActionPacket(state, node, injectPower);
   }
@@ -683,7 +700,7 @@ export function solveLevel(level, levelIndex, levelCount, options) {
   }
 
   const clickableNodes = level.nodes
-    .filter((node) => node.type === NODE_TYPES.POWER || node.type === NODE_TYPES.FIREWALL)
+    .filter((node) => node.type === NODE_TYPES.POWER || node.type === NODE_TYPES.FIREWALL || node.type === NODE_TYPES.BREAKER)
     .map((node) => ({ id: node.id, type: node.type }));
 
   const interactableAtStart = enumerateActions(initialState).map((action) => action.nodeId);
@@ -806,5 +823,6 @@ export function createValidationSummary(results) {
 
   return summary;
 }
+
 
 

@@ -30,6 +30,10 @@ function getNodeColor(node) {
     return CONFIG.NODES.COLORS.splitter;
   }
 
+  if (node.baseType === NODE_TYPES.BREAKER) {
+    return CONFIG.NODES.COLORS.breaker;
+  }
+
   if (node.baseType === NODE_TYPES.FIREWALL) {
     return CONFIG.NODES.COLORS.firewall;
   }
@@ -229,6 +233,8 @@ function drawNodeTypeTag(ctx, node) {
     tag = 'R';
   } else if (node.baseType === NODE_TYPES.SPLITTER) {
     tag = 'S';
+  } else if (node.baseType === NODE_TYPES.BREAKER) {
+    tag = 'B';
   } else if (node.baseType === NODE_TYPES.FIREWALL) {
     tag = 'F';
   } else if (node.baseType === NODE_TYPES.PURIFIER) {
@@ -436,6 +442,31 @@ function drawNodes(ctx, state) {
         : `PRIME ${node.charge}/${node.threshold}`;
       ctx.fillStyle = node.active ? '#efffcc' : '#b2c39d';
       ctx.fillText(splitLabel, node.x, node.y - node.radius - 11);
+    }
+
+    if (node.baseType === NODE_TYPES.BREAKER) {
+      let breakerLabel = `CAP ${node.breakerCap}`;
+      if (node.breakerPending) {
+        breakerLabel = `PRIMED CAP ${node.breakerCap}`;
+      } else if (node.breakerDissipatedThisTurn > 0) {
+        breakerLabel = `DISS ${node.breakerDissipatedThisTurn}`;
+      } else if (!node.active) {
+        breakerLabel = `PRIME ${node.charge}/${node.threshold}`;
+      }
+
+      ctx.fillStyle = node.breakerPending ? '#c6fbff' : node.active ? '#bfefff' : '#99b7c6';
+      ctx.fillText(breakerLabel, node.x, node.y - node.radius - 11);
+
+      if (node.breakerPending) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(165, 245, 255, 0.72)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius + 6, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     if (node.baseType === NODE_TYPES.PURIFIER) {
@@ -649,3 +680,4 @@ export function renderState(ctx, state) {
   drawDangerFlash(ctx, state);
   ctx.restore();
 }
+

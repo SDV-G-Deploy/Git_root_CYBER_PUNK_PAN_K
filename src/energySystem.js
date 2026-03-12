@@ -166,6 +166,35 @@ function processPacket(state, packet, hooks) {
     state.lastTurn.overloadDelta += emission.overloadAdded;
   }
 
+  if (Array.isArray(emission.breakerDissipation) && emission.breakerDissipation.length > 0) {
+    for (let i = 0; i < emission.breakerDissipation.length; i += 1) {
+      const dissipated = emission.breakerDissipation[i];
+      state.lastTurn.breakerDissipation.push({
+        nodeId: dissipated.nodeId,
+        edgeId: dissipated.edgeId,
+        amount: dissipated.amount
+      });
+
+      state.lastTurn.trace.push({
+        step: state.propagationSteps,
+        fromNodeId: dissipated.nodeId,
+        toNodeId: dissipated.nodeId,
+        edgeId: dissipated.edgeId || null,
+        energyIn: dissipated.amount,
+        energyAccepted: 0,
+        detail: `breaker_dissipate_${dissipated.amount}`
+      });
+
+      if (hooks.onBreakerDissipated) {
+        hooks.onBreakerDissipated({
+          nodeId: dissipated.nodeId,
+          edgeId: dissipated.edgeId,
+          amount: dissipated.amount
+        });
+      }
+    }
+  }
+
   for (let i = 0; i < emission.packets.length; i += 1) {
     const emitted = emission.packets[i];
 
@@ -304,6 +333,9 @@ function applyDecayPhase(state) {
   for (let i = 0; i < state.nodes.length; i += 1) {
     const node = state.nodes[i];
     applyDecay(node);
+    if (node.baseType === NODE_TYPES.BREAKER) {
+      node.breakerArmed = false;
+    }
     updateActiveState(node);
   }
 }
@@ -319,6 +351,8 @@ export function prepareTurn(state) {
     cleansedNodes: [],
     purifiedNodes: [],
     purifierActive: [],
+    breakerArmedNodes: [],
+    breakerDissipation: [],
     explodedNodes: [],
     objectiveProgress: [],
     status: 'Resolving network propagation...'
@@ -329,7 +363,16 @@ export function prepareTurn(state) {
   }
 
   for (let i = 0; i < state.nodes.length; i += 1) {
-    beginTurnForNode(state.nodes[i]);
+    const node = state.nodes[i];
+    beginTurnForNode(node);
+
+    if (node.baseType === NODE_TYPES.BREAKER) {
+      node.breakerArmed = Boolean(node.breakerPending);
+      node.breakerPending = false;
+      if (node.breakerArmed) {
+        state.lastTurn.breakerArmedNodes.push(node.id);
+      }
+    }
   }
 }
 
@@ -368,4 +411,7 @@ export function resolvePropagation(state, hooks) {
     overflow: false
   };
 }
+
+
+
 

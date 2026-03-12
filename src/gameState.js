@@ -37,6 +37,10 @@ function defaultThresholdForType(type) {
     return CONFIG.TURN.RELAY_THRESHOLD;
   }
 
+  if (type === NODE_TYPES.BREAKER) {
+    return CONFIG.TURN.BREAKER_THRESHOLD;
+  }
+
   if (type === NODE_TYPES.FIREWALL) {
     return CONFIG.TURN.FIREWALL_THRESHOLD;
   }
@@ -63,6 +67,10 @@ function defaultEmitForType(type, injectPower) {
 
   if (type === NODE_TYPES.SPLITTER) {
     return CONFIG.TURN.RELAY_EMIT_POWER;
+  }
+
+  if (type === NODE_TYPES.BREAKER) {
+    return CONFIG.TURN.BREAKER_EMIT_POWER;
   }
 
   if (type === NODE_TYPES.FIREWALL) {
@@ -127,6 +135,9 @@ function makeRuntimeNode(node) {
     overloadThreshold: Number.isFinite(node.overloadThreshold)
       ? node.overloadThreshold
       : CONFIG.TURN.OVERLOAD_NODE_THRESHOLD,
+    breakerCap: Number.isFinite(node.breakerCap)
+      ? Math.max(0, Math.floor(node.breakerCap))
+      : CONFIG.TURN.BREAKER_SAFE_CAP,
     corrupted: Boolean(node.corrupted),
     charge: 0,
     active: node.type === NODE_TYPES.POWER,
@@ -136,6 +147,9 @@ function makeRuntimeNode(node) {
     exploded: false,
     corruptionProgress: 0,
     cleanseAccumulated: 0,
+    breakerPending: Boolean(node.breakerPending),
+    breakerArmed: false,
+    breakerDissipatedThisTurn: 0,
     radius: CONFIG.NODES.RADIUS
   };
 }
@@ -222,6 +236,10 @@ function getNodeTypeLabel(type) {
     return 'Splitter Node';
   }
 
+  if (type === NODE_TYPES.BREAKER) {
+    return 'Breaker Node';
+  }
+
   if (type === NODE_TYPES.FIREWALL) {
     return 'Firewall Node';
   }
@@ -265,7 +283,11 @@ function buildHoverInfo(state) {
     return null;
   }
 
-  const clickable = (node.baseType === NODE_TYPES.POWER || node.baseType === NODE_TYPES.FIREWALL) && !node.exploded;
+  const clickable = (
+    node.baseType === NODE_TYPES.POWER ||
+    node.baseType === NODE_TYPES.FIREWALL ||
+    node.baseType === NODE_TYPES.BREAKER
+  ) && !node.exploded;
   const chargeText = node.baseType === NODE_TYPES.CORE
     ? `Charge ${node.charge}/${node.targetCharge}`
     : `Charge ${node.charge}`;
@@ -302,6 +324,13 @@ function buildHoverInfo(state) {
       .filter((edgeIndex) => state.edges[edgeIndex]?.enabled)
       .length;
     detailText = `${chargeText} | Needs ${node.threshold}, splits ${node.emitPower} across ${activeOutputs} routes.`;
+  } else if (node.baseType === NODE_TYPES.BREAKER) {
+    if (node.breakerPending) {
+      actionText = 'Breaker is primed: your next turn through this node will be capped and excess will dissipate safely.';
+    } else {
+      actionText = 'Click to prime a one-turn safety cap on this node for your next move.';
+    }
+    detailText = `${chargeText} | Prime cap ${node.breakerCap}, base emit ${node.emitPower}.`;
   } else if (node.baseType === NODE_TYPES.PURIFIER) {
     actionText = 'Purifier auto-cleans adjacent infection when it stays powered.';
     detailText = `${chargeText} | Needs ${node.threshold}, cleanse ${node.purifierStrength}/turn.`;
@@ -383,6 +412,8 @@ export function createState(level, levelIndex, levelCount) {
       cleansedNodes: [],
       purifiedNodes: [],
       purifierActive: [],
+      breakerArmedNodes: [],
+      breakerDissipation: [],
       explodedNodes: [],
       objectiveProgress: [],
       status: 'Awaiting input.'
@@ -573,6 +604,8 @@ export function getRunSummary(state) {
       cleansedNodes: state.lastTurn.cleansedNodes.slice(),
       purifiedNodes: state.lastTurn.purifiedNodes.slice(),
       purifierActive: state.lastTurn.purifierActive.slice(),
+      breakerArmedNodes: state.lastTurn.breakerArmedNodes.slice(),
+      breakerDissipation: state.lastTurn.breakerDissipation.map((entry) => ({ ...entry })),
       explodedNodes: state.lastTurn.explodedNodes.slice(),
       objectiveProgress: state.lastTurn.objectiveProgress.slice()
     },
@@ -595,3 +628,7 @@ export function createObjectiveText(objective) {
 
   return 'Unknown objective';
 }
+
+
+
+

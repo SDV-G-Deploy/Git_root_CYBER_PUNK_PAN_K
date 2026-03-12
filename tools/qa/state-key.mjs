@@ -8,6 +8,8 @@ export function createStateKey(state) {
       node.active ? 1 : 0,
       node.firewallOpen ? 1 : 0,
       Number.isFinite(node.activeMode) ? node.activeMode : 0,
+      node.breakerPending ? 1 : 0,
+      node.breakerArmed ? 1 : 0,
       node.corruptionProgress,
       node.cleanseAccumulated
     ].join(':'))
@@ -39,3 +41,4 @@ export function createStateKey(state) {
     objectiveKey
   ].join('||');
 }
+

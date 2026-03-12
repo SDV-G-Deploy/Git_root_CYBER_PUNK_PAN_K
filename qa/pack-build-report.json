@@ -1,10 +1,12 @@
 {
-  "generatedAt": "2026-03-12T15:17:16.354Z",
-  "candidateCount": 40,
+  "generatedAt": "2026-03-12T16:44:01.050Z",
+  "candidateCount": 44,
   "acceptedCount": 10,
-  "deferredCount": 30,
-  "rejectedCount": 0,
-  "rejectionCounts": {},
+  "deferredCount": 33,
+  "rejectedCount": 1,
+  "rejectionCounts": {
+    "min_moves_below_floor": 1
+  },
   "acceptedDifficultyCounts": {
     "easy": 3,
     "medium": 3,
@@ -1254,9 +1256,90 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_49fb5bf6"
+    },
+    {
+      "levelId": "L42",
+      "levelName": "Heat Budget",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 5,
+      "solutionCount": 15,
+      "averageBranchingFactor": 2,
+      "complexityScore": 12.7,
+      "topologyScale": 4,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_e7c88b86"
+    },
+    {
+      "levelId": "L43",
+      "levelName": "Grid Safeguard",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 4,
+      "solutionCount": 10,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.59,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_ce848605"
+    },
+    {
+      "levelId": "L44",
+      "levelName": "Breaker Mesh",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 392,
+      "averageBranchingFactor": 3,
+      "complexityScore": 21.21,
+      "topologyScale": 12.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_edf338df"
     }
   ],
-  "rejectedEntries": [],
+  "rejectedEntries": [
+    {
+      "levelId": "L41",
+      "levelName": "Breaker Primer",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 2,
+      "solutionCount": 3,
+      "averageBranchingFactor": 2,
+      "complexityScore": 10.78,
+      "topologyScale": 5.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "min_moves_below_floor"
+      ],
+      "topologyFingerprint": "topo_acee566c"
+    }
+  ],
   "topologyFingerprints": [
     "topo_b4c4950e",
     "topo_9bb0827e",

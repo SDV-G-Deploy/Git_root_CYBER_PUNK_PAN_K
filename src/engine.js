@@ -404,6 +404,26 @@ export function createChainLabEngine() {
     resetHintState(state);
     prepareTurn(state);
 
+    if (Array.isArray(state.lastTurn.breakerArmedNodes) && state.lastTurn.breakerArmedNodes.length > 0) {
+      for (let i = 0; i < state.lastTurn.breakerArmedNodes.length; i += 1) {
+        const armedBreakerId = state.lastTurn.breakerArmedNodes[i];
+        const armedBreaker = getNodeById(state, armedBreakerId);
+        if (!armedBreaker) {
+          continue;
+        }
+
+        state.lastTurn.trace.push({
+          step: 0,
+          fromNodeId: 'system',
+          toNodeId: armedBreakerId,
+          edgeId: null,
+          energyIn: 0,
+          energyAccepted: 0,
+          detail: `breaker_armed_cap${armedBreaker.breakerCap}`
+        });
+      }
+    }
+
     let injectPower = 0;
 
     if (node.baseType === NODE_TYPES.POWER) {
@@ -427,6 +447,28 @@ export function createChainLabEngine() {
       }
 
       if (node.injectOnClick && node.firewallOpen) {
+        injectPower = node.injectPower;
+      }
+    }
+
+    if (node.baseType === NODE_TYPES.BREAKER) {
+      node.breakerPending = true;
+      state.lastTurn.trace.push({
+        step: 0,
+        fromNodeId: 'player',
+        toNodeId: node.id,
+        edgeId: null,
+        energyIn: 0,
+        energyAccepted: 0,
+        detail: `breaker_primed_cap${node.breakerCap}`
+      });
+
+      emitUxEvent('breaker_primed', {
+        nodeId: node.id,
+        breakerCap: node.breakerCap
+      });
+
+      if (node.injectOnClick && node.injectPower > 0) {
         injectPower = node.injectPower;
       }
     }
@@ -488,6 +530,21 @@ export function createChainLabEngine() {
         pushNodeBurst(payload.nodeId, pulseColor, payload.cleansed ? 'purify_cleanse' : 'purify_stabilize');
         pushNodeBurst(payload.purifierId, '#78f0cb', 'purify_source');
         emitUxEvent('purifier_pulse', payload);
+      },
+      onBreakerDissipated: (payload) => {
+        pushNodePulse(payload.nodeId, 'breaker_dissipate', CONFIG.NODES.COLORS.breaker);
+        pushNodeBurst(payload.nodeId, CONFIG.NODES.COLORS.breaker, 'breaker_dissipate');
+        if (payload.edgeId) {
+          pushEdgeBurst(payload.edgeId, payload.amount);
+        }
+        emitUxEvent('breaker_dissipated', payload);
+        emitTelemetry('breaker_dissipated', {
+          levelId: state.levelId,
+          turnIndex: state.turnIndex,
+          nodeId: payload.nodeId,
+          edgeId: payload.edgeId,
+          amount: payload.amount
+        });
       }
     });
 
@@ -500,7 +557,9 @@ export function createChainLabEngine() {
       overflow: propagation.overflow,
       infectionNew: state.lastTurn.corruptionNew.slice(),
       cleansedNodes: state.lastTurn.cleansedNodes.slice(),
-      explodedNodes: state.lastTurn.explodedNodes.slice()
+      explodedNodes: state.lastTurn.explodedNodes.slice(),
+      breakerArmedNodes: state.lastTurn.breakerArmedNodes.slice(),
+      breakerDissipation: state.lastTurn.breakerDissipation.map((entry) => ({ ...entry }))
     });
 
     checkWinLoseAfterTurn(state, propagation.overflow);
@@ -868,3 +927,4 @@ export function createChainLabEngine() {
     exportTelemetry
   };
 }
+

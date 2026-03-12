@@ -17,6 +17,11 @@ function describeNodeTypes() {
       interaction: 'Not clickable. Eligible outputs are enabled outgoing edges. Shares are floor-divided evenly, then any remainder is assigned in ascending edge id order. If one output is active, it receives the full pre-attenuation emit.',
       purpose: 'Creates deterministic multi-route budgeting tradeoffs instead of single-lane forwarding.'
     },
+    [NODE_TYPES.BREAKER]: {
+      behavior: 'Clickable timing tool. Click primes it for the next turn; while armed, it caps outgoing packet energy per edge and dissipates excess safely.',
+      interaction: `Default threshold ${CONFIG.TURN.BREAKER_THRESHOLD}, emit ${CONFIG.TURN.BREAKER_EMIT_POWER}, armed cap ${CONFIG.TURN.BREAKER_SAFE_CAP}. Primed state is consumed at next turn start and armed state resets after that turn resolves.`,
+      purpose: 'Trade throughput for one-turn safety in overload-heavy lanes.'
+    },
     [NODE_TYPES.FIREWALL]: {
       behavior: 'Clickable. Opens, closes, or rotates route modes and may inject a small charge on click when open.',
       interaction: `Default threshold ${CONFIG.TURN.FIREWALL_THRESHOLD}, click inject ${CONFIG.TURN.FIREWALL_CLICK_INJECT}, emit ${CONFIG.TURN.FIREWALL_EMIT_POWER}. Corrupted firewalls remain clickable but cannot auto-emit until cleansed.`,
@@ -50,7 +55,8 @@ export function extractRuleModel() {
     playerActions: [
       'Click Power nodes.',
       'Click Firewall nodes to open, close, or rotate modes.',
-      'No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes.'
+      'Click Breaker nodes to prime a one-turn safety cap for the next turn.',
+      'No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes (except Breaker, which is clickable).'
     ],
     turnFlow: [
       'Player clicks a clickable node.',
@@ -78,8 +84,12 @@ export function extractRuleModel() {
       overflowPenalty: 'Any energy above edge capacity is added to global overload and the edge is marked overloaded for the turn.',
       corruptionAbsorbFactor: `Corrupted nodes only accept floor(incoming * ${CONFIG.TURN.CORRUPTION_ABSORB_FACTOR}).`,
       cleanseThreshold: `Corrupted non-virus nodes are cleansed if accumulated accepted energy this turn reaches ${CONFIG.TURN.CLEANSE_THRESHOLD}.`,
+      breakerDissipation: 'Armed breakers cap outgoing per-edge packet energy to breakerCap and dissipate the excess before edge capacity and downstream throughput checks.',
       decayPerTurn: CONFIG.TURN.DECAY_PER_TURN
     },
     nodeTypes: describeNodeTypes()
   };
 }
+
+
+

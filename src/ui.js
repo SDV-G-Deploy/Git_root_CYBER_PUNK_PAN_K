@@ -232,7 +232,7 @@ function getCoachCopy(snapshot, summary) {
     if (summary.lastAction.reason === 'no_target') {
       return {
         title: 'No target selected',
-        body: 'Clicks only count on Power and Firewall nodes.',
+        body: 'Clicks only count on Power, Firewall, and Breaker nodes.',
         meta: 'Aim near a node first on desktop, or use Hint on touch. Clickable nodes glow brighter.'
       };
     }
@@ -240,8 +240,8 @@ function getCoachCopy(snapshot, summary) {
     if (summary.lastAction.reason === 'node_not_clickable') {
       return {
         title: 'That node is passive',
-        body: 'Relay, Purifier, Overload, Virus, and Core nodes react automatically.',
-        meta: 'Use Power to inject energy and Firewall to route it.'
+        body: 'Relay, Splitter, Purifier, Overload, Virus, and Core nodes react automatically.',
+        meta: 'Use Power to inject, Firewall to route, and Breaker to prime a safety cap.'
       };
     }
   }
@@ -250,7 +250,7 @@ function getCoachCopy(snapshot, summary) {
     return {
       title: 'Primary Objective',
       body: summary.nextObjectiveText || 'Complete the listed objectives.',
-      meta: summary.teachingGoal || 'Open with a Power node. Firewalls let you redirect the flow.'
+      meta: summary.teachingGoal || 'Open with Power, route with Firewall, and prime Breakers before risky overload turns.'
     };
   }
 
@@ -259,6 +259,16 @@ function getCoachCopy(snapshot, summary) {
       title: 'Overload Detected',
       body: 'Too much energy passed through an overload node in one turn.',
       meta: 'Split the route, reduce feed, or open another firewall branch.'
+    };
+  }
+
+  if (summary.lastTurn && summary.lastTurn.breakerDissipation && summary.lastTurn.breakerDissipation.length > 0) {
+    const totalDissipated = summary.lastTurn.breakerDissipation
+      .reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+    return {
+      title: 'Breaker Dissipation',
+      body: 'A primed breaker capped throughput and safely vented excess energy this turn.',
+      meta: `Dissipated: ${totalDissipated} | Breakers trade peak output for safer routing.`
     };
   }
 
@@ -538,7 +548,7 @@ export function createUI(documentRef) {
     } else {
       const row = documentRef.createElement('li');
       row.className = 'chain-log-empty';
-      row.textContent = 'No propagation yet. Tap or click a Power or Firewall node.';
+      row.textContent = 'No propagation yet. Tap or click a Power, Firewall, or Breaker node.';
       refs.chainLogList.appendChild(row);
     }
   }
@@ -671,3 +681,4 @@ export function createUI(documentRef) {
     setCampaignStatus
   };
 }
+

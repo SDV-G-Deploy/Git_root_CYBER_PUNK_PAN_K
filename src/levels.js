@@ -1276,6 +1276,122 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 9 },
       { type: 'clean_corruption' }
     ]
+  },
+  {
+    id: 'L41',
+    name: 'Breaker Primer',
+    chapter: 'Breaker Node',
+    difficulty: 'intro',
+    difficultyTag: 'intro',
+    teachingGoal: 'Prime the breaker before feeding an overload lane, or the route blows out.',
+    parScore: 800,
+    movesLimit: 4,
+    overloadLimit: 6,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 100, y: 270, injectPower: 6 },
+      { id: 'B1', type: 'breaker', x: 300, y: 270, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'O1', type: 'overload', x: 520, y: 270, threshold: 2, emitPower: 5, overloadThreshold: 4 },
+      { id: 'C1', type: 'core', x: 800, y: 270, targetCharge: 3 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'B1', capacity: 6, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'B1', to: 'O1', capacity: 6, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 3 }
+    ]
+  },
+  {
+    id: 'L42',
+    name: 'Heat Budget',
+    chapter: 'Breaker Node',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Raw pushing overloads the lane; time a breaker prime to keep a final feed safe.',
+    parScore: 780,
+    movesLimit: 7,
+    overloadLimit: 6,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 120, y: 270, injectPower: 6 },
+      { id: 'B1', type: 'breaker', x: 350, y: 270, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 11 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'B1', capacity: 6, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'B1', to: 'C1', capacity: 3, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 11 }
+    ]
+  },
+  {
+    id: 'L43',
+    name: 'Grid Safeguard',
+    chapter: 'Breaker Node',
+    difficulty: 'medium',
+    difficultyTag: 'medium',
+    teachingGoal: 'Complete activate_all without blowing the overload lane by timing breaker primes.',
+    parScore: 760,
+    movesLimit: 7,
+    overloadLimit: 7,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 6 },
+      { id: 'B1', type: 'breaker', x: 300, y: 270, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'O1', type: 'overload', x: 520, y: 270, threshold: 1, emitPower: 5, overloadThreshold: 4 },
+      { id: 'R1', type: 'relay', x: 700, y: 170, threshold: 1, emitPower: 3 },
+      { id: 'C1', type: 'core', x: 880, y: 270, targetCharge: 6 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'B1', capacity: 6, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'B1', to: 'O1', capacity: 6, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'O1', to: 'R1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 6 },
+      { type: 'activate_all' }
+    ]
+  },
+  {
+    id: 'L44',
+    name: 'Breaker Mesh',
+    chapter: 'Breaker Node',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Chain firewall lane control with splitter support while timing breaker primes for overload bursts.',
+    parScore: 740,
+    movesLimit: 8,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 70, y: 270, injectPower: 6 },
+      { id: 'F1', type: 'firewall', x: 230, y: 270, firewallOpen: false, firewallModes: [['E3'], ['E2'], ['E2', 'E3']], activeMode: 0, injectPower: 2 },
+      { id: 'B1', type: 'breaker', x: 430, y: 170, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'O1', type: 'overload', x: 620, y: 170, threshold: 2, emitPower: 5, overloadThreshold: 4 },
+      { id: 'S1', type: 'splitter', x: 430, y: 360, threshold: 2, emitPower: 4 },
+      { id: 'R1', type: 'relay', x: 620, y: 320, threshold: 2, emitPower: 2 },
+      { id: 'R2', type: 'relay', x: 620, y: 420, threshold: 2, emitPower: 2 },
+      { id: 'C1', type: 'core', x: 880, y: 270, targetCharge: 12 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'F1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'F1', to: 'B1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'F1', to: 'S1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E4', from: 'B1', to: 'O1', capacity: 6, attenuation: 0, enabled: true },
+      { id: 'E5', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'S1', to: 'R1', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E7', from: 'S1', to: 'R2', capacity: 3, attenuation: 0, enabled: true },
+      { id: 'E8', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E9', from: 'R2', to: 'C1', capacity: 2, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
+    ]
   }
 ];
 function cloneLevel(level) {
@@ -1310,3 +1426,4 @@ export function clampLevelIndex(index, levels) {
 
   return Math.min(levels.length - 1, Math.max(0, Number(index) || 0));
 }
+

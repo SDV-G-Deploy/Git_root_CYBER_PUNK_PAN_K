@@ -2,7 +2,7 @@ import { CONFIG, NODE_TYPES } from './config.js';
 import { clamp } from './physicsLite.js';
 
 export function isClickableNode(node) {
-  return node && (node.baseType === NODE_TYPES.POWER || node.baseType === NODE_TYPES.FIREWALL);
+  return node && (node.baseType === NODE_TYPES.POWER || node.baseType === NODE_TYPES.FIREWALL || node.baseType === NODE_TYPES.BREAKER);
 }
 
 export function beginTurnForNode(node) {
@@ -10,6 +10,7 @@ export function beginTurnForNode(node) {
   node.receivedThisTurn = 0;
   node.cleanseAccumulated = 0;
   node.throughputThisTurn = 0;
+  node.breakerDissipatedThisTurn = 0;
 }
 
 export function updateActiveState(node) {
@@ -160,6 +161,7 @@ export function emitPackets(state, node) {
   const outgoing = state.outgoingByNode.get(node.id) || [];
   const packets = [];
   let overloadAdded = 0;
+  const breakerDissipation = [];
 
   const eligibleEdges = [];
 
@@ -230,6 +232,24 @@ export function emitPackets(state, node) {
         continue;
       }
 
+      if (node.baseType === NODE_TYPES.BREAKER && node.breakerArmed) {
+        const safeCap = Math.max(0, Math.floor(Number(node.breakerCap) || 0));
+        if (output > safeCap) {
+          const dissipated = output - safeCap;
+          output = safeCap;
+          node.breakerDissipatedThisTurn += dissipated;
+          breakerDissipation.push({
+            nodeId: node.id,
+            edgeId: edge.id,
+            amount: dissipated
+          });
+        }
+      }
+
+      if (output <= 0) {
+        continue;
+      }
+
       if (output > edge.capacity) {
         overloadAdded += output - edge.capacity;
         output = edge.capacity;
@@ -253,7 +273,8 @@ export function emitPackets(state, node) {
 
   return {
     packets,
-    overloadAdded
+    overloadAdded,
+    breakerDissipation
   };
 }
 
@@ -269,3 +290,4 @@ export function applyDecay(node) {
 
   node.charge = Math.max(0, node.charge - CONFIG.TURN.DECAY_PER_TURN);
 }
+

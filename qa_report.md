@@ -1,17 +1,18 @@
 # Chain Lab QA Report
 
-Generated levels checked: 40
-Solvable: 40
+Generated levels checked: 44
+Solvable: 44
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 48959
+Total states explored: 54451
 
 ## Gameplay Rules Summary
 
 ### Player Actions
 - Click Power nodes.
 - Click Firewall nodes to open, close, or rotate modes.
-- No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes.
+- Click Breaker nodes to prime a one-turn safety cap for the next turn.
+- No direct interaction with Relay, Splitter, Purifier, Virus, Overload, or Core nodes (except Breaker, which is clickable).
 
 ### Turn Flow
 - Player clicks a clickable node.
@@ -37,6 +38,7 @@ Total states explored: 48959
 - `power`: Clickable. Injects energy into itself on click, then emits along outgoing edges. Inject power defaults to 5. Always active unless custom level data changes its inject power. Purpose: Primary player-controlled energy source.
 - `relay`: Passive. Stores incoming charge and auto-emits once charge reaches threshold. Default threshold 3, default emit 3. Loses 1 charge after each turn. Purpose: Forward energy deeper into the network.
 - `splitter`: Passive branch node. When active, it splits its emit power across active outgoing routes before attenuation is applied. Not clickable. Eligible outputs are enabled outgoing edges. Shares are floor-divided evenly, then any remainder is assigned in ascending edge id order. If one output is active, it receives the full pre-attenuation emit. Purpose: Creates deterministic multi-route budgeting tradeoffs instead of single-lane forwarding.
+- `breaker`: Clickable timing tool. Click primes it for the next turn; while armed, it caps outgoing packet energy per edge and dissipates excess safely. Default threshold 2, emit 5, armed cap 2. Primed state is consumed at next turn start and armed state resets after that turn resolves. Purpose: Trade throughput for one-turn safety in overload-heavy lanes.
 - `firewall`: Clickable. Opens, closes, or rotates route modes and may inject a small charge on click when open. Default threshold 2, click inject 2, emit 3. Corrupted firewalls remain clickable but cannot auto-emit until cleansed. Purpose: Player-controlled routing and branch selection.
 - `purifier`: Passive support node. When charged above threshold, it reduces corruption on adjacent nodes at end of turn. Default threshold 2, emit 2, cleanse power 1. It is not directly clickable. Purpose: Adds tactical counterplay to infection by rewarding purifier route support.
 - `virus`: Passive hazard. Spreads corruption to neighbors at the end of each turn. Default spread 1 per turn. Cannot be directly clicked. Purpose: Creates time pressure and routing tension.
@@ -49,6 +51,7 @@ Total states explored: 48959
 - `overflowPenalty`: Any energy above edge capacity is added to global overload and the edge is marked overloaded for the turn.
 - `corruptionAbsorbFactor`: Corrupted nodes only accept floor(incoming * 0.5).
 - `cleanseThreshold`: Corrupted non-virus nodes are cleansed if accumulated accepted energy this turn reaches 2.
+- `breakerDissipation`: Armed breakers cap outgoing per-edge packet energy to breakerCap and dissipate the excess before edge capacity and downstream throughput checks.
 - `decayPerTurn`: 1
 
 ## Solvability Verification
@@ -95,6 +98,10 @@ Total states explored: 48959
 | L38 | Solvable | medium | Medium | 5 | 28 | 2 | tight_move_budget |
 | L39 | Solvable | medium | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path |
 | L40 | Solvable | hard | Medium | 4 | 58 | 2 | none |
+| L41 | Solvable | intro | Medium | 2 | 3 | 2 | single_opening_solution |
+| L42 | Solvable | medium | Hard | 5 | 15 | 2 | none |
+| L43 | Solvable | medium | Hard | 4 | 10 | 2 | single_opening_solution |
+| L44 | Solvable | hard | Hard | 6 | 392 | 3 | none |
 
 ## Level Details
 
@@ -1061,15 +1068,116 @@ Total states explored: 48959
   - moves=4, overload=0, infected=1, path=P1 -> P1 -> F1 -> P1
   - moves=4, overload=0, infected=1, path=P1 -> P1 -> P1 -> P1
 
+### L41 Breaker Primer
+
+- Chapter: Breaker Node
+- Teaching goal: Prime the breaker before feeding an overload lane, or the route blows out.
+- Status: Solvable
+- Authored difficulty: intro
+- Estimated difficulty: Medium (7.25)
+- Minimal winning path: B1 -> P1
+- Minimal moves: 2 / 4
+- Solution count (capped): 3
+- Average branching factor: 2
+- Explored states: 21
+- Dead states: 7
+- Overflow paths: 0
+- Clickable nodes at start: B1, P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=2; path=B1
+  - P1: dead branch; minMoves=n/a; path=P1
+- Dead state examples:
+  - moves=1, overload=2, infected=0, path=P1
+  - moves=2, overload=2, infected=0, path=P1 -> B1
+  - moves=2, overload=2, infected=0, path=P1 -> P1
+
+### L42 Heat Budget
+
+- Chapter: Breaker Node
+- Teaching goal: Raw pushing overloads the lane; time a breaker prime to keep a final feed safe.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Hard (8.8)
+- Minimal winning path: B1 -> P1 -> P1 -> P1 -> P1
+- Minimal moves: 5 / 7
+- Solution count (capped): 15
+- Average branching factor: 2
+- Explored states: 150
+- Dead states: 45
+- Overflow paths: 0
+- Clickable nodes at start: B1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=5; path=B1
+  - P1: keeps a win alive; minMoves=5; path=P1
+- Dead state examples:
+  - moves=4, overload=0, infected=0, path=B1 -> B1 -> B1 -> B1
+  - moves=4, overload=0, infected=0, path=B1 -> B1 -> P1 -> B1
+  - moves=4, overload=0, infected=0, path=B1 -> P1 -> B1 -> B1
+
+### L43 Grid Safeguard
+
+- Chapter: Breaker Node
+- Teaching goal: Complete activate_all without blowing the overload lane by timing breaker primes.
+- Status: Solvable
+- Authored difficulty: medium
+- Estimated difficulty: Hard (9.26)
+- Minimal winning path: B1 -> P1 -> B1 -> P1
+- Minimal moves: 4 / 7
+- Solution count (capped): 10
+- Average branching factor: 2
+- Explored states: 126
+- Dead states: 58
+- Overflow paths: 0
+- Clickable nodes at start: B1, P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=4; path=B1
+  - P1: dead branch; minMoves=n/a; path=P1
+- Dead state examples:
+  - moves=1, overload=2, infected=0, path=P1
+  - moves=2, overload=2, infected=0, path=P1 -> B1
+  - moves=2, overload=2, infected=0, path=P1 -> P1
+
+### L44 Breaker Mesh
+
+- Chapter: Breaker Node
+- Teaching goal: Chain firewall lane control with splitter support while timing breaker primes for overload bursts.
+- Status: Solvable
+- Authored difficulty: hard
+- Estimated difficulty: Hard (10.88)
+- Minimal winning path: F1 -> B1 -> F1 -> B1 -> F1 -> F1
+- Minimal moves: 6 / 8
+- Solution count (capped): 392
+- Average branching factor: 3
+- Explored states: 5195
+- Dead states: 1630
+- Overflow paths: 0
+- Clickable nodes at start: B1, F1, P1
+- Non-interactable clickables: none
+- Issues: none
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=7; path=B1
+  - F1: keeps a win alive; minMoves=6; path=F1
+  - P1: keeps a win alive; minMoves=7; path=P1
+- Dead state examples:
+  - moves=3, overload=0, infected=0, path=B1 -> B1 -> B1
+  - moves=3, overload=1, infected=0, path=B1 -> B1 -> P1
+  - moves=3, overload=1, infected=0, path=B1 -> P1 -> B1
+
 ## Findings
 
 ### Overall Solvability
 
-All 40 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
+All 44 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
 
 ### Difficulty Curve
 
-Estimated difficulty distribution is Easy 6, Medium 13, Hard 21, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
+Estimated difficulty distribution is Easy 6, Medium 14, Hard 24, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L41 (intro -> Medium), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard), L42 (medium -> Hard), L43 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
 
 ### Detected Gameplay Issues
 
@@ -1077,15 +1185,15 @@ Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution
 
 ### Balance Problems
 
-Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
+Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L42, L43 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
 
 ### Rebalancing Recommendations
 
-Either retag L2, L3, L5, L6, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Either retag L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L42, L43 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 
-Only Power and Firewall nodes are interactable, and the validator confirms every authored clickable node is interactable at level start. The remaining UX risk is explanatory: players still need strong feedback for why a route is a dead branch, why a firewall click changed the lane, and why a virus lane becomes unsafe over time.
+Power, Firewall, and Breaker nodes are interactable, and the validator confirms every authored clickable node is interactable at level start. The remaining UX risk is explanatory: players still need strong feedback for why a route is a dead branch, why firewall routing changed, and when a primed breaker traded throughput for safety.
 
 ### Automation Recommendation
 

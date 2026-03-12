@@ -194,6 +194,13 @@ function simulateActionFromState(baseState, nodeId) {
     }
   }
 
+  if (node.baseType === NODE_TYPES.BREAKER) {
+    node.breakerPending = true;
+    if (node.injectOnClick && node.injectPower > 0) {
+      injectPower = node.injectPower;
+    }
+  }
+
   if (injectPower > 0) {
     seedActionPacket(state, node, injectPower);
   }
@@ -341,6 +348,10 @@ function buildActionReason(candidate) {
     return 'it re-routes blocked traffic into a more useful branch.';
   }
 
+  if (candidate.nodeType === NODE_TYPES.BREAKER) {
+    return 'it primes a safety cap for the next turn through that lane.';
+  }
+
   return 'it is the safest productive move right now.';
 }
 
@@ -364,7 +375,7 @@ function buildDirectionalHint(state) {
     return {
       tier: 1,
       kind: 'directional',
-      message: 'No clickable nodes are available in this state. Retry and open with a Power or Firewall node.',
+      message: 'No clickable nodes are available in this state. Retry and open with a Power, Firewall, or Breaker node.',
       targetNodeId: null,
       secondaryNodeId: null
     };
@@ -520,3 +531,5 @@ export function buildHintForState(state, requestedTier) {
 
   return sanitizeHintPayload(state, rawHint, tier);
 }
+
+

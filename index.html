@@ -52,6 +52,7 @@
         <span class="legend-item power"><strong>P</strong> Power: click to inject energy.</span>
         <span class="legend-item relay"><strong>R</strong> Relay: forwards charge when active.</span>
         <span class="legend-item splitter"><strong>S</strong> Splitter: divides emit energy across active outgoing routes.</span>
+        <span class="legend-item breaker"><strong>B</strong> Breaker: click to prime a one-turn safety cap next turn.</span>
         <span class="legend-item firewall"><strong>F</strong> Firewall: blocks routes until activated.</span>
         <span class="legend-item purifier"><strong>U</strong> Purifier: auto-cleans adjacent infection when powered.</span>
         <span class="legend-item virus"><strong>V</strong> Virus: spreads infection each turn.</span>
@@ -100,7 +101,7 @@
       <h2 class="chain-title">Chain Feed</h2>
       <p id="chainFeedStatus" class="chain-feed-status">Awaiting move...</p>
       <ul id="chainLogList" class="chain-log-list">
-        <li class="chain-log-empty">Click a Power or Firewall node to start propagation.</li>
+        <li class="chain-log-empty">Click a Power, Firewall, or Breaker node to start propagation.</li>
       </ul>
     </section>
 
@@ -133,7 +134,7 @@
       <pre id="telemetryReportOutput" class="telemetry-report hidden"></pre>
     </section>
 
-    <p class="hint">Click Power or Firewall nodes. Neon glow means interactive. White pulses show activation. Dashed pink rings mark nodes threatened by virus spread next turn. Orange flash means overload. Final score depends on clear, efficiency, overload control, and network cleanliness.</p>
+    <p class="hint">Click Power, Firewall, or Breaker nodes. Neon glow means interactive. White pulses show activation. Dashed pink rings mark nodes threatened by virus spread next turn. Orange flash means overload. Final score depends on clear, efficiency, overload control, and network cleanliness.</p>
   </main>
 
   <div id="tutorialOverlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
@@ -149,7 +150,7 @@
           </article>
           <article class="tutorial-block">
             <h3>Input</h3>
-            <p>Click Power nodes to inject energy. Click Firewall nodes to open or switch routes.</p>
+            <p>Click Power nodes to inject energy. Click Firewall nodes to open or switch routes. Click Breaker nodes to prime a one-turn safety cap for the next turn.</p>
           </article>
           <article class="tutorial-block">
             <h3>Purifier + Danger</h3>
@@ -173,3 +174,4 @@
   <script type="module" src="src/bootstrap.js"></script>
 </body>
 </html>
+

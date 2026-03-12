@@ -94,7 +94,7 @@ function buildFindings(results, summary) {
 
   findings.push({
     title: 'UX Playability',
-    body: 'Only Power and Firewall nodes are interactable, and the validator confirms every authored clickable node is interactable at level start. The remaining UX risk is explanatory: players still need strong feedback for why a route is a dead branch, why a firewall click changed the lane, and why a virus lane becomes unsafe over time.'
+    body: 'Power, Firewall, and Breaker nodes are interactable, and the validator confirms every authored clickable node is interactable at level start. The remaining UX risk is explanatory: players still need strong feedback for why a route is a dead branch, why firewall routing changed, and when a primed breaker traded throughput for safety.'
   });
 
   findings.push({
@@ -173,3 +173,4 @@ console.log('');
 console.log(`JSON report written to ${jsonPath}`);
 console.log(`Markdown report written to ${markdownPath}`);
 console.log(`Validation system doc written to ${systemDocPath}`);
+
