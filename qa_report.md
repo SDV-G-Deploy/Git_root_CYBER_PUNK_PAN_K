@@ -4,7 +4,7 @@ Generated levels checked: 46
 Solvable: 46
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 54672
+Total states explored: 54698
 
 ## Gameplay Rules Summary
 
@@ -96,7 +96,7 @@ Total states explored: 54672
 | L36 | Solvable | boss | Hard | 7 | 1422 | 3 | none |
 | L37 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
 | L38 | Solvable | medium | Medium | 5 | 28 | 2 | tight_move_budget |
-| L39 | Solvable | medium | Hard | 6 | 112 | 2 | none |
+| L39 | Solvable | medium | Hard | 7 | 128 | 2 | tight_move_budget |
 | L40 | Solvable | hard | Medium | 4 | 58 | 2 | none |
 | L41 | Solvable | intro | Medium | 2 | 3 | 2 | single_opening_solution |
 | L42 | Solvable | hard | Hard | 5 | 15 | 2 | none |
@@ -130,7 +130,7 @@ Total states explored: 54672
 ### L2 Relay Ladder
 
 - Chapter: Boot Sector
-- Teaching goal: Primary push chains through R1, while the backup tap can feed R2 directly.
+- Teaching goal: Primary push chains through R1; backup P2 is weaker (INJ 3) but can wake R2 directly for steady core feed.
 - Status: Solvable
 - Authored difficulty: intro
 - Estimated difficulty: Easy (5)
@@ -176,7 +176,7 @@ Total states explored: 54672
 ### L4 Split Charge
 
 - Chapter: Boot Sector
-- Teaching goal: Use either injector to wake relay branches, then stack charge on the core efficiently.
+- Teaching goal: P1 is the heavy injector; P2 is a lighter support feed. Use both to keep relay branches awake and stack core charge.
 - Status: Solvable
 - Authored difficulty: light
 - Estimated difficulty: Easy (5)
@@ -298,7 +298,7 @@ Total states explored: 54672
 ### L9 Virus Wake
 
 - Chapter: Quarantine Loop
-- Teaching goal: Intro virus pressure: pick a lane before corruption spreads through the relay.
+- Teaching goal: Intro virus pressure: firewall modes swap route targets, so read mode/output labels before corruption spreads.
 - Status: Solvable
 - Authored difficulty: medium
 - Estimated difficulty: Hard (9.13)
@@ -323,7 +323,7 @@ Total states explored: 54672
 ### L10 Clean Sweep
 
 - Chapter: Quarantine Loop
-- Teaching goal: Clean infection with repeated energy while still advancing the core.
+- Teaching goal: Clean infection while advancing core charge; virus can re-infect relays on alternate turns if purifier/flow pressure drops.
 - Status: Solvable
 - Authored difficulty: medium
 - Estimated difficulty: Medium (7.5)
@@ -730,7 +730,7 @@ Total states explored: 54672
 ### L27 Sterile Route
 
 - Chapter: Purifier Loop
-- Teaching goal: Keep purifier support online to finish charge while clearing all infection.
+- Teaching goal: Keep purifier support online to finish charge while clearing infection; P2 is a low-strength support injector, not a burst lane.
 - Status: Solvable
 - Authored difficulty: medium
 - Estimated difficulty: Hard (10)
@@ -827,7 +827,7 @@ Total states explored: 54672
 ### L31 Sterile Lattice
 
 - Chapter: Purifier Loop
-- Teaching goal: Rotate firewall modes to keep purifier support online while cleansing and routing through relay chains.
+- Teaching goal: Rotate firewall modes (including dual-output mode) to keep purifier support online while cleansing and routing through relay chains.
 - Status: Solvable
 - Authored difficulty: hard
 - Estimated difficulty: Hard (10.31)
@@ -1026,27 +1026,27 @@ Total states explored: 54672
 ### L39 Cleansing Split
 
 - Chapter: Splitter Lab
-- Teaching goal: Keep purifier coverage online past the opener so clean_corruption and core charge advance together.
+- Teaching goal: Keep purifier coverage online across multiple turns so clean_corruption and core charge advance together beyond the opener.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (8.63)
-- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1 -> P1
-- Minimal moves: 6 / 8
-- Solution count (capped): 112
+- Estimated difficulty: Hard (10.61)
+- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1 -> P1 -> P1
+- Minimal moves: 7 / 8
+- Solution count (capped): 128
 - Average branching factor: 2
-- Explored states: 134
-- Dead states: 14
+- Explored states: 160
+- Dead states: 43
 - Overflow paths: 0
 - Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: none
+- Issues: tight_move_budget
 - Root branch analysis:
-  - P1: keeps a win alive; minMoves=6; path=P1
-  - P2: keeps a win alive; minMoves=6; path=P2
+  - P1: keeps a win alive; minMoves=7; path=P1
+  - P2: keeps a win alive; minMoves=7; path=P2
 - Dead state examples:
-  - moves=4, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2
-  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2 -> P1
-  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2 -> P2
+  - moves=3, overload=0, infected=0, path=P1 -> P2 -> P2
+  - moves=3, overload=0, infected=1, path=P2 -> P2 -> P2
+  - moves=4, overload=0, infected=0, path=P1 -> P2 -> P2 -> P1
 
 ### L40 Split Containment
 
@@ -1151,7 +1151,7 @@ Total states explored: 54672
 ### L44 Breaker Mesh
 
 - Chapter: Breaker Node
-- Teaching goal: Chain firewall lane control with splitter support while timing breaker primes for overload bursts.
+- Teaching goal: Chain firewall lane control with splitter support; some modes are safe setup while others expose the overload burst lane.
 - Status: Solvable
 - Authored difficulty: hard
 - Estimated difficulty: Hard (10.88)
@@ -1177,7 +1177,7 @@ Total states explored: 54672
 ### L45 Breaker Purge
 
 - Chapter: Breaker Node
-- Teaching goal: Prime breaker bursts while purifier pressure clears a corrupted relay lane.
+- Teaching goal: Prime breaker bursts while purifier pressure clears a corrupted relay lane; raw pushes can overheat before breaker timing is set.
 - Status: Solvable
 - Authored difficulty: hard
 - Estimated difficulty: Medium (8.48)
@@ -1202,7 +1202,7 @@ Total states explored: 54672
 ### L46 Quarantine Fuse
 
 - Chapter: Breaker Node
-- Teaching goal: Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane.
+- Teaching goal: Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane; unprimed bursts are intentionally high risk.
 - Status: Solvable
 - Authored difficulty: hard
 - Estimated difficulty: Hard (8.81)
@@ -1236,7 +1236,7 @@ Estimated difficulty distribution is Easy 6, Medium 14, Hard 26, Unsolvable 0. T
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L37 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10), L38 (5/6). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L37 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10), L38 (5/6), L39 (7/8). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 

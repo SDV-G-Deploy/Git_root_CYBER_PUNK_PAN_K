@@ -30,7 +30,7 @@ const LEVELS = [
     chapter: 'Boot Sector',
     difficulty: 'intro',
     difficultyTag: 'intro',
-    teachingGoal: 'Primary push chains through R1, while the backup tap can feed R2 directly.',
+    teachingGoal: 'Primary push chains through R1; backup P2 is weaker (INJ 3) but can wake R2 directly for steady core feed.',
     parScore: 1450,
     movesLimit: 6,
     overloadLimit: 6,
@@ -84,7 +84,7 @@ const LEVELS = [
     chapter: 'Boot Sector',
     difficulty: 'light',
     difficultyTag: 'light',
-    teachingGoal: 'Use either injector to wake relay branches, then stack charge on the core efficiently.',
+    teachingGoal: 'P1 is the heavy injector; P2 is a lighter support feed. Use both to keep relay branches awake and stack core charge.',
     parScore: 1375,
     movesLimit: 6,
     overloadLimit: 7,
@@ -231,7 +231,7 @@ const LEVELS = [
     chapter: 'Quarantine Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Intro virus pressure: pick a lane before corruption spreads through the relay.',
+    teachingGoal: 'Intro virus pressure: firewall modes swap route targets, so read mode/output labels before corruption spreads.',
     parScore: 1240,
     movesLimit: 6,
     overloadLimit: 7,
@@ -260,7 +260,7 @@ const LEVELS = [
     chapter: 'Quarantine Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Clean infection with repeated energy while still advancing the core.',
+    teachingGoal: 'Clean infection while advancing core charge; virus can re-infect relays on alternate turns if purifier/flow pressure drops.',
     parScore: 1225,
     movesLimit: 7,
     overloadLimit: 7,
@@ -796,7 +796,7 @@ const LEVELS = [
     chapter: 'Purifier Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Keep purifier support online to finish charge while clearing all infection.',
+    teachingGoal: 'Keep purifier support online to finish charge while clearing infection; P2 is a low-strength support injector, not a burst lane.',
     parScore: 1060,
     movesLimit: 10,
     overloadLimit: 8,
@@ -934,7 +934,7 @@ const LEVELS = [
     chapter: 'Purifier Loop',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Rotate firewall modes to keep purifier support online while cleansing and routing through relay chains.',
+    teachingGoal: 'Rotate firewall modes (including dual-output mode) to keep purifier support online while cleansing and routing through relay chains.',
     parScore: 1000,
     movesLimit: 10,
     overloadLimit: 9,
@@ -1223,7 +1223,7 @@ const LEVELS = [
     chapter: 'Splitter Lab',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Keep purifier coverage online past the opener so clean_corruption and core charge advance together.',
+    teachingGoal: 'Keep purifier coverage online across multiple turns so clean_corruption and core charge advance together beyond the opener.',
     parScore: 840,
     movesLimit: 8,
     overloadLimit: 7,
@@ -1235,7 +1235,7 @@ const LEVELS = [
       { id: 'R1', type: 'relay', x: 470, y: 200, emitPower: 2, threshold: 2, corrupted: true },
       { id: 'U1', type: 'purifier', x: 470, y: 360, emitPower: 3, threshold: 4, purifierStrength: 1 },
       { id: 'V1', type: 'virus', x: 620, y: 140, spreadRate: 1 },
-      { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 5 }
+      { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 6 }
     ],
     edges: [
       { id: 'E1', from: 'P1', to: 'S1', capacity: 4, attenuation: 1, enabled: true },
@@ -1247,7 +1247,7 @@ const LEVELS = [
       { id: 'E7', from: 'P2', to: 'U1', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
-      { type: 'power_core', nodeId: 'C1', requiredCharge: 5 },
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 6 },
       { type: 'clean_corruption' }
     ]
   },
@@ -1375,7 +1375,7 @@ const LEVELS = [
     chapter: 'Breaker Node',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Chain firewall lane control with splitter support while timing breaker primes for overload bursts.',
+    teachingGoal: 'Chain firewall lane control with splitter support; some modes are safe setup while others expose the overload burst lane.',
     parScore: 740,
     movesLimit: 8,
     overloadLimit: 8,
@@ -1411,7 +1411,7 @@ const LEVELS = [
     chapter: 'Breaker Node',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Prime breaker bursts while purifier pressure clears a corrupted relay lane.',
+    teachingGoal: 'Prime breaker bursts while purifier pressure clears a corrupted relay lane; raw pushes can overheat before breaker timing is set.',
     parScore: 720,
     movesLimit: 7,
     overloadLimit: 8,
@@ -1444,7 +1444,7 @@ const LEVELS = [
     chapter: 'Breaker Node',
     difficulty: 'hard',
     difficultyTag: 'hard',
-    teachingGoal: 'Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane.',
+    teachingGoal: 'Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane; unprimed bursts are intentionally high risk.',
     parScore: 700,
     movesLimit: 7,
     overloadLimit: 9,
@@ -1502,4 +1502,6 @@ export function clampLevelIndex(index, levels) {
 
   return Math.min(levels.length - 1, Math.max(0, Number(index) || 0));
 }
+
+
 

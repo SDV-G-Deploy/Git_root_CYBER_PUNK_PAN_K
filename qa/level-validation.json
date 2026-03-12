@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-03-12T18:35:34.436Z",
+  "generatedAt": "2026-03-12T19:54:02.502Z",
   "summary": {
     "levelCount": 46,
     "solvableCount": 46,
     "unsolvedCount": 0,
     "searchCutoffCount": 0,
-    "totalStatesExplored": 54672,
+    "totalStatesExplored": 54698,
     "issueCounts": {
       "single_opening_solution": 8,
       "single_solution_path": 4,
-      "tight_move_budget": 4
+      "tight_move_budget": 5
     },
     "difficultyCounts": {
       "Easy": 6,
@@ -140,7 +140,7 @@
       "levelName": "Relay Ladder",
       "authoredDifficulty": "intro",
       "chapter": "Boot Sector",
-      "teachingGoal": "Primary push chains through R1, while the backup tap can feed R2 directly.",
+      "teachingGoal": "Primary push chains through R1; backup P2 is weaker (INJ 3) but can wake R2 directly for steady core feed.",
       "movesLimit": 6,
       "overloadLimit": 6,
       "collapseLimit": 4,
@@ -448,7 +448,7 @@
       "levelName": "Split Charge",
       "authoredDifficulty": "light",
       "chapter": "Boot Sector",
-      "teachingGoal": "Use either injector to wake relay branches, then stack charge on the core efficiently.",
+      "teachingGoal": "P1 is the heavy injector; P2 is a lighter support feed. Use both to keep relay branches awake and stack core charge.",
       "movesLimit": 6,
       "overloadLimit": 7,
       "collapseLimit": 4,
@@ -1375,7 +1375,7 @@
       "levelName": "Virus Wake",
       "authoredDifficulty": "medium",
       "chapter": "Quarantine Loop",
-      "teachingGoal": "Intro virus pressure: pick a lane before corruption spreads through the relay.",
+      "teachingGoal": "Intro virus pressure: firewall modes swap route targets, so read mode/output labels before corruption spreads.",
       "movesLimit": 6,
       "overloadLimit": 7,
       "collapseLimit": 4,
@@ -1563,7 +1563,7 @@
       "levelName": "Clean Sweep",
       "authoredDifficulty": "medium",
       "chapter": "Quarantine Loop",
-      "teachingGoal": "Clean infection with repeated energy while still advancing the core.",
+      "teachingGoal": "Clean infection while advancing core charge; virus can re-infect relays on alternate turns if purifier/flow pressure drops.",
       "movesLimit": 7,
       "overloadLimit": 7,
       "collapseLimit": 3,
@@ -4646,7 +4646,7 @@
       "levelName": "Sterile Route",
       "authoredDifficulty": "medium",
       "chapter": "Purifier Loop",
-      "teachingGoal": "Keep purifier support online to finish charge while clearing all infection.",
+      "teachingGoal": "Keep purifier support online to finish charge while clearing infection; P2 is a low-strength support injector, not a burst lane.",
       "movesLimit": 10,
       "overloadLimit": 8,
       "collapseLimit": 4,
@@ -5472,7 +5472,7 @@
       "levelName": "Sterile Lattice",
       "authoredDifficulty": "hard",
       "chapter": "Purifier Loop",
-      "teachingGoal": "Rotate firewall modes to keep purifier support online while cleansing and routing through relay chains.",
+      "teachingGoal": "Rotate firewall modes (including dual-output mode) to keep purifier support online while cleansing and routing through relay chains.",
       "movesLimit": 10,
       "overloadLimit": 9,
       "collapseLimit": 4,
@@ -7132,23 +7132,28 @@
       "levelName": "Cleansing Split",
       "authoredDifficulty": "medium",
       "chapter": "Splitter Lab",
-      "teachingGoal": "Keep purifier coverage online past the opener so clean_corruption and core charge advance together.",
+      "teachingGoal": "Keep purifier coverage online across multiple turns so clean_corruption and core charge advance together beyond the opener.",
       "movesLimit": 8,
       "overloadLimit": 7,
       "collapseLimit": 4,
-      "totalStates": 134,
-      "expandedStates": 88,
-      "generatedTransitions": 176,
-      "repeatedStates": 43,
+      "totalStates": 160,
+      "expandedStates": 108,
+      "generatedTransitions": 216,
+      "repeatedStates": 57,
       "overflowStates": 0,
-      "winningStateCount": 35,
-      "terminalLossStateCount": 11,
+      "winningStateCount": 26,
+      "terminalLossStateCount": 26,
       "averageBranchingFactor": 2,
       "solvable": true,
-      "minMoves": 6,
-      "minimalMoves": 6,
-      "solutionCount": 112,
+      "minMoves": 7,
+      "minimalMoves": 7,
+      "solutionCount": 128,
       "solutionPath": [
+        {
+          "type": "activate_node",
+          "nodeId": "P1",
+          "nodeType": "power"
+        },
         {
           "type": "activate_node",
           "nodeId": "P1",
@@ -7182,9 +7187,14 @@
       ],
       "solverProof": {
         "solvable": true,
-        "minMoves": 6,
-        "solutionCount": 112,
+        "minMoves": 7,
+        "solutionCount": 128,
         "solutionPath": [
+          {
+            "type": "activate_node",
+            "nodeId": "P1",
+            "nodeType": "power"
+          },
           {
             "type": "activate_node",
             "nodeId": "P1",
@@ -7217,7 +7227,7 @@
           }
         ]
       },
-      "deadStateCount": 14,
+      "deadStateCount": 43,
       "searchCutoff": false,
       "minimalWinningPath": [
         "P1",
@@ -7225,11 +7235,13 @@
         "P1",
         "P1",
         "P1",
+        "P1",
         "P1"
       ],
-      "maxCoreCharge": 5,
+      "maxCoreCharge": 6,
       "bestObjectiveCount": 2,
       "bestProgressPath": [
+        "P1",
         "P1",
         "P1",
         "P1",
@@ -7238,10 +7250,10 @@
         "P1"
       ],
       "bestProgressState": {
-        "movesUsed": 6,
+        "movesUsed": 7,
         "overload": 0,
         "infectedCount": 0,
-        "coreCharge": 5,
+        "coreCharge": 6,
         "objectivesCompleted": 2,
         "result": "win",
         "endReason": "objectives_complete"
@@ -7251,7 +7263,7 @@
           "action": "P1",
           "nodeType": "power",
           "solvable": true,
-          "minMovesToWin": 6,
+          "minMovesToWin": 7,
           "solutionCount": 64,
           "endState": "in_progress",
           "endReason": null,
@@ -7263,8 +7275,8 @@
           "action": "P2",
           "nodeType": "power",
           "solvable": true,
-          "minMovesToWin": 6,
-          "solutionCount": 48,
+          "minMovesToWin": 7,
+          "solutionCount": 64,
           "endState": "in_progress",
           "endReason": null,
           "path": [
@@ -7274,43 +7286,39 @@
       ],
       "deadStateExamples": [
         {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 0,
+          "path": [
+            "P1",
+            "P2",
+            "P2"
+          ]
+        },
+        {
+          "movesUsed": 3,
+          "overload": 0,
+          "infectedCount": 1,
+          "path": [
+            "P2",
+            "P2",
+            "P2"
+          ]
+        },
+        {
           "movesUsed": 4,
           "overload": 0,
           "infectedCount": 0,
           "path": [
-            "P2",
-            "P2",
-            "P2",
-            "P2"
-          ]
-        },
-        {
-          "movesUsed": 5,
-          "overload": 0,
-          "infectedCount": 0,
-          "path": [
-            "P2",
-            "P2",
+            "P1",
             "P2",
             "P2",
             "P1"
           ]
-        },
-        {
-          "movesUsed": 5,
-          "overload": 0,
-          "infectedCount": 0,
-          "path": [
-            "P2",
-            "P2",
-            "P2",
-            "P2",
-            "P2"
-          ]
         }
       ],
       "lossReasonCounts": {
-        "out_of_moves": 11
+        "out_of_moves": 26
       },
       "clickableNodes": [
         {
@@ -7328,8 +7336,10 @@
       ],
       "nonInteractableClickables": [],
       "difficultyEstimate": "Hard",
-      "difficultyScore": 8.63,
-      "issues": []
+      "difficultyScore": 10.61,
+      "issues": [
+        "tight_move_budget"
+      ]
     },
     {
       "levelId": "L40",
@@ -8032,7 +8042,7 @@
       "levelName": "Breaker Mesh",
       "authoredDifficulty": "hard",
       "chapter": "Breaker Node",
-      "teachingGoal": "Chain firewall lane control with splitter support while timing breaker primes for overload bursts.",
+      "teachingGoal": "Chain firewall lane control with splitter support; some modes are safe setup while others expose the overload burst lane.",
       "movesLimit": 8,
       "overloadLimit": 8,
       "collapseLimit": 4,
@@ -8251,7 +8261,7 @@
       "levelName": "Breaker Purge",
       "authoredDifficulty": "hard",
       "chapter": "Breaker Node",
-      "teachingGoal": "Prime breaker bursts while purifier pressure clears a corrupted relay lane.",
+      "teachingGoal": "Prime breaker bursts while purifier pressure clears a corrupted relay lane; raw pushes can overheat before breaker timing is set.",
       "movesLimit": 7,
       "overloadLimit": 8,
       "collapseLimit": 4,
@@ -8425,7 +8435,7 @@
       "levelName": "Quarantine Fuse",
       "authoredDifficulty": "hard",
       "chapter": "Breaker Node",
-      "teachingGoal": "Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane.",
+      "teachingGoal": "Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane; unprimed bursts are intentionally high risk.",
       "movesLimit": 7,
       "overloadLimit": 9,
       "collapseLimit": 4,
