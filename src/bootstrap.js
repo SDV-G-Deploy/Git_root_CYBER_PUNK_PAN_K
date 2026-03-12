@@ -297,6 +297,7 @@ function bootstrap() {
   function unlockAudio() {
     audio.unlock();
     ui.setSoundEnabled(!audio.isMuted());
+  ui.setMusicEnabled(!audio.isMusicMuted());
   }
 
   function trackRetry(reason) {
@@ -363,6 +364,10 @@ function bootstrap() {
   game.initGame(ui.refs.canvas, {
     startLevelIndex,
     onRunEnd: (result, rewardPacket, summary) => {
+      audio.play('run_end', {
+        result,
+        levelId: summary ? summary.levelId : null
+      });
       saveData = applyRunSummaryToSave(saveData, summary, game.getLevelList().length);
       persistSave();
       renderLevelSelect();
@@ -376,6 +381,7 @@ function bootstrap() {
   ui.applyPlaytestMode(saveData.playtestMode);
   ui.setTutorialVisible(!saveData.tutorialSeen);
   ui.setSoundEnabled(!audio.isMuted());
+  ui.setMusicEnabled(!audio.isMusicMuted());
 
   createInputController({
     windowRef: window,
@@ -448,6 +454,14 @@ function bootstrap() {
       unlockAudio();
       const enabled = audio.toggleMute();
       ui.setSoundEnabled(enabled);
+    });
+  }
+
+  if (ui.refs.musicToggleButton) {
+    ui.refs.musicToggleButton.addEventListener('click', () => {
+      unlockAudio();
+      const enabled = audio.toggleMusic();
+      ui.setMusicEnabled(enabled);
     });
   }
 
