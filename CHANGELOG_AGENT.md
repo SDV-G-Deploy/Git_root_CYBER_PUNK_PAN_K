@@ -232,3 +232,48 @@
 ### Notes
 - Scope remained focused on Splitter Node only.
 - Protected systems were not changed: daily/seed behavior, pack semantics, classifier semantics, slot thresholds, generator heuristics, Fuse/Stabilizer, Delay, and campaign infrastructure.
+
+## 2026-03-12 - Mixed Clarity / Legacy Anomaly Micro-Pass + Breaker Mixed Coverage
+
+### Changed
+- Investigated and addressed targeted legacy-clarity and authored-behavior anomalies without changing protected systems.
+- Level-content micro-edits:
+  - `L2`: increased visibility of `P2` contribution (`P2` inject and `E5` throughput tune).
+  - `L4`: increased visibility of `P2` contribution (`E5` attenuation tune).
+  - `L14`: added optional backup injector branch (`P2`, `E6`) to diversify decision pattern from neighboring overload levels.
+  - `L24`: added optional backup injector branch (`P2`, `E5`) to reduce near-1:1 repetition pressure.
+  - `L27`: fixed optional `P2` edge from effective no-output to visible support (`E8` tune).
+  - `L39`: retuned cleanser pacing and optional support (`movesLimit`, `P2`, `U1` threshold, `E7`) so `clean_corruption` remains active past the opener.
+- Added exactly two authored mixed levels:
+  - `L45` **Breaker Purge** (Breaker + Purifier)
+  - `L46` **Quarantine Fuse** (Breaker + Virus)
+- Firewall/readability improvements:
+  - firewall hover text now explains binary vs mode-cycling behavior and names current mode destinations,
+  - firewall render labels now show mode index and output count (`Mx/y xN`),
+  - legend/tutorial copy updated for firewall mode semantics.
+- Infection feedback/readability improvements:
+  - added trace events for direct-flow cleanse (`flow_cleanse`) and virus infection (`virus_corruption`),
+  - chain-log detail parsing now surfaces readable firewall/breaker/cleanse/infection events,
+  - hover info now shows corruption progress (`X/threshold`) when relevant.
+
+### Files Changed in This Pass
+- `src/levels.js`
+- `src/gameState.js`
+- `src/render.js`
+- `src/energySystem.js`
+- `src/ui.js`
+- `index.html`
+- `qa/level-validation.json`
+- `qa/pack-build-report.json`
+- `qa_report.md`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `validate-levels`: pass (`46/46` solvable, `0` unsolved, `0` cutoffs)
+- `runtime-smoke`: pass
+- `build-pack`: pass (`46` candidates, `10` accepted, `34` deferred, `2` rejected)
+
+### Notes
+- Protected systems were not touched: daily/seed behavior, pack semantics, classifier semantics, slot thresholds, generator heuristics, and campaign infrastructure rules.

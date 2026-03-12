@@ -118,3 +118,26 @@
   - `build-pack`: pass (`40` candidates, `10` accepted, `30` deferred, `0` rejected)
   - `runtime-smoke`: pass
 - Protected systems outside splitter scope were not touched.
+
+## 2026-03-12 - Mixed Clarity + Legacy Anomaly Micro-Pass (Post Combined Audit)
+- Start state verified clean on `main` with local audit commit at `742eadc` and `origin/main` at `e145ef1`.
+- Investigated 11 user-reported level/mechanic observations (`L2`, `L4`, `L9`, `L10`, `L13`-`L15`, `L21`, `L23`, `L24`, `L27`, `L31`, `L44`).
+- Applied targeted authored fixes only (no protected-system rewrites):
+  - `L2` / `L4`: secondary injector now gives visible first-use contribution.
+  - `L14`: added backup injector branch to diversify from `L13`.
+  - `L24`: added backup injector branch to reduce repetition pressure.
+  - `L27`: fixed optional `P2` branch from effective no-output state.
+  - `L39`: retuned purifier pacing and optional input so `clean_corruption` remains active beyond opener.
+- Added exactly two new authored mixed levels:
+  - `L45` Breaker + Purifier
+  - `L46` Breaker + Virus
+- Improved rule clarity feedback (runtime/UI copy only):
+  - firewall hover now explains binary vs mode-cycling and shows current mode destinations,
+  - firewall node labels show mode/output counts,
+  - chain/coach now surfaces direct-flow cleanse and virus infection events,
+  - hover now shows corruption progress (`X/2`) on relevant nodes.
+- Validation after edits:
+  - `validate-levels`: pass (`46/46` solvable)
+  - `runtime-smoke`: pass
+  - `build-pack`: pass (`46` candidates, `10` accepted, `34` deferred, `2` rejected)
+- Protected systems remained untouched.

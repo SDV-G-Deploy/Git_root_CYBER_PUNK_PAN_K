@@ -424,11 +424,19 @@ function drawNodes(ctx, state) {
     ctx.fillText(chargeLabel, node.x, node.y + node.radius + 11);
 
     if (node.baseType === NODE_TYPES.FIREWALL) {
-      const modeLabel = node.firewallOpen
-        ? Array.isArray(node.firewallModes) && node.firewallModes.length > 0
-          ? `OPEN M${node.activeMode + 1}`
-          : 'OPEN'
-        : 'LOCKED';
+      let modeLabel = node.firewallOpen ? 'OPEN ALL' : 'LOCKED';
+
+      if (Array.isArray(node.firewallModes) && node.firewallModes.length > 0) {
+        const totalModes = node.firewallModes.length;
+        const activeMode = Math.max(0, Math.min(totalModes - 1, Math.floor(Number(node.activeMode) || 0)));
+        const modeEdges = Array.isArray(node.firewallModes[activeMode]) ? node.firewallModes[activeMode] : [];
+        const outputCount = modeEdges.length;
+
+        modeLabel = node.firewallOpen
+          ? `M${activeMode + 1}/${totalModes} x${Math.max(1, outputCount)}`
+          : `LOCK M${activeMode + 1}/${totalModes}`;
+      }
+
       ctx.fillStyle = '#dacbff';
       ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
     }

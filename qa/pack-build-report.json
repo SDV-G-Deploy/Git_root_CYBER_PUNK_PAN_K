@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-03-12T17:00:57.600Z",
-  "candidateCount": 44,
+  "generatedAt": "2026-03-12T18:35:34.429Z",
+  "candidateCount": 46,
   "acceptedCount": 10,
-  "deferredCount": 33,
-  "rejectedCount": 1,
+  "deferredCount": 34,
+  "rejectedCount": 2,
   "rejectionCounts": {
+    "random_click_solve_risk": 1,
     "min_moves_below_floor": 1
   },
   "acceptedDifficultyCounts": {
@@ -257,6 +258,19 @@
       "slotId": "slot2",
       "slotRole": "easy",
       "slotLabel": "Easy Puzzle A",
+      "levelId": "L2",
+      "levelName": "Relay Ladder",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "easy",
+      "topologyScale": 7.5,
+      "complexityScore": 11.75,
+      "slotScore": 104.1
+    },
+    {
+      "slotIndex": 3,
+      "slotId": "slot3",
+      "slotRole": "easy",
+      "slotLabel": "Easy Puzzle B",
       "levelId": "L4",
       "levelName": "Split Charge",
       "authoredDifficultyTag": "easy",
@@ -266,23 +280,23 @@
       "slotScore": 103.8
     },
     {
-      "slotIndex": 3,
-      "slotId": "slot3",
-      "slotRole": "easy",
-      "slotLabel": "Easy Puzzle B",
-      "levelId": "L37",
-      "levelName": "Splitter Primer",
-      "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "easy",
-      "topologyScale": 7.5,
-      "complexityScore": 9.75,
-      "slotScore": 100.85
-    },
-    {
       "slotIndex": 4,
       "slotId": "slot4",
       "slotRole": "medium",
       "slotLabel": "Medium Puzzle A",
+      "levelId": "L14",
+      "levelName": "Split Feed",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "topologyScale": 9,
+      "complexityScore": 13.28,
+      "slotScore": 108.27
+    },
+    {
+      "slotIndex": 5,
+      "slotId": "slot5",
+      "slotRole": "medium",
+      "slotLabel": "Medium Puzzle B",
       "levelId": "L22",
       "levelName": "Switchback Gate",
       "authoredDifficultyTag": "medium",
@@ -292,10 +306,10 @@
       "slotScore": 106.97
     },
     {
-      "slotIndex": 5,
-      "slotId": "slot5",
+      "slotIndex": 6,
+      "slotId": "slot6",
       "slotRole": "medium",
-      "slotLabel": "Medium Puzzle B",
+      "slotLabel": "Medium Puzzle C",
       "levelId": "L25",
       "levelName": "Purifier Wake",
       "authoredDifficultyTag": "medium",
@@ -303,19 +317,6 @@
       "topologyScale": 9.5,
       "complexityScore": 14.05,
       "slotScore": 105.85
-    },
-    {
-      "slotIndex": 6,
-      "slotId": "slot6",
-      "slotRole": "medium",
-      "slotLabel": "Medium Puzzle C",
-      "levelId": "L23",
-      "levelName": "Median Filter",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "medium",
-      "topologyScale": 9,
-      "complexityScore": 14.49,
-      "slotScore": 105.71
     },
     {
       "slotIndex": 7,
@@ -427,9 +428,9 @@
       "slotIndex": 4,
       "role": "medium",
       "label": "Medium Puzzle A",
-      "selectedLevelId": "L22",
-      "selectedLevelName": "Switchback Gate",
-      "slotScore": 106.97,
+      "selectedLevelId": "L14",
+      "selectedLevelName": "Split Feed",
+      "slotScore": 108.27,
       "constraintSummary": null
     },
     {
@@ -437,9 +438,9 @@
       "slotIndex": 5,
       "role": "medium",
       "label": "Medium Puzzle B",
-      "selectedLevelId": "L25",
-      "selectedLevelName": "Purifier Wake",
-      "slotScore": 105.85,
+      "selectedLevelId": "L22",
+      "selectedLevelName": "Switchback Gate",
+      "slotScore": 106.97,
       "constraintSummary": null
     },
     {
@@ -447,9 +448,9 @@
       "slotIndex": 6,
       "role": "medium",
       "label": "Medium Puzzle C",
-      "selectedLevelId": "L23",
-      "selectedLevelName": "Median Filter",
-      "slotScore": 105.71,
+      "selectedLevelId": "L25",
+      "selectedLevelName": "Purifier Wake",
+      "slotScore": 105.85,
       "constraintSummary": null
     },
     {
@@ -457,9 +458,9 @@
       "slotIndex": 2,
       "role": "easy",
       "label": "Easy Puzzle A",
-      "selectedLevelId": "L4",
-      "selectedLevelName": "Split Charge",
-      "slotScore": 103.8,
+      "selectedLevelId": "L2",
+      "selectedLevelName": "Relay Ladder",
+      "slotScore": 104.1,
       "constraintSummary": null
     },
     {
@@ -467,9 +468,9 @@
       "slotIndex": 3,
       "role": "easy",
       "label": "Easy Puzzle B",
-      "selectedLevelId": "L37",
-      "selectedLevelName": "Splitter Primer",
-      "slotScore": 100.85,
+      "selectedLevelId": "L4",
+      "selectedLevelName": "Split Charge",
+      "slotScore": 103.8,
       "constraintSummary": null
     }
   ],
@@ -566,6 +567,24 @@
       "topologyFingerprint": "topo_2d212b04"
     },
     {
+      "levelId": "L14",
+      "levelName": "Split Feed",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 3,
+      "solutionCount": 24,
+      "averageBranchingFactor": 2,
+      "complexityScore": 13.28,
+      "topologyScale": 9,
+      "slotId": "slot4",
+      "slotRole": "medium",
+      "slotIndex": 4,
+      "slotScore": 108.27,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_b7d5f807"
+    },
+    {
       "levelId": "L22",
       "levelName": "Switchback Gate",
       "authoredDifficultyTag": "medium",
@@ -576,9 +595,9 @@
       "averageBranchingFactor": 2,
       "complexityScore": 13.38,
       "topologyScale": 8,
-      "slotId": "slot4",
+      "slotId": "slot5",
       "slotRole": "medium",
-      "slotIndex": 4,
+      "slotIndex": 5,
       "slotScore": 106.97,
       "rejectionReasons": [],
       "topologyFingerprint": "topo_8b02e8f2"
@@ -594,30 +613,30 @@
       "averageBranchingFactor": 2,
       "complexityScore": 14.05,
       "topologyScale": 9.5,
-      "slotId": "slot5",
+      "slotId": "slot6",
       "slotRole": "medium",
-      "slotIndex": 5,
+      "slotIndex": 6,
       "slotScore": 105.85,
       "rejectionReasons": [],
       "topologyFingerprint": "topo_bb99e57c"
     },
     {
-      "levelId": "L23",
-      "levelName": "Median Filter",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 4,
-      "solutionCount": 42,
+      "levelId": "L2",
+      "levelName": "Relay Ladder",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 18,
+      "minMoves": 3,
+      "solutionCount": 12,
       "averageBranchingFactor": 2,
-      "complexityScore": 14.49,
-      "topologyScale": 9,
-      "slotId": "slot6",
-      "slotRole": "medium",
-      "slotIndex": 6,
-      "slotScore": 105.71,
+      "complexityScore": 11.75,
+      "topologyScale": 7.5,
+      "slotId": "slot2",
+      "slotRole": "easy",
+      "slotIndex": 2,
+      "slotScore": 104.1,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_e7430aa9"
+      "topologyFingerprint": "topo_9a207d96"
     },
     {
       "levelId": "L4",
@@ -626,57 +645,19 @@
       "predictedActualDifficultyClass": "easy",
       "predictedActualDifficultyScore": 18,
       "minMoves": 3,
-      "solutionCount": 27,
+      "solutionCount": 21,
       "averageBranchingFactor": 2,
       "complexityScore": 11.75,
-      "topologyScale": 7.5,
-      "slotId": "slot2",
-      "slotRole": "easy",
-      "slotIndex": 2,
-      "slotScore": 103.8,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_2c776cbf"
-    },
-    {
-      "levelId": "L37",
-      "levelName": "Splitter Primer",
-      "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "easy",
-      "predictedActualDifficultyScore": 24,
-      "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 9.75,
       "topologyScale": 7.5,
       "slotId": "slot3",
       "slotRole": "easy",
       "slotIndex": 3,
-      "slotScore": 100.85,
+      "slotScore": 103.8,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_cbef7083"
+      "topologyFingerprint": "topo_8b3f2ef8"
     }
   ],
   "deferredEntries": [
-    {
-      "levelId": "L2",
-      "levelName": "Relay Ladder",
-      "authoredDifficultyTag": "warmup",
-      "predictedActualDifficultyClass": "medium",
-      "predictedActualDifficultyScore": 45,
-      "minMoves": 3,
-      "solutionCount": 22,
-      "averageBranchingFactor": 2,
-      "complexityScore": 12.09,
-      "topologyScale": 7.5,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_a1290ae2"
-    },
     {
       "levelId": "L3",
       "levelName": "First Firewall",
@@ -878,26 +859,6 @@
       "topologyFingerprint": "topo_8d543b60"
     },
     {
-      "levelId": "L14",
-      "levelName": "Split Feed",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "easy",
-      "predictedActualDifficultyScore": 24,
-      "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 9.75,
-      "topologyScale": 7.5,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_0e5c2522"
-    },
-    {
       "levelId": "L15",
       "levelName": "Heat Sink",
       "authoredDifficultyTag": "hard",
@@ -998,16 +959,16 @@
       "topologyFingerprint": "topo_8e9e8072"
     },
     {
-      "levelId": "L24",
-      "levelName": "Purge Junction",
+      "levelId": "L23",
+      "levelName": "Median Filter",
       "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "easy",
-      "predictedActualDifficultyScore": 24,
-      "minMoves": 3,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 8.8,
-      "topologyScale": 6,
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 42,
+      "averageBranchingFactor": 2,
+      "complexityScore": 14.49,
+      "topologyScale": 9,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -1015,7 +976,27 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_06421cbf"
+      "topologyFingerprint": "topo_e7430aa9"
+    },
+    {
+      "levelId": "L24",
+      "levelName": "Purge Junction",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 18,
+      "minMoves": 3,
+      "solutionCount": 29,
+      "averageBranchingFactor": 2,
+      "complexityScore": 11.75,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_4d74d6f2"
     },
     {
       "levelId": "L26",
@@ -1036,26 +1017,6 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_98d63f83"
-    },
-    {
-      "levelId": "L27",
-      "levelName": "Sterile Route",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "extreme",
-      "predictedActualDifficultyScore": 80,
-      "minMoves": 8,
-      "solutionCount": 45,
-      "averageBranchingFactor": 2,
-      "complexityScore": 21.23,
-      "topologyScale": 11,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_58f06d54"
     },
     {
       "levelId": "L28",
@@ -1218,6 +1179,26 @@
       "topologyFingerprint": "topo_90c9ed0e"
     },
     {
+      "levelId": "L37",
+      "levelName": "Splitter Primer",
+      "authoredDifficultyTag": "warmup",
+      "predictedActualDifficultyClass": "easy",
+      "predictedActualDifficultyScore": 24,
+      "minMoves": 3,
+      "solutionCount": 1,
+      "averageBranchingFactor": 1,
+      "complexityScore": 9.75,
+      "topologyScale": 7.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_cbef7083"
+    },
+    {
       "levelId": "L38",
       "levelName": "Forked Budget",
       "authoredDifficultyTag": "medium",
@@ -1242,12 +1223,12 @@
       "levelName": "Cleansing Split",
       "authoredDifficultyTag": "medium",
       "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 51,
-      "minMoves": 5,
-      "solutionCount": 1,
-      "averageBranchingFactor": 1,
-      "complexityScore": 12.7,
-      "topologyScale": 9,
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 112,
+      "averageBranchingFactor": 2,
+      "complexityScore": 17.07,
+      "topologyScale": 10.5,
       "slotId": null,
       "slotRole": null,
       "slotIndex": null,
@@ -1255,7 +1236,7 @@
       "rejectionReasons": [
         "not_selected_for_slot_template"
       ],
-      "topologyFingerprint": "topo_1e30be02"
+      "topologyFingerprint": "topo_4d8198f5"
     },
     {
       "levelId": "L40",
@@ -1316,9 +1297,69 @@
         "not_selected_for_slot_template"
       ],
       "topologyFingerprint": "topo_edf338df"
+    },
+    {
+      "levelId": "L45",
+      "levelName": "Breaker Purge",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "medium",
+      "predictedActualDifficultyScore": 45,
+      "minMoves": 4,
+      "solutionCount": 10,
+      "averageBranchingFactor": 2,
+      "complexityScore": 15.37,
+      "topologyScale": 9.5,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_10700fb9"
+    },
+    {
+      "levelId": "L46",
+      "levelName": "Quarantine Fuse",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 4,
+      "solutionCount": 5,
+      "averageBranchingFactor": 2,
+      "complexityScore": 15.24,
+      "topologyScale": 9,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_fd716163"
     }
   ],
   "rejectedEntries": [
+    {
+      "levelId": "L27",
+      "levelName": "Sterile Route",
+      "authoredDifficultyTag": "medium",
+      "predictedActualDifficultyClass": "extreme",
+      "predictedActualDifficultyScore": 80,
+      "minMoves": 8,
+      "solutionCount": 256,
+      "averageBranchingFactor": 2,
+      "complexityScore": 19,
+      "topologyScale": 11,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "random_click_solve_risk"
+      ],
+      "topologyFingerprint": "topo_179d14c7"
+    },
     {
       "levelId": "L41",
       "levelName": "Breaker Primer",
@@ -1346,10 +1387,10 @@
     "topo_4d4055d2",
     "topo_e7c88b86",
     "topo_2d212b04",
+    "topo_b7d5f807",
     "topo_8b02e8f2",
     "topo_bb99e57c",
-    "topo_e7430aa9",
-    "topo_2c776cbf",
-    "topo_cbef7083"
+    "topo_9a207d96",
+    "topo_8b3f2ef8"
   ]
 }

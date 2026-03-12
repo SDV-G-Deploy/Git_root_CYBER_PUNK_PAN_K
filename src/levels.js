@@ -23,20 +23,21 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 6 }
     ]
   },
+
   {
     id: 'L2',
     name: 'Relay Ladder',
     chapter: 'Boot Sector',
     difficulty: 'intro',
     difficultyTag: 'intro',
-    teachingGoal: 'Learn that relays chain together and store charge across turns.',
+    teachingGoal: 'Primary push chains through R1, while the backup tap can feed R2 directly.',
     parScore: 1450,
     movesLimit: 6,
     overloadLimit: 6,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 140, y: 270, injectPower: 5 },
-      { id: 'P2', type: 'power', x: 140, y: 360, injectPower: 2 },
+      { id: 'P2', type: 'power', x: 140, y: 360, injectPower: 3 },
       { id: 'R1', type: 'relay', x: 320, y: 180, threshold: 3, emitPower: 3 },
       { id: 'R2', type: 'relay', x: 520, y: 320, threshold: 3, emitPower: 3 },
       { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 7 }
@@ -46,7 +47,7 @@ const LEVELS = [
       { id: 'E2', from: 'R1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E3', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E4', from: 'R1', to: 'C1', capacity: 1, attenuation: 2, enabled: true },
-      { id: 'E5', from: 'P2', to: 'R2', capacity: 2, attenuation: 1, enabled: true }
+      { id: 'E5', from: 'P2', to: 'R2', capacity: 3, attenuation: 0, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 7 }
@@ -76,13 +77,14 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
     ]
   },
+
   {
     id: 'L4',
     name: 'Split Charge',
     chapter: 'Boot Sector',
     difficulty: 'light',
     difficultyTag: 'light',
-    teachingGoal: 'Feed both relay branches and stack charge on the core efficiently.',
+    teachingGoal: 'Use either injector to wake relay branches, then stack charge on the core efficiently.',
     parScore: 1375,
     movesLimit: 6,
     overloadLimit: 7,
@@ -99,7 +101,7 @@ const LEVELS = [
       { id: 'E2', from: 'P1', to: 'R2', capacity: 4, attenuation: 1, enabled: true },
       { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'P2', to: 'R2', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E5', from: 'P2', to: 'R2', capacity: 3, attenuation: 0, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
@@ -377,19 +379,21 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 10 }
     ]
   },
+
   {
     id: 'L14',
     name: 'Split Feed',
     chapter: 'Overload Channel',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Send energy around the overload node instead of through it every turn.',
+    teachingGoal: 'Split feed between the main injector and backup tap so activate_all does not force one script.',
     parScore: 1160,
     movesLimit: 8,
     overloadLimit: 10,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 100, y: 280, injectPower: 6 },
+      { id: 'P2', type: 'power', x: 100, y: 390, injectPower: 3 },
       { id: 'R1', type: 'relay', x: 270, y: 280, emitPower: 4 },
       { id: 'O1', type: 'overload', x: 470, y: 170, emitPower: 5, overloadThreshold: 4, threshold: 2 },
       { id: 'R2', type: 'relay', x: 470, y: 390, emitPower: 3 },
@@ -400,7 +404,8 @@ const LEVELS = [
       { id: 'E2', from: 'R1', to: 'O1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E3', from: 'R1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E4', from: 'O1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
-      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E5', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'P2', to: 'R2', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
@@ -689,19 +694,21 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 6 }
     ]
   },
+
   {
     id: 'L24',
     name: 'Purge Junction',
     chapter: 'Quarantine Loop',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Clean a corrupted relay first, then route both branches to finish the core.',
+    teachingGoal: 'Clean the corrupted relay, then use a backup injector to finish both branches cleanly.',
     parScore: 1120,
     movesLimit: 8,
     overloadLimit: 8,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 110, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 110, y: 360, injectPower: 3 },
       { id: 'R1', type: 'relay', x: 340, y: 180, emitPower: 3, threshold: 3, corrupted: true },
       { id: 'R2', type: 'relay', x: 340, y: 360, emitPower: 3, threshold: 3 },
       { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 10 }
@@ -710,7 +717,8 @@ const LEVELS = [
       { id: 'E1', from: 'P1', to: 'R1', capacity: 5, attenuation: 0, enabled: true },
       { id: 'E2', from: 'P1', to: 'R2', capacity: 3, attenuation: 1, enabled: true },
       { id: 'E3', from: 'R1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
-      { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true }
+      { id: 'E4', from: 'R2', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'P2', to: 'R2', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 10 },
@@ -781,6 +789,7 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
     ]
   },
+
   {
     id: 'L27',
     name: 'Sterile Route',
@@ -809,7 +818,7 @@ const LEVELS = [
       { id: 'E5', from: 'U1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
       { id: 'E7', from: 'U1', to: 'R2', capacity: 1, attenuation: 4, enabled: true },
-      { id: 'E8', from: 'P2', to: 'U1', capacity: 1, attenuation: 2, enabled: true }
+      { id: 'E8', from: 'P2', to: 'U1', capacity: 2, attenuation: 0, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
@@ -1207,22 +1216,24 @@ const LEVELS = [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 9 }
     ]
   },
+
   {
     id: 'L39',
     name: 'Cleansing Split',
     chapter: 'Splitter Lab',
     difficulty: 'medium',
     difficultyTag: 'medium',
-    teachingGoal: 'Use splitter coverage to keep purifier support online while clearing corruption and charging the core.',
+    teachingGoal: 'Keep purifier coverage online past the opener so clean_corruption and core charge advance together.',
     parScore: 840,
-    movesLimit: 7,
+    movesLimit: 8,
     overloadLimit: 7,
     collapseLimit: 4,
     nodes: [
       { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 5 },
+      { id: 'P2', type: 'power', x: 90, y: 360, injectPower: 3 },
       { id: 'S1', type: 'splitter', x: 270, y: 270, threshold: 2, emitPower: 6 },
       { id: 'R1', type: 'relay', x: 470, y: 200, emitPower: 2, threshold: 2, corrupted: true },
-      { id: 'U1', type: 'purifier', x: 470, y: 360, emitPower: 3, threshold: 2, purifierStrength: 1 },
+      { id: 'U1', type: 'purifier', x: 470, y: 360, emitPower: 3, threshold: 4, purifierStrength: 1 },
       { id: 'V1', type: 'virus', x: 620, y: 140, spreadRate: 1 },
       { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 5 }
     ],
@@ -1232,7 +1243,8 @@ const LEVELS = [
       { id: 'E3', from: 'S1', to: 'U1', capacity: 3, attenuation: 0, enabled: true },
       { id: 'E4', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
       { id: 'E5', from: 'U1', to: 'R1', capacity: 2, attenuation: 1, enabled: true },
-      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true },
+      { id: 'E7', from: 'P2', to: 'U1', capacity: 3, attenuation: 1, enabled: true }
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 5 },
@@ -1391,6 +1403,70 @@ const LEVELS = [
     ],
     objectives: [
       { type: 'power_core', nodeId: 'C1', requiredCharge: 12 }
+    ]
+  },
+  {
+    id: 'L45',
+    name: 'Breaker Purge',
+    chapter: 'Breaker Node',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Prime breaker bursts while purifier pressure clears a corrupted relay lane.',
+    parScore: 720,
+    movesLimit: 7,
+    overloadLimit: 8,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 80, y: 270, injectPower: 6 },
+      { id: 'B1', type: 'breaker', x: 260, y: 190, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'O1', type: 'overload', x: 460, y: 190, threshold: 2, emitPower: 5, overloadThreshold: 4 },
+      { id: 'U1', type: 'purifier', x: 260, y: 360, emitPower: 2, threshold: 2, purifierStrength: 1 },
+      { id: 'R1', type: 'relay', x: 460, y: 360, emitPower: 2, threshold: 2, corrupted: true },
+      { id: 'C1', type: 'core', x: 760, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'B1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'B1', to: 'O1', capacity: 6, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'P1', to: 'U1', capacity: 3, attenuation: 2, enabled: true },
+      { id: 'E5', from: 'U1', to: 'R1', capacity: 2, attenuation: 0, enabled: true },
+      { id: 'E6', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E7', from: 'U1', to: 'C1', capacity: 1, attenuation: 1, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 },
+      { type: 'clean_corruption' }
+    ]
+  },
+  {
+    id: 'L46',
+    name: 'Quarantine Fuse',
+    chapter: 'Breaker Node',
+    difficulty: 'hard',
+    difficultyTag: 'hard',
+    teachingGoal: 'Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane.',
+    parScore: 700,
+    movesLimit: 7,
+    overloadLimit: 9,
+    collapseLimit: 4,
+    nodes: [
+      { id: 'P1', type: 'power', x: 90, y: 270, injectPower: 6 },
+      { id: 'B1', type: 'breaker', x: 270, y: 180, threshold: 2, emitPower: 5, breakerCap: 2 },
+      { id: 'O1', type: 'overload', x: 470, y: 180, threshold: 2, emitPower: 5, overloadThreshold: 4 },
+      { id: 'R1', type: 'relay', x: 270, y: 360, threshold: 2, emitPower: 3 },
+      { id: 'V1', type: 'virus', x: 470, y: 360, spreadRate: 1 },
+      { id: 'C1', type: 'core', x: 820, y: 270, targetCharge: 8 }
+    ],
+    edges: [
+      { id: 'E1', from: 'P1', to: 'B1', capacity: 4, attenuation: 1, enabled: true },
+      { id: 'E2', from: 'B1', to: 'O1', capacity: 6, attenuation: 0, enabled: true },
+      { id: 'E3', from: 'O1', to: 'C1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E4', from: 'P1', to: 'R1', capacity: 3, attenuation: 1, enabled: true },
+      { id: 'E5', from: 'R1', to: 'C1', capacity: 2, attenuation: 1, enabled: true },
+      { id: 'E6', from: 'V1', to: 'R1', capacity: 1, attenuation: 0, enabled: true }
+    ],
+    objectives: [
+      { type: 'power_core', nodeId: 'C1', requiredCharge: 8 }
     ]
   }
 ];

@@ -308,13 +308,41 @@ function buildHoverInfo(state) {
     actionText = 'Click to inject energy into connected routes.';
     detailText = `${chargeText} | Injects ${node.injectPower} energy each click.`;
   } else if (node.baseType === NODE_TYPES.FIREWALL) {
-    actionText = node.firewallOpen
-      ? 'Click to rotate this route or lock it again.'
-      : 'Click to open this route and let energy through.';
-    const modeText = Array.isArray(node.firewallModes) && node.firewallModes.length > 0
-      ? `${node.firewallModes.length} route modes available.`
-      : 'Single route gate.';
-    detailText = `${chargeText} | ${modeText}`;
+    const hasModes = Array.isArray(node.firewallModes) && node.firewallModes.length > 0;
+
+    if (hasModes) {
+      const totalModes = node.firewallModes.length;
+      const activeMode = Math.max(0, Math.min(totalModes - 1, Math.floor(Number(node.activeMode) || 0)));
+      const modeEdges = Array.isArray(node.firewallModes[activeMode]) ? node.firewallModes[activeMode] : [];
+      const destinations = [];
+
+      for (let i = 0; i < modeEdges.length; i += 1) {
+        const edgeId = modeEdges[i];
+        const edge = state.edges.find((entry) => entry.id === edgeId && entry.from === node.id);
+        const destinationId = edge ? edge.to : String(edgeId);
+        if (destinations.indexOf(destinationId) < 0) {
+          destinations.push(destinationId);
+        }
+      }
+
+      const routeText = destinations.length > 0 ? destinations.join(', ') : 'none';
+      const outputText = modeEdges.length > 1 ? `multi-output x${modeEdges.length}` : 'single-output';
+      const gateText = node.firewallOpen
+        ? `Mode ${activeMode + 1}/${totalModes}`
+        : `Locked (next Mode ${activeMode + 1}/${totalModes})`;
+
+      actionText = node.firewallOpen
+        ? totalModes > 1
+          ? 'Click to rotate to the next route mode.'
+          : 'Click to lock this route gate.'
+        : 'Click to open this route gate.';
+      detailText = `${chargeText} | ${gateText} -> ${routeText} (${outputText}).`;
+    } else {
+      actionText = node.firewallOpen
+        ? 'Click to lock this route gate.'
+        : 'Click to open this route and enable all outgoing edges.';
+      detailText = `${chargeText} | Binary gate: locked or open-all outputs.`;
+    }
   } else if (node.baseType === NODE_TYPES.RELAY) {
     actionText = 'Relay nodes auto-forward once charged enough.';
     detailText = `${chargeText} | Needs ${node.threshold}, emits ${node.emitPower}.`;
@@ -343,6 +371,19 @@ function buildHoverInfo(state) {
   } else if (node.baseType === NODE_TYPES.CORE) {
     actionText = 'Main objective. Fill the core to the target charge.';
     detailText = `${chargeText} | ${stateText}`;
+  }
+
+  const corruptionThreshold = Math.max(1, Number(CONFIG.TURN.CORRUPTION_THRESHOLD) || 1);
+  const corruptionProgress = node.corrupted
+    ? corruptionThreshold
+    : Math.max(0, Math.min(corruptionThreshold, Math.ceil(Number(node.corruptionProgress) || 0)));
+
+  if (
+    node.baseType !== NODE_TYPES.VIRUS &&
+    node.baseType !== NODE_TYPES.CORE &&
+    (node.corrupted || corruptionProgress > 0)
+  ) {
+    detailText = `${detailText} | Corruption ${corruptionProgress}/${corruptionThreshold}`;
   }
 
   return {

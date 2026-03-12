@@ -59,17 +59,18 @@ function infectNode(node) {
 
 function tryCleanseNode(node, cleansedNodes) {
   if (!node.corrupted || node.baseType === NODE_TYPES.VIRUS) {
-    return;
+    return false;
   }
 
   if (node.cleanseAccumulated < CONFIG.TURN.CLEANSE_THRESHOLD) {
-    return;
+    return false;
   }
 
   node.corrupted = false;
   node.corruptionProgress = 0;
   node.cleanseAccumulated = 0;
   cleansedNodes.push(node.id);
+  return true;
 }
 
 function explodeOverloadNode(state, node) {
@@ -126,7 +127,18 @@ function processPacket(state, packet, hooks) {
     state.lastTurn.activatedNodes.push(node.id);
   }
 
-  tryCleanseNode(node, state.lastTurn.cleansedNodes);
+  const flowCleansed = tryCleanseNode(node, state.lastTurn.cleansedNodes);
+  if (flowCleansed) {
+    state.lastTurn.trace.push({
+      step: state.propagationSteps,
+      fromNodeId: 'system',
+      toNodeId: node.id,
+      edgeId: null,
+      energyIn: 0,
+      energyAccepted: 0,
+      detail: 'flow_cleanse'
+    });
+  }
 
   if (
     node.baseType === NODE_TYPES.OVERLOAD &&
@@ -240,6 +252,15 @@ function spreadCorruption(state) {
       if (node.corruptionProgress >= CONFIG.TURN.CORRUPTION_THRESHOLD) {
         if (infectNode(node)) {
           newlyCorrupted.push(node.id);
+          state.lastTurn.trace.push({
+            step: state.propagationSteps + 1,
+            fromNodeId: source.id,
+            toNodeId: node.id,
+            edgeId: null,
+            energyIn: 0,
+            energyAccepted: 0,
+            detail: 'virus_corruption'
+          });
         }
       }
     });

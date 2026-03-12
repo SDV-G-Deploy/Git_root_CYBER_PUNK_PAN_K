@@ -1,10 +1,10 @@
 # Chain Lab QA Report
 
-Generated levels checked: 44
-Solvable: 44
+Generated levels checked: 46
+Solvable: 46
 Unsolvable: 0
 Search cutoffs: 0
-Total states explored: 54451
+Total states explored: 54672
 
 ## Gameplay Rules Summary
 
@@ -59,9 +59,9 @@ Total states explored: 54451
 | Level | Status | Authored | Estimated | Min moves | Solutions | Branching | Issues |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- |
 | L1 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
-| L2 | Solvable | intro | Medium | 3 | 22 | 2 | none |
+| L2 | Solvable | intro | Easy | 3 | 12 | 2 | none |
 | L3 | Solvable | intro | Medium | 4 | 15 | 2 | none |
-| L4 | Solvable | light | Easy | 3 | 27 | 2 | none |
+| L4 | Solvable | light | Easy | 3 | 21 | 2 | none |
 | L5 | Solvable | light | Hard | 5 | 37 | 2 | none |
 | L6 | Solvable | light | Hard | 5 | 18 | 2 | none |
 | L7 | Solvable | medium | Hard | 6 | 1648 | 3 | none |
@@ -71,7 +71,7 @@ Total states explored: 54451
 | L11 | Solvable | medium | Hard | 5 | 15 | 2 | none |
 | L12 | Solvable | hard | Medium | 6 | 116 | 2 | none |
 | L13 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
-| L14 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
+| L14 | Solvable | medium | Medium | 3 | 24 | 2 | none |
 | L15 | Solvable | hard | Medium | 4 | 54 | 2 | none |
 | L16 | Solvable | hard | Hard | 5 | 2511 | 3 | none |
 | L17 | Solvable | hard | Medium | 4 | 2767 | 3 | none |
@@ -81,10 +81,10 @@ Total states explored: 54451
 | L21 | Solvable | light | Medium | 4 | 16 | 2 | none |
 | L22 | Solvable | medium | Medium | 4 | 54 | 2 | none |
 | L23 | Solvable | medium | Medium | 4 | 42 | 2 | none |
-| L24 | Solvable | medium | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
+| L24 | Solvable | medium | Easy | 3 | 29 | 2 | none |
 | L25 | Solvable | medium | Medium | 4 | 39 | 2 | none |
 | L26 | Solvable | medium | Hard | 7 | 54 | 2 | none |
-| L27 | Solvable | medium | Hard | 8 | 45 | 2 | none |
+| L27 | Solvable | medium | Hard | 8 | 256 | 2 | none |
 | L28 | Solvable | hard | Hard | 6 | 72 | 2 | none |
 | L29 | Solvable | medium | Hard | 8 | 108 | 2 | none |
 | L30 | Solvable | medium | Hard | 5 | 1016 | 3 | none |
@@ -96,12 +96,14 @@ Total states explored: 54451
 | L36 | Solvable | boss | Hard | 7 | 1422 | 3 | none |
 | L37 | Solvable | intro | Easy | 3 | 1 | 1 | single_opening_solution, single_solution_path |
 | L38 | Solvable | medium | Medium | 5 | 28 | 2 | tight_move_budget |
-| L39 | Solvable | medium | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path |
+| L39 | Solvable | medium | Hard | 6 | 112 | 2 | none |
 | L40 | Solvable | hard | Medium | 4 | 58 | 2 | none |
 | L41 | Solvable | intro | Medium | 2 | 3 | 2 | single_opening_solution |
 | L42 | Solvable | hard | Hard | 5 | 15 | 2 | none |
 | L43 | Solvable | hard | Hard | 4 | 10 | 2 | single_opening_solution |
 | L44 | Solvable | hard | Hard | 6 | 392 | 3 | none |
+| L45 | Solvable | hard | Medium | 4 | 10 | 2 | single_opening_solution |
+| L46 | Solvable | hard | Hard | 4 | 5 | 2 | single_opening_solution |
 
 ## Level Details
 
@@ -128,27 +130,23 @@ Total states explored: 54451
 ### L2 Relay Ladder
 
 - Chapter: Boot Sector
-- Teaching goal: Learn that relays chain together and store charge across turns.
+- Teaching goal: Primary push chains through R1, while the backup tap can feed R2 directly.
 - Status: Solvable
 - Authored difficulty: intro
-- Estimated difficulty: Medium (5.51)
+- Estimated difficulty: Easy (5)
 - Minimal winning path: P1 -> P1 -> P1
 - Minimal moves: 3 / 6
-- Solution count (capped): 22
+- Solution count (capped): 12
 - Average branching factor: 2
-- Explored states: 71
-- Dead states: 6
+- Explored states: 19
+- Dead states: 0
 - Overflow paths: 0
 - Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
 - Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=3; path=P1
-  - P2: keeps a win alive; minMoves=4; path=P2
-- Dead state examples:
-  - moves=4, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2
-  - moves=5, overload=0, infected=0, path=P1 -> P2 -> P2 -> P2 -> P2
-  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P1 -> P2 -> P2
+  - P2: keeps a win alive; minMoves=3; path=P2
 
 ### L3 First Firewall
 
@@ -178,15 +176,15 @@ Total states explored: 54451
 ### L4 Split Charge
 
 - Chapter: Boot Sector
-- Teaching goal: Feed both relay branches and stack charge on the core efficiently.
+- Teaching goal: Use either injector to wake relay branches, then stack charge on the core efficiently.
 - Status: Solvable
 - Authored difficulty: light
 - Estimated difficulty: Easy (5)
 - Minimal winning path: P1 -> P1 -> P1
 - Minimal moves: 3 / 6
-- Solution count (capped): 27
+- Solution count (capped): 21
 - Average branching factor: 2
-- Explored states: 45
+- Explored states: 35
 - Dead states: 0
 - Overflow paths: 0
 - Clickable nodes at start: P1, P2
@@ -414,22 +412,27 @@ Total states explored: 54451
 ### L14 Split Feed
 
 - Chapter: Overload Channel
-- Teaching goal: Send energy around the overload node instead of through it every turn.
+- Teaching goal: Split feed between the main injector and backup tap so activate_all does not force one script.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Easy (5.5)
+- Estimated difficulty: Medium (5.86)
 - Minimal winning path: P1 -> P1 -> P1
 - Minimal moves: 3 / 8
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 4
-- Dead states: 0
+- Solution count (capped): 24
+- Average branching factor: 2
+- Explored states: 111
+- Dead states: 16
 - Overflow paths: 0
-- Clickable nodes at start: P1
+- Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path
+- Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=3; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
+- Dead state examples:
+  - moves=4, overload=8, infected=0, path=P1 -> P1 -> P2 -> P2
+  - moves=5, overload=8, infected=0, path=P1 -> P1 -> P2 -> P2 -> P2
+  - moves=5, overload=8, infected=0, path=P2 -> P1 -> P1 -> P2 -> P2
 
 ### L15 Heat Sink
 
@@ -660,22 +663,23 @@ Total states explored: 54451
 ### L24 Purge Junction
 
 - Chapter: Quarantine Loop
-- Teaching goal: Clean a corrupted relay first, then route both branches to finish the core.
+- Teaching goal: Clean the corrupted relay, then use a backup injector to finish both branches cleanly.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Easy (5.5)
+- Estimated difficulty: Easy (5)
 - Minimal winning path: P1 -> P1 -> P1
 - Minimal moves: 3 / 8
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 4
+- Solution count (capped): 29
+- Average branching factor: 2
+- Explored states: 46
 - Dead states: 0
 - Overflow paths: 0
-- Clickable nodes at start: P1
+- Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path
+- Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=3; path=P1
+  - P2: keeps a win alive; minMoves=4; path=P2
 
 ### L25 Purifier Wake
 
@@ -729,24 +733,20 @@ Total states explored: 54451
 - Teaching goal: Keep purifier support online to finish charge while clearing all infection.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Hard (13.34)
+- Estimated difficulty: Hard (10)
 - Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1 -> P1 -> P1 -> P1
 - Minimal moves: 8 / 10
-- Solution count (capped): 45
+- Solution count (capped): 256
 - Average branching factor: 2
-- Explored states: 219
-- Dead states: 122
+- Explored states: 45
+- Dead states: 0
 - Overflow paths: 0
 - Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
 - Issues: none
 - Root branch analysis:
   - P1: keeps a win alive; minMoves=8; path=P1
-  - P2: keeps a win alive; minMoves=9; path=P2
-- Dead state examples:
-  - moves=3, overload=0, infected=1, path=P2 -> P2 -> P2
-  - moves=4, overload=0, infected=0, path=P1 -> P2 -> P2 -> P2
-  - moves=4, overload=0, infected=0, path=P2 -> P1 -> P2 -> P2
+  - P2: keeps a win alive; minMoves=8; path=P2
 
 ### L28 Sanitation Gate
 
@@ -1026,22 +1026,27 @@ Total states explored: 54451
 ### L39 Cleansing Split
 
 - Chapter: Splitter Lab
-- Teaching goal: Use splitter coverage to keep purifier support online while clearing corruption and charging the core.
+- Teaching goal: Keep purifier coverage online past the opener so clean_corruption and core charge advance together.
 - Status: Solvable
 - Authored difficulty: medium
-- Estimated difficulty: Medium (7.5)
-- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1
-- Minimal moves: 5 / 7
-- Solution count (capped): 1
-- Average branching factor: 1
-- Explored states: 6
-- Dead states: 0
+- Estimated difficulty: Hard (8.63)
+- Minimal winning path: P1 -> P1 -> P1 -> P1 -> P1 -> P1
+- Minimal moves: 6 / 8
+- Solution count (capped): 112
+- Average branching factor: 2
+- Explored states: 134
+- Dead states: 14
 - Overflow paths: 0
-- Clickable nodes at start: P1
+- Clickable nodes at start: P1, P2
 - Non-interactable clickables: none
-- Issues: single_opening_solution, single_solution_path
+- Issues: none
 - Root branch analysis:
-  - P1: keeps a win alive; minMoves=5; path=P1
+  - P1: keeps a win alive; minMoves=6; path=P1
+  - P2: keeps a win alive; minMoves=6; path=P2
+- Dead state examples:
+  - moves=4, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2
+  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2 -> P1
+  - moves=5, overload=0, infected=0, path=P2 -> P2 -> P2 -> P2 -> P2
 
 ### L40 Split Containment
 
@@ -1169,27 +1174,77 @@ Total states explored: 54451
   - moves=3, overload=1, infected=0, path=B1 -> B1 -> P1
   - moves=3, overload=1, infected=0, path=B1 -> P1 -> B1
 
+### L45 Breaker Purge
+
+- Chapter: Breaker Node
+- Teaching goal: Prime breaker bursts while purifier pressure clears a corrupted relay lane.
+- Status: Solvable
+- Authored difficulty: hard
+- Estimated difficulty: Medium (8.48)
+- Minimal winning path: B1 -> P1 -> B1 -> P1
+- Minimal moves: 4 / 7
+- Solution count (capped): 10
+- Average branching factor: 2
+- Explored states: 97
+- Dead states: 32
+- Overflow paths: 0
+- Clickable nodes at start: B1, P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=4; path=B1
+  - P1: dead branch; minMoves=n/a; path=P1
+- Dead state examples:
+  - moves=1, overload=4, infected=1, path=P1
+  - moves=2, overload=4, infected=0, path=P1 -> B1
+  - moves=2, overload=6, infected=0, path=P1 -> P1
+
+### L46 Quarantine Fuse
+
+- Chapter: Breaker Node
+- Teaching goal: Prime breaker-fed overload bursts while virus pressure degrades the relay backup lane.
+- Status: Solvable
+- Authored difficulty: hard
+- Estimated difficulty: Hard (8.81)
+- Minimal winning path: B1 -> P1 -> B1 -> P1
+- Minimal moves: 4 / 7
+- Solution count (capped): 5
+- Average branching factor: 2
+- Explored states: 83
+- Dead states: 32
+- Overflow paths: 0
+- Clickable nodes at start: B1, P1
+- Non-interactable clickables: none
+- Issues: single_opening_solution
+- Root branch analysis:
+  - B1: keeps a win alive; minMoves=4; path=B1
+  - P1: dead branch; minMoves=n/a; path=P1
+- Dead state examples:
+  - moves=1, overload=5, infected=0, path=P1
+  - moves=2, overload=5, infected=1, path=P1 -> B1
+  - moves=2, overload=8, infected=1, path=P1 -> P1
+
 ## Findings
 
 ### Overall Solvability
 
-All 44 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
+All 46 levels are solvable within the current ruleset. The solver found at least one winning action sequence for every authored level, and no level hit the propagation search cutoff.
 
 ### Difficulty Curve
 
-Estimated difficulty distribution is Easy 6, Medium 14, Hard 24, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L41 (intro -> Medium), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
+Estimated difficulty distribution is Easy 6, Medium 14, Hard 26, Unsolvable 0. The main pacing spike is L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L41 (intro -> Medium), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard), L39 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium), L45 (hard -> Medium).
 
 ### Detected Gameplay Issues
 
-Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L14 (1 solution), L24 (1 solution), L37 (1 solution), L39 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10), L38 (5/6). No systemic instability remains in overload or virus propagation under the current ruleset.
+Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution), L13 (1 solution), L37 (1 solution). Tight move budgets remain in L9 (5/6), L18 (5/6), L20 (9/10), L38 (5/6). No systemic instability remains in overload or virus propagation under the current ruleset.
 
 ### Balance Problems
 
-Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
+Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L39 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L24, L4, L12, L15, L17, L40, L45. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
 
 ### Rebalancing Recommendations
 
-Either retag L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Either retag L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L39 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L24, L4, L12, L15, L17, L40, L45 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 

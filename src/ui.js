@@ -36,6 +36,38 @@ function buildObjectiveLine(objective) {
 
 function buildTraceLine(entry) {
   if (entry.detail) {
+    if (entry.detail.startsWith('firewall_open_m')) {
+      const mode = entry.detail.replace('firewall_open_m', '');
+      return `#${entry.step} ${entry.toNodeId}: firewall mode ${mode} opened`;
+    }
+
+    if (entry.detail === 'firewall_closed') {
+      return `#${entry.step} ${entry.toNodeId}: firewall locked`;
+    }
+
+    if (entry.detail.startsWith('breaker_primed_cap')) {
+      const cap = entry.detail.replace('breaker_primed_cap', '');
+      return `#${entry.step} ${entry.toNodeId}: breaker primed (cap ${cap})`;
+    }
+
+    if (entry.detail.startsWith('breaker_armed_cap')) {
+      const cap = entry.detail.replace('breaker_armed_cap', '');
+      return `#${entry.step} ${entry.toNodeId}: breaker armed (cap ${cap})`;
+    }
+
+    if (entry.detail.startsWith('breaker_dissipate_')) {
+      const amount = entry.detail.replace('breaker_dissipate_', '');
+      return `#${entry.step} ${entry.toNodeId}: breaker dissipated ${amount}`;
+    }
+
+    if (entry.detail === 'flow_cleanse') {
+      return `#${entry.step} ${entry.toNodeId}: cleansed by direct flow`;
+    }
+
+    if (entry.detail === 'virus_corruption') {
+      return `#${entry.step} ${entry.toNodeId}: infected by virus spread`;
+    }
+
     return `#${entry.step} ${entry.toNodeId}: ${entry.detail}`;
   }
 
@@ -278,6 +310,20 @@ function getCoachCopy(snapshot, summary) {
       body: 'Powered purifier nodes reduced local corruption pressure this turn.',
       meta: `Purified: ${summary.lastTurn.purifiedNodes.join(', ')} | Keep purifier lanes energized to stabilize routes.`
     };
+  }
+
+  if (summary.lastTurn && summary.lastTurn.cleansedNodes && summary.lastTurn.cleansedNodes.length > 0) {
+    const purifiedNodes = Array.isArray(summary.lastTurn.purifiedNodes) ? summary.lastTurn.purifiedNodes : [];
+    const directCleansed = summary.lastTurn.cleansedNodes
+      .filter((nodeId) => purifiedNodes.indexOf(nodeId) < 0);
+
+    if (directCleansed.length > 0) {
+      return {
+        title: 'Flow Cleanse',
+        body: 'Direct energy flow removed corruption from charged nodes this turn.',
+        meta: `Cleansed by flow: ${directCleansed.join(', ')} | Hover nodes to track Corruption progress (X/2).`
+      };
+    }
   }
 
   if (summary.lastTurn && summary.lastTurn.corruptionNew && summary.lastTurn.corruptionNew.length > 0) {
