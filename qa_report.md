@@ -99,8 +99,8 @@ Total states explored: 54451
 | L39 | Solvable | medium | Medium | 5 | 1 | 1 | single_opening_solution, single_solution_path |
 | L40 | Solvable | hard | Medium | 4 | 58 | 2 | none |
 | L41 | Solvable | intro | Medium | 2 | 3 | 2 | single_opening_solution |
-| L42 | Solvable | medium | Hard | 5 | 15 | 2 | none |
-| L43 | Solvable | medium | Hard | 4 | 10 | 2 | single_opening_solution |
+| L42 | Solvable | hard | Hard | 5 | 15 | 2 | none |
+| L43 | Solvable | hard | Hard | 4 | 10 | 2 | single_opening_solution |
 | L44 | Solvable | hard | Hard | 6 | 392 | 3 | none |
 
 ## Level Details
@@ -1098,7 +1098,7 @@ Total states explored: 54451
 - Chapter: Breaker Node
 - Teaching goal: Raw pushing overloads the lane; time a breaker prime to keep a final feed safe.
 - Status: Solvable
-- Authored difficulty: medium
+- Authored difficulty: hard
 - Estimated difficulty: Hard (8.8)
 - Minimal winning path: B1 -> P1 -> P1 -> P1 -> P1
 - Minimal moves: 5 / 7
@@ -1123,7 +1123,7 @@ Total states explored: 54451
 - Chapter: Breaker Node
 - Teaching goal: Complete activate_all without blowing the overload lane by timing breaker primes.
 - Status: Solvable
-- Authored difficulty: medium
+- Authored difficulty: hard
 - Estimated difficulty: Hard (9.26)
 - Minimal winning path: B1 -> P1 -> B1 -> P1
 - Minimal moves: 4 / 7
@@ -1177,7 +1177,7 @@ All 44 levels are solvable within the current ruleset. The solver found at least
 
 ### Difficulty Curve
 
-Estimated difficulty distribution is Easy 6, Medium 14, Hard 24, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L41 (intro -> Medium), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard), L42 (medium -> Hard), L43 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
+Estimated difficulty distribution is Easy 6, Medium 14, Hard 24, Unsolvable 0. The main pacing spike is L2 (intro -> Medium), L3 (intro -> Medium), L5 (light -> Hard), L6 (light -> Hard), L41 (intro -> Medium), L7 (medium -> Hard), L8 (medium -> Hard), L9 (medium -> Hard), L11 (medium -> Hard), L21 (light -> Medium), L26 (medium -> Hard), L27 (medium -> Hard), L29 (medium -> Hard), L30 (medium -> Hard). The main undertuned pocket is L13 (medium -> Easy), L14 (medium -> Easy), L24 (medium -> Easy), L4 (light -> Easy), L12 (hard -> Medium), L15 (hard -> Medium), L17 (hard -> Medium), L40 (hard -> Medium).
 
 ### Detected Gameplay Issues
 
@@ -1185,11 +1185,11 @@ Single-solution or near-single-solution levels: L1 (1 solution), L10 (1 solution
 
 ### Balance Problems
 
-Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L42, L43 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
+Early and mid-game difficulty jumps are steeper than the authored labels imply. In particular, L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30 demand more search than their current tier suggests. Several later levels land below their authored tier: L13, L14, L24, L4, L12, L15, L17, L40. This is most noticeable on intro routing levels where the player effectively repeats one correct action sequence with little room for experimentation.
 
 ### Rebalancing Recommendations
 
-Either retag L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30, L42, L43 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
+Either retag L2, L3, L5, L6, L41, L7, L8, L9, L11, L21, L26, L27, L29, L30 upward, or reduce their branching pressure by trimming one redundant route or raising their move slack by 1. Move L13, L14, L24, L4, L12, L15, L17, L40 earlier in the campaign or retag them downward so the late-game arc does not flatten out. Keep `CLEANSE_THRESHOLD = 2`; raising it back to 4 would make corruption-cleaning objectives disproportionately brittle. Keep corruption spread exclusive to `virus` nodes; allowing every corrupted node to spread creates exponential contagion and collapses solvability.
 
 ### UX Playability
 

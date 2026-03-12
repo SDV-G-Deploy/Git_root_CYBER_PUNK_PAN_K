@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-12T16:44:01.050Z",
+  "generatedAt": "2026-03-12T17:00:57.600Z",
   "candidateCount": 44,
   "acceptedCount": 10,
   "deferredCount": 33,
@@ -322,6 +322,19 @@
       "slotId": "slot7",
       "slotRole": "hard",
       "slotLabel": "Hard Puzzle A",
+      "levelId": "L42",
+      "levelName": "Heat Budget",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "topologyScale": 4,
+      "complexityScore": 12.7,
+      "slotScore": 107.05
+    },
+    {
+      "slotIndex": 8,
+      "slotId": "slot8",
+      "slotRole": "hard",
+      "slotLabel": "Hard Puzzle B",
       "levelId": "L16",
       "levelName": "Pressure Valve",
       "authoredDifficultyTag": "hard",
@@ -329,19 +342,6 @@
       "topologyScale": 9,
       "complexityScore": 17.21,
       "slotScore": 107.04
-    },
-    {
-      "slotIndex": 8,
-      "slotId": "slot8",
-      "slotRole": "hard",
-      "slotLabel": "Hard Puzzle B",
-      "levelId": "L28",
-      "levelName": "Sanitation Gate",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "hard",
-      "topologyScale": 11,
-      "complexityScore": 18.22,
-      "slotScore": 104.23
     },
     {
       "slotIndex": 9,
@@ -407,9 +407,9 @@
       "slotIndex": 7,
       "role": "hard",
       "label": "Hard Puzzle A",
-      "selectedLevelId": "L16",
-      "selectedLevelName": "Pressure Valve",
-      "slotScore": 107.04,
+      "selectedLevelId": "L42",
+      "selectedLevelName": "Heat Budget",
+      "slotScore": 107.05,
       "constraintSummary": null
     },
     {
@@ -417,9 +417,9 @@
       "slotIndex": 8,
       "role": "hard",
       "label": "Hard Puzzle B",
-      "selectedLevelId": "L28",
-      "selectedLevelName": "Sanitation Gate",
-      "slotScore": 104.23,
+      "selectedLevelId": "L16",
+      "selectedLevelName": "Pressure Valve",
+      "slotScore": 107.04,
       "constraintSummary": null
     },
     {
@@ -530,6 +530,24 @@
       "topologyFingerprint": "topo_4d4055d2"
     },
     {
+      "levelId": "L42",
+      "levelName": "Heat Budget",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 5,
+      "solutionCount": 15,
+      "averageBranchingFactor": 2,
+      "complexityScore": 12.7,
+      "topologyScale": 4,
+      "slotId": "slot7",
+      "slotRole": "hard",
+      "slotIndex": 7,
+      "slotScore": 107.05,
+      "rejectionReasons": [],
+      "topologyFingerprint": "topo_e7c88b86"
+    },
+    {
       "levelId": "L16",
       "levelName": "Pressure Valve",
       "authoredDifficultyTag": "hard",
@@ -540,30 +558,12 @@
       "averageBranchingFactor": 3,
       "complexityScore": 17.21,
       "topologyScale": 9,
-      "slotId": "slot7",
-      "slotRole": "hard",
-      "slotIndex": 7,
-      "slotScore": 107.04,
-      "rejectionReasons": [],
-      "topologyFingerprint": "topo_2d212b04"
-    },
-    {
-      "levelId": "L28",
-      "levelName": "Sanitation Gate",
-      "authoredDifficultyTag": "hard",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 70,
-      "minMoves": 6,
-      "solutionCount": 72,
-      "averageBranchingFactor": 2,
-      "complexityScore": 18.22,
-      "topologyScale": 11,
       "slotId": "slot8",
       "slotRole": "hard",
       "slotIndex": 8,
-      "slotScore": 104.23,
+      "slotScore": 107.04,
       "rejectionReasons": [],
-      "topologyFingerprint": "topo_407d0214"
+      "topologyFingerprint": "topo_2d212b04"
     },
     {
       "levelId": "L22",
@@ -1058,6 +1058,26 @@
       "topologyFingerprint": "topo_58f06d54"
     },
     {
+      "levelId": "L28",
+      "levelName": "Sanitation Gate",
+      "authoredDifficultyTag": "hard",
+      "predictedActualDifficultyClass": "hard",
+      "predictedActualDifficultyScore": 70,
+      "minMoves": 6,
+      "solutionCount": 72,
+      "averageBranchingFactor": 2,
+      "complexityScore": 18.22,
+      "topologyScale": 11,
+      "slotId": null,
+      "slotRole": null,
+      "slotIndex": null,
+      "slotScore": null,
+      "rejectionReasons": [
+        "not_selected_for_slot_template"
+      ],
+      "topologyFingerprint": "topo_407d0214"
+    },
+    {
       "levelId": "L29",
       "levelName": "Purity Switch",
       "authoredDifficultyTag": "medium",
@@ -1258,29 +1278,9 @@
       "topologyFingerprint": "topo_49fb5bf6"
     },
     {
-      "levelId": "L42",
-      "levelName": "Heat Budget",
-      "authoredDifficultyTag": "medium",
-      "predictedActualDifficultyClass": "hard",
-      "predictedActualDifficultyScore": 70,
-      "minMoves": 5,
-      "solutionCount": 15,
-      "averageBranchingFactor": 2,
-      "complexityScore": 12.7,
-      "topologyScale": 4,
-      "slotId": null,
-      "slotRole": null,
-      "slotIndex": null,
-      "slotScore": null,
-      "rejectionReasons": [
-        "not_selected_for_slot_template"
-      ],
-      "topologyFingerprint": "topo_e7c88b86"
-    },
-    {
       "levelId": "L43",
       "levelName": "Grid Safeguard",
-      "authoredDifficultyTag": "medium",
+      "authoredDifficultyTag": "hard",
       "predictedActualDifficultyClass": "hard",
       "predictedActualDifficultyScore": 70,
       "minMoves": 4,
@@ -1344,8 +1344,8 @@
     "topo_b4c4950e",
     "topo_9bb0827e",
     "topo_4d4055d2",
+    "topo_e7c88b86",
     "topo_2d212b04",
-    "topo_407d0214",
     "topo_8b02e8f2",
     "topo_bb99e57c",
     "topo_e7430aa9",

@@ -172,6 +172,42 @@ function verifyTelemetryFormats(engine) {
   return counters;
 }
 
+
+function verifyBreakerLifecycle(engine, levels, levelIndexById) {
+  const levelIndex = levelIndexById.get('L42');
+  assertCondition(Number.isFinite(levelIndex), 'L42 not found for breaker lifecycle smoke check');
+
+  engine.setLevel(levelIndex);
+  const level = levels[levelIndex];
+  const breakerNode = level.nodes.find((node) => node.type === 'breaker');
+  const powerNode = level.nodes.find((node) => node.type === 'power');
+  assertCondition(Boolean(breakerNode && powerNode), 'L42 missing breaker or power node');
+
+  const primed = engine.fireShot(breakerNode.x, breakerNode.y);
+  assertCondition(primed === true, 'Failed to prime breaker on L42');
+
+  let summary = engine.getRunSummary();
+  assertCondition(summary.lastTurn.breakerArmedNodes.length === 0, 'Breaker armed on same turn as prime');
+
+  const armedFeed = engine.fireShot(powerNode.x, powerNode.y);
+  assertCondition(armedFeed === true, 'Failed to feed armed breaker on L42');
+
+  summary = engine.getRunSummary();
+  assertCondition(summary.lastTurn.breakerArmedNodes.includes(breakerNode.id), 'Breaker did not arm on next turn');
+  assertCondition(summary.lastTurn.breakerDissipation.length > 0, 'Breaker did not dissipate on armed feed turn');
+
+  const unprimedFeed = engine.fireShot(powerNode.x, powerNode.y);
+  assertCondition(unprimedFeed === true, 'Failed to feed after armed turn on L42');
+
+  summary = engine.getRunSummary();
+  assertCondition(
+    !summary.lastTurn.breakerArmedNodes.includes(breakerNode.id),
+    'Breaker armed state did not reset after one turn'
+  );
+
+  engine.resetLevel();
+}
+
 function runSmoke() {
   const levels = loadLevels();
   const levelIndexById = new Map();
@@ -186,6 +222,7 @@ function runSmoke() {
   });
 
   verifyLevelList(engine, levels);
+  verifyBreakerLifecycle(engine, levels, levelIndexById);
 
   const checkpoints = ['L1', 'L2', 'L4', 'L25', 'L29', 'L32', 'L34', 'L36', 'L37', 'L40'];
 
