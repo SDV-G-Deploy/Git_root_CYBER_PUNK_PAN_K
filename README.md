@@ -7,7 +7,7 @@
 
 ## Campaign Flow
 - Runtime loads the full authored campaign from `src/levels.js`
-- Current authored campaign size: 36 levels (`L1`-`L36`)
+- Current authored campaign size: 46 levels (`L1`-`L46`)
 - Player progression uses save data in local storage (`src/persistence.js`)
 
 ## Authored Campaign vs Structured Pack
@@ -23,7 +23,8 @@
 - Runtime smoke checks:
   - `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1`
 
-## Safe Editing Notes
+## Sprite Assets`r`n- Main gameplay node sprites are loaded from `SPRITES_IMAGES/` via `src/sprites.js` with primitive fallback in `src/render.js``r`n`r`n## Safe Editing Notes
 - For gameplay/content changes, edit `src/levels.js` and rerun all QA commands above
 - For player-facing HUD/tutorial behavior, edit `index.html`, `styles.css`, and `src/ui.js`
 - Keep protected mechanics stable unless intentionally scoped: Splitter, Fuse/Stabilizer, Delay, and classifier/slot semantics
+

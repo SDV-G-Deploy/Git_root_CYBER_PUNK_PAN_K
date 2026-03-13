@@ -1,5 +1,6 @@
 import { CONFIG, NODE_TYPES } from './config.js';
 import { clamp, lerp } from './physicsLite.js';
+import { getSpriteDiagnostics, tryDrawNodeSprite } from './sprites.js';
 
 function getNodeColor(node) {
   if (node.exploded) {
@@ -401,13 +402,59 @@ function drawNodeBursts(ctx, state, node) {
   }
 }
 
+function drawLabelChip(ctx, text, x, y, options) {
+  const chip = options || {};
+  const minWidth = Number.isFinite(chip.minWidth) ? chip.minWidth : 18;
+  const paddingX = Number.isFinite(chip.paddingX) ? chip.paddingX : 5;
+  const height = Number.isFinite(chip.height) ? chip.height : 14;
+  const chipFill = chip.chipFill || 'rgba(7, 16, 24, 0.8)';
+  const chipStroke = chip.chipStroke || 'rgba(138, 203, 243, 0.24)';
+
+  const width = Math.max(minWidth, Math.ceil(ctx.measureText(text).width) + paddingX * 2);
+  const left = x - width * 0.5;
+  const top = y - height * 0.5;
+
+  ctx.save();
+  ctx.fillStyle = chipFill;
+  ctx.fillRect(left, top, width, height);
+  if (chipStroke) {
+    ctx.strokeStyle = chipStroke;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(left, top, width, height);
+  }
+  ctx.restore();
+}
+
+function drawNodeText(ctx, text, x, y, color, spriteBacked, options) {
+  if (!text) {
+    return;
+  }
+
+  if (spriteBacked) {
+    drawLabelChip(ctx, text, x, y, options);
+  }
+
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+}
+
+function drawNodeBodyPrimitive(ctx, node, baseColor) {
+  ctx.beginPath();
+  ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+  ctx.fillStyle = baseColor;
+  ctx.fill();
+}
+
 function drawNodes(ctx, state) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
+  const hint = state.hint || null;
+
   for (let i = 0; i < state.nodes.length; i += 1) {
     const node = state.nodes[i];
     const hovered = isHoveredNode(state, node.id);
+    const hintFocused = Boolean(hint && (hint.targetNodeId === node.id || hint.secondaryNodeId === node.id));
     const hoverPulse = hovered ? 0.6 + Math.sin(state.effects.time * 7.5) * 0.15 : 0;
     const baseColor = getNodeColor(node);
 
@@ -417,11 +464,17 @@ function drawNodes(ctx, state) {
       drawNodeGlow(ctx, node, baseColor, hovered ? 18 : 12, hovered ? 0.2 + hoverPulse * 0.1 : 0.12);
     }
 
+    const spriteDrawn = tryDrawNodeSprite(ctx, node, state, {
+      hovered,
+      hintFocused
+    });
+
+    if (!spriteDrawn) {
+      drawNodeBodyPrimitive(ctx, node, baseColor);
+    }
+
     ctx.beginPath();
     ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-    ctx.fillStyle = baseColor;
-    ctx.fill();
-
     ctx.lineWidth = hovered ? 3 : node.active ? 3 : 2;
     ctx.strokeStyle = hovered
       ? CONFIG.NODES.COLORS.hoverStroke
@@ -446,29 +499,39 @@ function drawNodes(ctx, state) {
     drawNodeTypeTag(ctx, node);
 
     ctx.font = 'bold 12px monospace';
-    ctx.fillStyle = CONFIG.NODES.COLORS.label;
-    ctx.fillText(node.id, node.x, node.y - 1);
+    drawNodeText(ctx, node.id, node.x, node.y - 1, CONFIG.NODES.COLORS.label, spriteDrawn, {
+      paddingX: 5,
+      height: 14,
+      chipFill: 'rgba(8, 17, 27, 0.78)',
+      chipStroke: 'rgba(143, 213, 255, 0.26)'
+    });
 
     ctx.font = '11px monospace';
-    ctx.fillStyle = '#d2f2ff';
 
     const chargeLabel = node.baseType === NODE_TYPES.CORE
       ? `${node.charge}/${node.targetCharge}`
       : `${node.charge}`;
 
-    ctx.fillText(chargeLabel, node.x, node.y + node.radius + 11);
+    drawNodeText(ctx, chargeLabel, node.x, node.y + node.radius + 11, '#d2f2ff', spriteDrawn, {
+      paddingX: 4,
+      height: 13
+    });
 
     if (node.baseType === NODE_TYPES.POWER) {
-      ctx.fillStyle = '#c9f2ff';
-      ctx.fillText(`INJ ${node.injectPower}`, node.x, node.y - node.radius - 11);
+      drawNodeText(ctx, `INJ ${node.injectPower}`, node.x, node.y - node.radius - 11, '#c9f2ff', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
     }
 
     if (node.baseType === NODE_TYPES.RELAY) {
       const relayLabel = node.active
         ? `EM ${node.emitPower}`
         : `NEED ${node.charge}/${node.threshold}`;
-      ctx.fillStyle = node.active ? '#d6ffd6' : '#a9c4a1';
-      ctx.fillText(relayLabel, node.x, node.y - node.radius - 11);
+      drawNodeText(ctx, relayLabel, node.x, node.y - node.radius - 11, node.active ? '#d6ffd6' : '#a9c4a1', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
     }
 
     if (node.baseType === NODE_TYPES.FIREWALL) {
@@ -486,8 +549,10 @@ function drawNodes(ctx, state) {
           : `OFF M${activeMode + 1}/${totalModes}`;
       }
 
-      ctx.fillStyle = '#dacbff';
-      ctx.fillText(modeLabel, node.x, node.y - node.radius - 11);
+      drawNodeText(ctx, modeLabel, node.x, node.y - node.radius - 11, '#dacbff', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
     }
 
     if (node.baseType === NODE_TYPES.SPLITTER) {
@@ -497,8 +562,10 @@ function drawNodes(ctx, state) {
       const splitLabel = node.active
         ? `SPLIT x${Math.max(1, activeOutputs)}`
         : `PRIME ${node.charge}/${node.threshold}`;
-      ctx.fillStyle = node.active ? '#efffcc' : '#b2c39d';
-      ctx.fillText(splitLabel, node.x, node.y - node.radius - 11);
+      drawNodeText(ctx, splitLabel, node.x, node.y - node.radius - 11, node.active ? '#efffcc' : '#b2c39d', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
     }
 
     if (node.baseType === NODE_TYPES.BREAKER) {
@@ -511,8 +578,18 @@ function drawNodes(ctx, state) {
         breakerLabel = `PRIME ${node.charge}/${node.threshold}`;
       }
 
-      ctx.fillStyle = node.breakerPending ? '#c6fbff' : node.active ? '#bfefff' : '#99b7c6';
-      ctx.fillText(breakerLabel, node.x, node.y - node.radius - 11);
+      drawNodeText(
+        ctx,
+        breakerLabel,
+        node.x,
+        node.y - node.radius - 11,
+        node.breakerPending ? '#c6fbff' : node.active ? '#bfefff' : '#99b7c6',
+        spriteDrawn,
+        {
+          paddingX: 4,
+          height: 13
+        }
+      );
 
       if (node.breakerPending) {
         ctx.save();
@@ -530,8 +607,11 @@ function drawNodes(ctx, state) {
       const purifierLabel = node.active
         ? `PURIFY ${node.purifierStrength}`
         : `PRIME ${node.charge}/${node.threshold}`;
-      ctx.fillStyle = node.active ? '#c9ffe8' : '#9fbfb2';
-      ctx.fillText(purifierLabel, node.x, node.y - node.radius - 11);
+
+      drawNodeText(ctx, purifierLabel, node.x, node.y - node.radius - 11, node.active ? '#c9ffe8' : '#9fbfb2', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
 
       if (node.active) {
         ctx.save();
@@ -553,8 +633,10 @@ function drawNodes(ctx, state) {
       const overloadLabel = node.exploded
         ? 'BOOM'
         : `${risk} ${node.throughputThisTurn}/${threshold}`;
-      ctx.fillStyle = node.exploded ? '#ffd6b8' : '#ffe1be';
-      ctx.fillText(overloadLabel, node.x, node.y - node.radius - 11);
+      drawNodeText(ctx, overloadLabel, node.x, node.y - node.radius - 11, node.exploded ? '#ffd6b8' : '#ffe1be', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
 
       if (!node.exploded) {
         ctx.save();
@@ -571,13 +653,25 @@ function drawNodes(ctx, state) {
     }
 
     if (node.baseType === NODE_TYPES.VIRUS) {
-      ctx.fillStyle = '#ffb5c7';
-      ctx.fillText(`SPREAD +${node.spreadRate}`, node.x, node.y + node.radius + 24);
+      drawNodeText(ctx, `SPREAD +${node.spreadRate}`, node.x, node.y + node.radius + 24, '#ffb5c7', spriteDrawn, {
+        paddingX: 4,
+        height: 13
+      });
     }
 
     if (node.corrupted) {
-      ctx.fillStyle = '#ffb5c7';
-      ctx.fillText(`INF ${node.corruptionProgress}/${CONFIG.TURN.CORRUPTION_THRESHOLD}`, node.x, node.y + node.radius + 24);
+      drawNodeText(
+        ctx,
+        `INF ${node.corruptionProgress}/${CONFIG.TURN.CORRUPTION_THRESHOLD}`,
+        node.x,
+        node.y + node.radius + 24,
+        '#ffb5c7',
+        spriteDrawn,
+        {
+          paddingX: 4,
+          height: 13
+        }
+      );
     }
   }
 }
@@ -756,6 +850,9 @@ export function renderState(ctx, state) {
   ctx.restore();
 }
 
-
-
+export function getRenderDiagnostics() {
+  return {
+    sprites: getSpriteDiagnostics()
+  };
+}
 

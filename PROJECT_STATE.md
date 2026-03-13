@@ -1,14 +1,13 @@
 # PROJECT_STATE.md
 
-Last updated: 2026-03-12
+Last updated: 2026-03-13
 
 ## Repository State Snapshot
-- Local HEAD at start of this pass: `742eadc` on `main`
-- Upstream baseline at start of this pass: `origin/main` at `e145ef1`
-- Starting tree state: clean working tree, local branch ahead by 1 local audit commit
+- Local HEAD at start of this pass: `f109f88` on `main`
+- Starting tree state: clean tracked files, `SPRITES_IMAGES/` present as untracked asset folder
 
 ## Project Summary
-CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under pressure from infection, overload, firewall routing constraints, and multi-objective level logic.
+CyberPunkPuzzleWars is a browser puzzle game about routing energy through node networks under infection, overload, firewall routing constraints, and multi-objective level logic.
 
 ## Active Runtime and Structure
 - Active playable entry path: `index.html` -> `src/bootstrap.js` -> `src/engine.js`
@@ -18,82 +17,58 @@ CyberPunkPuzzleWars is a browser puzzle game about routing energy through node n
 ## Core Mechanics Status
 - Clickable inputs: `power`, `firewall`, `breaker`
 - Passive/autonomous: `relay`, `splitter`, `purifier`, `virus`, `overload`, `core`
-- Firewall behavior contract is unchanged and content-defined:
+- Firewall behavior contract remains unchanged and content-defined:
   - no `firewallModes`: binary lock/open-all gate
   - with `firewallModes`: closed -> mode cycle while open
   - individual modes may enable one or multiple outgoing edges
 
 ## Authored Content State
 - Total authored levels: **46** (`L1`-`L46`)
-- Chapters:
-  - Boot Sector: 5
-  - Firewall Ring: 5
-  - Quarantine Loop: 6
-  - Overload Channel: 4
-  - Purifier Loop: 6
-  - District Core: 10
-  - Splitter Lab: 4
-  - Breaker Node: 6
 - Objective totals:
   - `power_core`: 46
   - `activate_all`: 9
   - `clean_corruption`: 14
 
-## Latest Scoped Pass (2026-03-12) - Mixed Clarity + Legacy Anomaly Micro-Pass
-### Investigation + triage scope
-- Audited user-reported behavior across levels `L2`, `L4`, `L9`, `L10`, `L13`-`L15`, `L21`, `L23`, `L24`, `L27`, `L31`, `L44`
-- Confirmed primary issues were authored readability/no-op-like tuning, not protected-system regressions
+## Latest Scoped Pass (2026-03-13) - Sprite Rendering Integration (Main Gameplay)
+### Rendering and asset-layer changes
+- Added centralized sprite subsystem: `src/sprites.js`
+  - explicit manifest for all files in `SPRITES_IMAGES`
+  - lazy load and preprocessing pipeline
+  - non-browser safety guard (runtime smoke environment falls back automatically)
+  - diagnostics API for mapping/load/fallback telemetry (`getSpriteDiagnostics`)
+- Upgraded node-body render path in `src/render.js`:
+  - node body now uses `sprite-first -> primitive fallback`
+  - fallback remains active for missing/failed/unmapped states and for exploded node states by design
+  - existing effect/overlay order preserved (glow, rings, pulse, labels, hint, miss markers)
+- Added compact dark label chips behind node text when sprite body is used to preserve readability on detailed textures.
 
-### Content and readability edits
-- Level micro-retunes:
-  - `L2` / `L4`: made secondary injector contribution visible on first use
-  - `L14`: added small backup injector branch to reduce near-scripted overlap with `L13`
-  - `L24`: added backup injector branch to reduce near-1:1 repetition pressure
-  - `L27`: fixed optional `P2` lane from effective no-op to visible support path
-  - `L39`: retuned cleanser pacing so `clean_corruption` is not auto-cleared on opening turn
-- Added exactly two authored mixed-coverage levels:
-  - `L45` Breaker + Purifier
-  - `L46` Breaker + Virus
-
-### Firewall/infection clarity improvements
-- Firewall hover info now shows:
-  - binary gate vs mode-router behavior
-  - active mode index and explicit destination nodes
-  - multi-output mode signal
-- Firewall on-node label now surfaces mode index and output count (`Mx/y xN`)
-- Trace/coach readability now decodes firewall/breaker detail tokens and surfaces:
-  - `flow_cleanse`
-  - `virus_corruption`
-- Hover panel now shows per-node corruption progress (`Corruption X/2`) for non-core/non-virus nodes when relevant
+### Current sprite coverage
+- Sprite-backed node bodies now cover: core, power, firewall, overload, relay, splitter, breaker, purifier, virus.
+- Virus receives a dedicated emphasis variant during hover/hint focus.
+- Exploded node body intentionally stays primitive fallback in this pass for high-risk readability safety.
 
 ## Current Validation Status
-Latest verified state after this pass:
-- `validate-levels`: pass
-  - solvability: **46/46**
-  - unsolved: 0
-  - search cutoffs: 0
-- `runtime-smoke`: pass
-- `build-pack`: pass
-  - candidates: 46
-  - accepted: 10
-  - deferred: 34
-  - rejected: 2
+- Parse checks: pass
+  - `node --check src/sprites.js`
+  - `node --check src/render.js`
+- Runtime smoke: pass
+  - `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1`
+- Full campaign solver/pack reports were not rerun in this pass because no level/mechanic/rule content changed.
 
 ## Protected Systems
 - Not touched in this pass:
-  - daily generation behavior
-  - seed behavior
-  - pack semantics
-  - classifier semantics
-  - slot thresholds
-  - generator heuristics
-  - campaign-system infrastructure/rules
+  - gameplay logic and hit behavior
+  - objective validation semantics
+  - generator and pack selection semantics
+  - level authored content
+  - splitter/purifier/breaker mechanical contracts
 
 ## Known Limitations
-- Some designed tutorial-style entries remain single-opening by intent (for example `L45`, `L46` currently flagged `single_opening_solution`).
-- Objective resolution still takes win precedence over lose checks when both are met in the same turn (existing runtime behavior, unchanged in this pass).
+- Most provided sprites are opaque-background PNGs; this pass uses runtime keying to remove light backgrounds, which can vary by browser/canvas implementation.
+- No dedicated sprite variant yet for exploded/broken node bodies (kept on primitive fallback intentionally).
+- Several mapped files are medium-confidence semantic matches (power/core and overload/firewall families).
 
 ## Recommended Next Steps
-1. If desired, run one focused pass on remaining single-opening tutorial levels (`L1`, `L10`, `L13`, `L37`, `L45`, `L46`) without broad campaign reshuffle.
-2. If additional firewall-heavy content is added, consider one tiny in-run legend line that explicitly maps `M1/M2` labels to destination IDs.
-3. Keep future passes isolated (content/clarity vs mechanic rewrites) to preserve protected-system stability.
+1. Provide dedicated state-specific sprites for exploded, corrupted/infected, and overload-critical readability states to reduce fallback/ambiguity.
+2. Add explicit selected/active/blocked overlay icon sprites for stronger readability on busy node art.
+3. Perform a browser visual QA sweep across representative levels and mobile aspect ratios, then tune per-entity offsets/scales if needed.

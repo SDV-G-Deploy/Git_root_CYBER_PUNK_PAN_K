@@ -141,3 +141,21 @@
   - `runtime-smoke`: pass
   - `build-pack`: pass (`46` candidates, `10` accepted, `34` deferred, `2` rejected)
 - Protected systems remained untouched.
+
+## 2026-03-13 - Main Gameplay Sprite Rendering Integration (SPRITES_IMAGES)
+- Start state confirmed on `main` at commit `f109f88`; tracked tree was clean with `SPRITES_IMAGES/` present locally.
+- Added new sprite subsystem in active runtime:
+  - `src/sprites.js` with explicit manifest/mapping for all sprite files,
+  - lazy loading,
+  - auto background keying for opaque assets,
+  - trimmed draw bounds,
+  - non-browser fallback safety,
+  - diagnostics export (`getSpriteDiagnostics`).
+- Updated `src/render.js` node-body rendering to `sprite-first -> primitive fallback` without touching mechanics/hit logic.
+- Preserved existing gameplay overlays and readability feedback; added compact label chips behind node text when sprite-backed.
+- Intentionally kept exploded node body on primitive fallback this pass.
+- Validation executed:
+  - `node --check src/sprites.js` (pass)
+  - `node --check src/render.js` (pass)
+  - `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1` (pass)
+- Protected systems and authored levels were not modified.

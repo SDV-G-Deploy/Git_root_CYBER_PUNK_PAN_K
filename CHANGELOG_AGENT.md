@@ -277,3 +277,39 @@
 
 ### Notes
 - Protected systems were not touched: daily/seed behavior, pack semantics, classifier semantics, slot thresholds, generator heuristics, and campaign infrastructure rules.
+
+## 2026-03-13 - Render Upgrade: SPRITES_IMAGES Integration with Safe Fallback
+
+### Changed
+- Added `src/sprites.js` as a centralized sprite layer for active runtime rendering.
+  - explicit filename manifest and mapping for all files in `SPRITES_IMAGES`
+  - per-entity draw style config (scale/offset)
+  - lazy sprite load pipeline
+  - automatic near-white background keying for opaque PNGs
+  - trimmed source bounds for tighter centering
+  - runtime diagnostics (`getSpriteDiagnostics`) for mapping/load/fallback visibility
+- Updated `src/render.js` node-body path:
+  - sprite-first drawing for mapped entities
+  - primitive fallback if mapping is missing/ambiguous/failed/loading or in non-browser environments
+  - primitive fallback retained for exploded node bodies by design
+  - preserved overlay semantics (hover/active rings, purifier/breaker states, overload rings, hint/miss/packet effects)
+  - added compact dark text chips for sprite-backed node labels to keep readability on detailed textures
+  - added `getRenderDiagnostics` wrapper exposing sprite diagnostics
+
+### Files Changed in This Pass
+- `src/sprites.js`
+- `src/render.js`
+- `SPRITES_IMAGES/*.png` (added to repository)
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `node --check src/sprites.js`: pass
+- `node --check src/render.js`: pass
+- `runtime-smoke`: pass
+  - `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1`
+
+### Notes
+- No gameplay mechanics, click radius, puzzle logic, objective logic, or generator rules were changed.
+- Full solver/pack regeneration was intentionally skipped because level content and rule semantics were unchanged.
