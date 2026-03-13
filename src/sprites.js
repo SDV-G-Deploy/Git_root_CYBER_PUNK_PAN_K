@@ -7,132 +7,104 @@ function getSpriteUrl(filename) {
 
 export const SPRITE_MANIFEST = Object.freeze([
   {
-    filename: 'Sprite_Power_Core_001.png',
-    confidence: 'medium',
-    backgroundKeyMode: 'auto',
+    filename: 'node_core.png',
+    confidence: 'high',
+    backgroundKeyMode: 'none',
     mappingKeys: ['core_default']
   },
   {
-    filename: 'Sprite_Power_Core_002.png',
-    confidence: 'medium',
+    filename: 'node_power.png',
+    confidence: 'high',
     backgroundKeyMode: 'none',
     mappingKeys: ['power_default']
   },
   {
-    filename: 'Sprite_Power_Firewall_001.png',
-    confidence: 'medium',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['overload_calm']
-  },
-  {
-    filename: 'Sprite_Power_Firewall_002.png',
-    confidence: 'medium',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['overload_critical']
-  },
-  {
-    filename: 'Sprite_Power_Firewall_003_grey.png',
+    filename: 'node_firewall.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['firewall_closed']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['firewall_closed', 'firewall_open']
   },
   {
-    filename: 'Sprite_Power_Firewall_004_green.png',
+    filename: 'node_overload.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['firewall_open']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['overload_calm', 'overload_critical']
   },
   {
-    filename: 'Sprite_Relay_block_005.png',
+    filename: 'node_relay.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['relay_default']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['relay_default', 'relay_active']
   },
   {
-    filename: 'Sprite_Relay_block_006.png',
+    filename: 'node_splitter.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['relay_active']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['splitter_default', 'splitter_corrupted']
   },
   {
-    filename: 'Sprite_splitter_block_009.png',
+    filename: 'node_breaker.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['splitter_default']
-  },
-  {
-    filename: 'Sprite_splitter_block_010_red.png',
-    confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['splitter_corrupted']
-  },
-  {
-    filename: 'Sprite_BREAKER_block_012.png',
-    confidence: 'high',
-    backgroundKeyMode: 'auto',
+    backgroundKeyMode: 'none',
     mappingKeys: ['breaker_default']
   },
   {
-    filename: 'Sprite_Purifier_block_014_green.png',
+    filename: 'node_purifier.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['purifier_active']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['purifier_active', 'purifier_inactive']
   },
   {
-    filename: 'Sprite_Purifier_block_015_violet.png',
+    filename: 'node_virus.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['purifier_inactive']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['virus_default', 'virus_emphasis']
   },
   {
-    filename: 'Sprite_VIRUS_block_010_orange.png',
+    filename: 'overlay_target.png',
     confidence: 'high',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['virus_default']
-  },
-  {
-    filename: 'Sprite_VIRUS_block_019_MULTICOLOR.png',
-    confidence: 'medium',
-    backgroundKeyMode: 'auto',
-    mappingKeys: ['virus_emphasis']
+    backgroundKeyMode: 'none',
+    mappingKeys: ['overlay_target']
   }
 ]);
 
 const SPRITE_MAP = Object.freeze({
-  core_default: 'Sprite_Power_Core_001.png',
-  power_default: 'Sprite_Power_Core_002.png',
-  firewall_closed: 'Sprite_Power_Firewall_003_grey.png',
-  firewall_open: 'Sprite_Power_Firewall_004_green.png',
-  overload_calm: 'Sprite_Power_Firewall_001.png',
-  overload_critical: 'Sprite_Power_Firewall_002.png',
-  relay_default: 'Sprite_Relay_block_005.png',
-  relay_active: 'Sprite_Relay_block_006.png',
-  splitter_default: 'Sprite_splitter_block_009.png',
-  splitter_corrupted: 'Sprite_splitter_block_010_red.png',
-  breaker_default: 'Sprite_BREAKER_block_012.png',
-  purifier_active: 'Sprite_Purifier_block_014_green.png',
-  purifier_inactive: 'Sprite_Purifier_block_015_violet.png',
-  virus_default: 'Sprite_VIRUS_block_010_orange.png',
-  virus_emphasis: 'Sprite_VIRUS_block_019_MULTICOLOR.png'
+  core_default: 'node_core.png',
+  power_default: 'node_power.png',
+  firewall_closed: 'node_firewall.png',
+  firewall_open: 'node_firewall.png',
+  overload_calm: 'node_overload.png',
+  overload_critical: 'node_overload.png',
+  relay_default: 'node_relay.png',
+  relay_active: 'node_relay.png',
+  splitter_default: 'node_splitter.png',
+  splitter_corrupted: 'node_splitter.png',
+  breaker_default: 'node_breaker.png',
+  purifier_active: 'node_purifier.png',
+  purifier_inactive: 'node_purifier.png',
+  virus_default: 'node_virus.png',
+  virus_emphasis: 'node_virus.png',
+  overlay_target: 'overlay_target.png'
 });
 
 const SPRITE_DRAW_STYLE = Object.freeze({
-  default: Object.freeze({ scaleMul: 1.48, offsetX: 0, offsetY: 0 }),
-  power_default: Object.freeze({ scaleMul: 1.6, offsetX: 0, offsetY: 0.08 }),
-  core_default: Object.freeze({ scaleMul: 1.58, offsetX: 0, offsetY: 0.02 }),
-  firewall_closed: Object.freeze({ scaleMul: 1.52, offsetX: 0, offsetY: 0 }),
-  firewall_open: Object.freeze({ scaleMul: 1.52, offsetX: 0, offsetY: 0 }),
-  overload_calm: Object.freeze({ scaleMul: 1.52, offsetX: 0, offsetY: 0.02 }),
-  overload_critical: Object.freeze({ scaleMul: 1.52, offsetX: 0, offsetY: 0.02 }),
-  relay_default: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  relay_active: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  splitter_default: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  splitter_corrupted: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  breaker_default: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  purifier_active: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  purifier_inactive: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  virus_default: Object.freeze({ scaleMul: 1.46, offsetX: 0, offsetY: 0 }),
-  virus_emphasis: Object.freeze({ scaleMul: 1.48, offsetX: 0, offsetY: 0 })
+  default: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  power_default: Object.freeze({ scaleMul: 1.28, offsetX: 0, offsetY: 0 }),
+  core_default: Object.freeze({ scaleMul: 1.28, offsetX: 0, offsetY: 0 }),
+  firewall_closed: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  firewall_open: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  overload_calm: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  overload_critical: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  relay_default: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  relay_active: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  splitter_default: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  splitter_corrupted: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  breaker_default: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  purifier_active: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  purifier_inactive: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  virus_default: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  virus_emphasis: Object.freeze({ scaleMul: 1.24, offsetX: 0, offsetY: 0 }),
+  overlay_target: Object.freeze({ scaleMul: 1.62, offsetX: 0, offsetY: 0 })
 });
 
 function canCreateImage() {
@@ -558,14 +530,17 @@ function resolveMappingKey(node, flags) {
   return null;
 }
 
-function drawPreparedRecord(ctx, node, record, mappingKey) {
+function drawPreparedRecord(ctx, node, record, mappingKey, options) {
   if (!ctx || !node || !record || record.state !== 'ready' || !record.canvas) {
     return false;
   }
 
-  const style = SPRITE_DRAW_STYLE[mappingKey] || SPRITE_DRAW_STYLE.default;
+  const drawOptions = options || {};
+  const styleFromMap = SPRITE_DRAW_STYLE[mappingKey] || SPRITE_DRAW_STYLE.default;
+  const style = drawOptions.style || styleFromMap;
   const viewportScale = getViewportScaleFactor(ctx);
-  const effectiveScale = clamp((style.scaleMul || SPRITE_DRAW_STYLE.default.scaleMul) * viewportScale, 1.2, 1.68);
+  const scaleValue = Number.isFinite(drawOptions.scaleMul) ? drawOptions.scaleMul : style.scaleMul;
+  const effectiveScale = clamp((scaleValue || SPRITE_DRAW_STYLE.default.scaleMul) * viewportScale, 1.14, 1.68);
 
   const sourceBounds = record.bounds || {
     x: 0,
@@ -581,11 +556,19 @@ function drawPreparedRecord(ctx, node, record, mappingKey) {
   const drawWidth = node.radius * 2 * effectiveScale;
   const aspect = sourceBounds.height / Math.max(sourceBounds.width, 1);
   const drawHeight = drawWidth * aspect;
-  const offsetX = (style.offsetX || 0) * node.radius;
-  const offsetY = (style.offsetY || 0) * node.radius;
+  const offsetXValue = Number.isFinite(drawOptions.offsetX) ? drawOptions.offsetX : style.offsetX;
+  const offsetYValue = Number.isFinite(drawOptions.offsetY) ? drawOptions.offsetY : style.offsetY;
+  const offsetX = (offsetXValue || 0) * node.radius;
+  const offsetY = (offsetYValue || 0) * node.radius;
 
   const drawX = node.x - drawWidth * 0.5 + offsetX;
   const drawY = node.y - drawHeight * 0.5 + offsetY;
+  const alpha = Number.isFinite(drawOptions.alpha) ? clamp(drawOptions.alpha, 0, 1) : 1;
+
+  if (alpha < 1) {
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+  }
 
   ctx.drawImage(
     record.canvas,
@@ -598,6 +581,10 @@ function drawPreparedRecord(ctx, node, record, mappingKey) {
     drawWidth,
     drawHeight
   );
+
+  if (alpha < 1) {
+    ctx.restore();
+  }
 
   return true;
 }
@@ -615,12 +602,7 @@ function markFallback(mappingKey, reason) {
   incrementFallbackReason(mappingKey, reason || 'fallback');
 }
 
-export function tryDrawNodeSprite(ctx, node, state, flags) {
-  const mappingKey = resolveMappingKey(node, flags);
-  if (!mappingKey) {
-    return false;
-  }
-
+function drawFromMapping(ctx, node, mappingKey, drawOptions) {
   markAttempt(mappingKey);
 
   if (!SUPPORT_STATE.enabled) {
@@ -647,7 +629,7 @@ export function tryDrawNodeSprite(ctx, node, state, flags) {
     return false;
   }
 
-  const drawn = drawPreparedRecord(ctx, node, record, mappingKey);
+  const drawn = drawPreparedRecord(ctx, node, record, mappingKey, drawOptions);
   if (!drawn) {
     markFallback(mappingKey, 'draw_failed');
     return false;
@@ -655,6 +637,29 @@ export function tryDrawNodeSprite(ctx, node, state, flags) {
 
   markDrawn(mappingKey);
   return true;
+}
+
+export function tryDrawNodeSprite(ctx, node, state, flags) {
+  const mappingKey = resolveMappingKey(node, flags);
+  if (!mappingKey) {
+    return false;
+  }
+
+  return drawFromMapping(ctx, node, mappingKey, null);
+}
+
+export function tryDrawOverlayTarget(ctx, node, options) {
+  if (!node || node.exploded) {
+    return false;
+  }
+
+  const opts = options || {};
+  return drawFromMapping(ctx, node, 'overlay_target', {
+    scaleMul: Number.isFinite(opts.scaleMul) ? opts.scaleMul : SPRITE_DRAW_STYLE.overlay_target.scaleMul,
+    alpha: Number.isFinite(opts.alpha) ? opts.alpha : 0.82,
+    offsetX: Number.isFinite(opts.offsetX) ? opts.offsetX : SPRITE_DRAW_STYLE.overlay_target.offsetX,
+    offsetY: Number.isFinite(opts.offsetY) ? opts.offsetY : SPRITE_DRAW_STYLE.overlay_target.offsetY
+  });
 }
 
 function mapToPlainObject(map) {

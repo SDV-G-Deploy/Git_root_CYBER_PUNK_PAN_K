@@ -72,3 +72,41 @@ CyberPunkPuzzleWars is a browser puzzle game about routing energy through node n
 1. Provide dedicated state-specific sprites for exploded, corrupted/infected, and overload-critical readability states to reduce fallback/ambiguity.
 2. Add explicit selected/active/blocked overlay icon sprites for stronger readability on busy node art.
 3. Perform a browser visual QA sweep across representative levels and mobile aspect ratios, then tune per-entity offsets/scales if needed.
+
+## Latest Scoped Pass (2026-03-13) - Minimalist Node Icon Sheet Slice + Remap
+### Source asset and slicing outcome
+- New sheet source integrated: `SPRITES_IMAGES/SPRITE_SHEET_EXAMPLE_all_of_nodes.png` (`1536x1024`).
+- Sheet was sliced into 10 canonical `256x256` icon outputs for node-first readability:
+  - `node_core.png`
+  - `node_power.png`
+  - `node_firewall.png`
+  - `node_overload.png`
+  - `node_relay.png`
+  - `node_splitter.png`
+  - `node_breaker.png`
+  - `node_purifier.png`
+  - `node_virus.png`
+  - `overlay_target.png`
+
+### Rendering remap
+- `src/sprites.js` manifest/mapping now prefers new minimalist node icons for:
+  - core, power, firewall, overload, relay, splitter, breaker, purifier, virus
+- Added explicit overlay sprite mapping key:
+  - `overlay_target -> overlay_target.png`
+- Updated draw-style defaults for icon-grade readability at gameplay scale:
+  - reduced node icon scale baseline,
+  - preserved per-entity style overrides in one central map.
+
+### Overlay integration and fallback safety
+- `src/render.js` hint-focus path now tries sprite overlay ring first via `tryDrawOverlayTarget(...)`.
+- Existing vector hint ring rendering remains as automatic fallback if overlay sprite is unavailable.
+- Node body render flow remains `sprite-first -> primitive fallback`.
+- Exploded node states remain primitive fallback by design.
+
+### Validation status for this pass
+- Parse checks: pass
+  - `node --check src/sprites.js`
+  - `node --check src/render.js`
+- Runtime smoke: pass
+  - `powershell -ExecutionPolicy Bypass -File scripts/runtime-smoke.ps1`
+- Full browser visual QA is intentionally deferred to post-push GitHub Pages verification.

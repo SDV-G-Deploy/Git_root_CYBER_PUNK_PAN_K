@@ -159,3 +159,20 @@
   - `node --check src/render.js` (pass)
   - `powershell -ExecutionPolicy Bypass -File scripts\runtime-smoke.ps1` (pass)
 - Protected systems and authored levels were not modified.
+
+## 2026-03-13 - Minimalist Icon Sheet Slice + Node Sprite Remap
+- Located new node icon sheet `SPRITES_IMAGES/SPRITE_SHEET_EXAMPLE_all_of_nodes.png` and used it as source of truth.
+- Sliced and exported canonical icon assets into existing sprite flow:
+  - `node_core.png`, `node_power.png`, `node_firewall.png`, `node_overload.png`, `node_relay.png`,
+  - `node_splitter.png`, `node_breaker.png`, `node_purifier.png`, `node_virus.png`, `overlay_target.png`
+- Remapped sprite manifest/registry in `src/sprites.js` to use the new minimalist icons as preferred node visuals.
+- Preserved resilient fallback behavior:
+  - primitive node rendering still used on missing/failed sprite cases,
+  - exploded nodes stay on primitive body path.
+- Added overlay sprite helper `tryDrawOverlayTarget(...)` and integrated it into hint-focus rendering in `src/render.js` with ring fallback intact.
+- Tuned icon draw sizing to keep silhouettes readable and centered on the gameplay board.
+- Validation executed:
+  - `node --check src/sprites.js` (pass)
+  - `node --check src/render.js` (pass)
+  - `powershell -ExecutionPolicy Bypass -File scripts/runtime-smoke.ps1` (pass)
+- No gameplay logic, puzzle logic, hit behavior, level rules, or generator logic were changed.

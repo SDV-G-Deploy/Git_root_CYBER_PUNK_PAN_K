@@ -1,6 +1,6 @@
 import { CONFIG, NODE_TYPES } from './config.js';
 import { clamp, lerp } from './physicsLite.js';
-import { getSpriteDiagnostics, tryDrawNodeSprite } from './sprites.js';
+import { getSpriteDiagnostics, tryDrawNodeSprite, tryDrawOverlayTarget } from './sprites.js';
 
 function getNodeColor(node) {
   if (node.exploded) {
@@ -761,14 +761,28 @@ function drawHintFocus(ctx, state, nodeMap) {
   const color = getHintTierColor(tier);
   const primaryRadius = target.radius + 10 + tier * 2 + pulse * 3;
 
-  drawHintMarker(ctx, target, color, primaryRadius, 0.55, false);
-  drawHintMarker(ctx, target, color, primaryRadius + 6, 0.22, true);
+  const drewPrimaryOverlay = tryDrawOverlayTarget(ctx, target, {
+    scaleMul: 1.7 + tier * 0.05,
+    alpha: 0.45 + tier * 0.08
+  });
+
+  if (!drewPrimaryOverlay) {
+    drawHintMarker(ctx, target, color, primaryRadius, 0.55, false);
+    drawHintMarker(ctx, target, color, primaryRadius + 6, 0.22, true);
+  }
 
   if (hint.secondaryNodeId) {
     const secondary = nodeMap.get(hint.secondaryNodeId);
     if (secondary) {
       const secondaryRadius = secondary.radius + 8 + pulse * 2;
-      drawHintMarker(ctx, secondary, '#bfe9ff', secondaryRadius, 0.24, true);
+      const drewSecondaryOverlay = tryDrawOverlayTarget(ctx, secondary, {
+        scaleMul: 1.55,
+        alpha: 0.32
+      });
+
+      if (!drewSecondaryOverlay) {
+        drawHintMarker(ctx, secondary, '#bfe9ff', secondaryRadius, 0.24, true);
+      }
     }
   }
 }
@@ -855,4 +869,3 @@ export function getRenderDiagnostics() {
     sprites: getSpriteDiagnostics()
   };
 }
-

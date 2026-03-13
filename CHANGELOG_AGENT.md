@@ -313,3 +313,56 @@
 ### Notes
 - No gameplay mechanics, click radius, puzzle logic, objective logic, or generator rules were changed.
 - Full solver/pack regeneration was intentionally skipped because level content and rule semantics were unchanged.
+
+## 2026-03-13 - Minimalist Node Icons Integration (Sheet Slice + Remap)
+
+### Changed
+- Integrated new sheet source into repo assets:
+  - `SPRITES_IMAGES/SPRITE_SHEET_EXAMPLE_all_of_nodes.png`
+- Added sliced canonical icon outputs (`256x256`) to `SPRITES_IMAGES`:
+  - `node_core.png`
+  - `node_power.png`
+  - `node_firewall.png`
+  - `node_overload.png`
+  - `node_relay.png`
+  - `node_splitter.png`
+  - `node_breaker.png`
+  - `node_purifier.png`
+  - `node_virus.png`
+  - `overlay_target.png`
+- Updated `src/sprites.js`:
+  - manifest now points to canonical `node_*.png` assets,
+  - node entity/state keys remapped to minimalist icons,
+  - added `overlay_target` key,
+  - adjusted centralized icon draw style multipliers for gameplay readability.
+- Updated `src/render.js`:
+  - imported `tryDrawOverlayTarget`,
+  - hint focus now attempts sprite ring overlay first and falls back to vector ring markers if unavailable.
+
+### Files Changed in This Pass
+- `src/sprites.js`
+- `src/render.js`
+- `SPRITES_IMAGES/SPRITE_SHEET_EXAMPLE_all_of_nodes.png`
+- `SPRITES_IMAGES/node_core.png`
+- `SPRITES_IMAGES/node_power.png`
+- `SPRITES_IMAGES/node_firewall.png`
+- `SPRITES_IMAGES/node_overload.png`
+- `SPRITES_IMAGES/node_relay.png`
+- `SPRITES_IMAGES/node_splitter.png`
+- `SPRITES_IMAGES/node_breaker.png`
+- `SPRITES_IMAGES/node_purifier.png`
+- `SPRITES_IMAGES/node_virus.png`
+- `SPRITES_IMAGES/overlay_target.png`
+- `PROJECT_STATE.md`
+- `SESSION_LOG.md`
+- `CHANGELOG_AGENT.md`
+
+### Validation Outcome
+- `node --check src/sprites.js`: pass
+- `node --check src/render.js`: pass
+- `runtime-smoke`: pass
+  - `powershell -ExecutionPolicy Bypass -File scripts/runtime-smoke.ps1`
+
+### Notes
+- Primitive fallback behavior remains intact and is still used for exploded node bodies by design.
+- No mechanics/rebalance/objective/generator or interaction semantic changes.
